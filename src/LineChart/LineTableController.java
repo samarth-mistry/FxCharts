@@ -1,4 +1,4 @@
-package PieChart;
+package LineChart;
 
 public class LineTableController {
 	private String series;

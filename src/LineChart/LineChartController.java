@@ -1,17 +1,12 @@
-package PieChart;
+package LineChart;
 
-import Experiments.fileSystemDemo;
+import FileSys.fileSystemDemo;
+import DbSys.DbController;
+
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Optional;
-
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.value.ObservableValue;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
@@ -20,17 +15,10 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
-import javafx.scene.control.TableColumn.CellDataFeatures;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
-import javafx.scene.control.cell.MapValueFactory;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.control.cell.TextFieldTableCell;
-import javafx.scene.layout.AnchorPane;
-import javafx.util.Callback;
-import javafx.util.StringConverter;
 
 public class LineChartController {
 	@FXML private LineChart<Integer, Integer> lChart;
@@ -61,7 +49,9 @@ public class LineChartController {
 			error_label.setText("Entered pattern is not valid\nPlease try again!");
 			System.out.println("Invalid Pattern");
 		} else {
-			decodeAndDraw(seriesLabel.getText(),X,true);
+			try {if(!DbController.insertSeries(seriesLabel.getText(),1,X)) {error_label.setText("Error in Database");}} 
+			catch (SQLException e) {e.printStackTrace();}
+			//decodeAndDraw(seriesLabel.getText(),X,true);
 		}
 	}
 	private void drawChart(String lineName,int xValues[],int yValues[],int filled,Boolean whoCalled) {
@@ -153,13 +143,8 @@ public class LineChartController {
 	}
 	public void loadDataFromFileConfirmed() {
 		clearChart();
-		ArrayList<String> seriesArr = fileSystemDemo.readDataFromFile();		
-		Boolean isnull= false;
-		try{if(seriesArr.get(0) == "") {}			
-		}catch(IndexOutOfBoundsException e) {
-			error_label.setText("File is empty!\nPlease add data first");
-		}
-		if(!isnull) {			
+		ArrayList<String> seriesArr = fileSystemDemo.readDataFromFile();						
+		if(!seriesArr.isEmpty()) {			
 			for(int seriIndex=0;seriIndex< seriesArr.size();seriIndex++) {
 				String X = seriesArr.get(seriIndex);
 				if(!inputValidator(X)) {
@@ -176,6 +161,8 @@ public class LineChartController {
 					decodeAndDraw(line,X,false);
 				}
 			}
+		}else {
+			error_label.setText("File is empty!\nPlease add data first");
 		}
 	}
 	public void decodeAndDraw(String line,String X,Boolean whoCalled) {
@@ -220,7 +207,7 @@ public class LineChartController {
 	}
 	public void clearChart() {
 		lChart.getData().clear();
-		error_label.setText("Chart Data Cleared!\nClick load data to reload");
+		error_label.setText("Chart Data Cleared!\nClick load data to reload");				
 	}
 	public void clearFile() {		
 		Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -310,5 +297,30 @@ public class LineChartController {
 		if (result.get() == ButtonType.OK){
 			System.exit(0);
 		}		
+	}
+	public void loadDataFromDb() {
+		String X="";
+		try {
+			X = DbController.getSeries();
+		} catch (SQLException e) {
+			error_label.setText("Error fetching data from DB");
+			e.printStackTrace();
+		}
+		if(X.isEmpty()) {
+			error_label.setText("DB is empty!\nPlease add data first");
+		}else {
+			for(int seriIndex=0;seriIndex< X.length() ;seriIndex++) {
+				String line = "";
+				if(X.charAt(0) == '{') {						
+					for(int j=0; X.charAt(j+1) != '}'; j++) {
+						line += X.charAt(j+1);
+					}						
+				}
+				decodeAndDraw(line,X,false);
+			}
+		}
+	}
+	public void clearDb() {
+		DbController.clearSeries();
 	}
 }
