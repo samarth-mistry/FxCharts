@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.chart.PieChart?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Line?>
+
+<AnchorPane minHeight="200.0" minWidth="400.0" prefHeight="482.0" prefWidth="766.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1">
+   <children>
+      <TabPane prefHeight="482.0" prefWidth="766.0" style="-fx-background-color: khaki;" tabClosingPolicy="UNAVAILABLE">
+        <tabs>
+          <Tab text="Pie Chart">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <PieChart prefHeight="452.0" prefWidth="500.0" style="-fx-background-color: white;" title="Pie Chart" />
+                        <TextField layoutX="582.0" layoutY="21.0" />
+                        <TextField layoutX="593.0" layoutY="261.0" prefHeight="24.0" prefWidth="157.0" />
+                        <TextField layoutX="590.0" layoutY="104.0" prefHeight="24.0" prefWidth="163.0" />
+                        <TextField layoutX="592.0" layoutY="63.0" prefHeight="24.0" prefWidth="161.0" />
+                        <Label layoutX="510.0" layoutY="25.0" text="Title" />
+                        <Label layoutX="512.0" layoutY="45.0" text="Element" />
+                        <Label layoutX="548.0" layoutY="108.0" text="Value" />
+                        <Label layoutX="547.0" layoutY="67.0" text="Name" />
+                        <Line endX="14.0" endY="56.0" layoutX="510.0" layoutY="68.0" startX="14.0" startY="-4.0" />
+                        <Line endX="81.0" layoutX="462.0" layoutY="75.0" startX="63.0" />
+                        <Line endX="81.0" layoutX="462.0" layoutY="116.0" startX="63.0" />
+                        <Label layoutX="509.0" layoutY="148.0" text="Comment" />
+                        <Label layoutX="508.0" layoutY="234.0" text="Store in Database" />
+                        <CheckBox layoutX="678.0" layoutY="233.0" mnemonicParsing="false" text="yes/no" />
+                        <Button layoutX="573.0" layoutY="413.0" mnemonicParsing="false" style="-fx-background-color: blue;" text="Preview" textFill="#fffefe" />
+                        <Button layoutX="652.0" layoutY="413.0" mnemonicParsing="false" text="Store" />
+                        <Button layoutX="712.0" layoutY="413.0" mnemonicParsing="false" style="-fx-background-color: red;" text="Exit" textFill="WHITE" />
+                        <Button layoutX="513.0" layoutY="413.0" mnemonicParsing="false" style="-fx-background-color: green;" text="Save" textFill="WHITE" />
+                        <TextArea layoutX="589.0" layoutY="139.0" prefHeight="89.0" prefWidth="163.0" />
+                        <Button layoutX="513.0" layoutY="381.0" mnemonicParsing="false" style="-fx-background-color: green;" text="ADD" textFill="WHITE" />
+                        <Label layoutX="509.0" layoutY="265.0" text="Title of table" />
+                        <Button layoutX="573.0" layoutY="381.0" mnemonicParsing="false" text="Refresh" />
+                        <Button layoutX="652.0" layoutY="381.0" mnemonicParsing="false" text="Export" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+          <Tab text="Entry Table">
+            <content>
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                     <children>
+                        <TableView layoutX="14.0" layoutY="14.0" prefHeight="426.0" prefWidth="602.0">
+                          <columns>
+                            <TableColumn prefWidth="75.0" text="C1" />
+                            <TableColumn prefWidth="75.0" text="C2" />
+                          </columns>
+                        </TableView>
+                        <Button layoutX="690.0" layoutY="14.0" mnemonicParsing="false" text="Edit" />
+                        <Button layoutX="691.0" layoutY="88.0" mnemonicParsing="false" style="-fx-background-color: red;" text="Exit" textFill="WHITE" />
+                        <Button layoutX="687.0" layoutY="50.0" mnemonicParsing="false" style="-fx-background-color: green;" text="Save" textFill="WHITE" />
+                     </children>
+                  </AnchorPane>
+            </content>
+          </Tab>
+        </tabs>
+      </TabPane>
+   </children>
+</AnchorPane>
