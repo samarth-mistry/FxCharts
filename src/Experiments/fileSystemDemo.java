@@ -10,15 +10,16 @@ import java.util.Scanner;
 public class fileSystemDemo {
 	static FileWriter locFile = null;
 	@SuppressWarnings("null")
-	public static void writeDataInFile(int[] xVal,int[] yVal, String filename, int seriesId) {
+	public static void writeDataInFile(int[] xVal,int[] yVal, String lineName, int seriesId) {
 		System.out.println("File System Report:\n");
 	    try {	    
-	    	locFile = new FileWriter("dat/"+filename,true);
+	    	locFile = new FileWriter("dat/locations.txt",true);
 	    	Scanner scanner = new Scanner(new FileReader("dat/locations.txt"));
 	    	if(scanner.hasNextLine()) {
 	    		locFile.append("\n");
 	    	}
 	        //locFile.append(seriesId+"-");
+	    	locFile.append("{"+lineName+"}");
 	        for(int i=0;i<xVal.length;i++) {
 	            locFile.append("["+xVal[i]+","+yVal[i]+"]");
 	        }	        

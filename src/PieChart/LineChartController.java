@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
@@ -15,6 +16,9 @@ import javafx.fxml.FXML;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
@@ -31,6 +35,7 @@ import javafx.util.StringConverter;
 public class LineChartController {
 	@FXML private LineChart<Integer, Integer> lChart;
 	@FXML private Label error_label;
+	@FXML private Label table_error_label;
 	@FXML private TextField xVal;
 	@FXML private TextField lineChartTitle;
 	@FXML private TextField seriesLabel;
@@ -38,17 +43,14 @@ public class LineChartController {
 	@FXML private TextField yxisLabel;
 	@FXML private NumberAxis xxis;
 	@FXML private NumberAxis yxis;
-	//@FXML private TableView table;
-	@FXML private AnchorPane a_t;
-	@FXML private TableColumn<String, String> column1;
-	@FXML private TableColumn<String, String> column2;
-	private TableView table = new TableView();
-	public static final String Column1MapKey = "A";
-    public static final String Column2MapKey = "B";   
-	@SuppressWarnings("unchecked")	
+	@FXML private TableView table;
+	@FXML private TableColumn<String, String> c1;
+	@FXML private TableColumn<String, String> c2;
+	@FXML private TableColumn<String, String> c3;	
+	
 	public void addData() {		
 		System.out.println("#AddData#");
-		String X = xVal.getText();
+		String X = "{"+seriesLabel.getText()+"}"+xVal.getText();
 		if(xVal.getText().isEmpty())
 			error_label.setText("Enter Pattern before adding");
 		else if(seriesLabel == null) {
@@ -59,17 +61,19 @@ public class LineChartController {
 			error_label.setText("Entered pattern is not valid\nPlease try again!");
 			System.out.println("Invalid Pattern");
 		} else {
-			decodeAndDraw(X,true);
+			decodeAndDraw(seriesLabel.getText(),X,true);
 		}
 	}
-	private void drawChart(int xValues[],int yValues[],int filled,Boolean whoCalled) {
+	private void drawChart(String lineName,int xValues[],int yValues[],int filled,Boolean whoCalled) {
 		try {			
 			@SuppressWarnings("rawtypes")			
-			XYChart.Series series = new XYChart.Series();
-			series.setName(seriesLabel.getText());			
+			XYChart.Series series = new XYChart.Series();						
 			int i=0;
 			for(i=0;i<filled;i++) {
-				//System.out.println("("+xValues[i]+","+yValues[i]+")");				
+				//System.out.println("("+xValues[i]+","+yValues[i]+")");
+				if(!whoCalled) {
+					series.setName(lineName);
+				}
 				series.getData().add(new XYChart.Data(xValues[i],yValues[i]));
 			}
 			int[] xFin= new int[i];
@@ -80,18 +84,20 @@ public class LineChartController {
 			}
 			lChart.getData().add(series);			
 			if(whoCalled) {
-				System.out.println(whoCalled);
-				callWriter(xFin, yFin);
+				System.out.println("who Called :"+ whoCalled);
+				series.setName(seriesLabel.getText());
+				callWriter(lineName, xFin, yFin);
 			}
 		}catch(Exception e) {e.printStackTrace();}
 	}
 	private boolean inputValidator(String X) {
 		System.out.println("#PatternValidator#");		
-		for(int i=0;i< X.length();i++) {			
-			if(X.charAt(0) != '[' || X.charAt(X.length()-1) != ']') {
+		for(int i=0;i< X.length();i++) {
+			
+			if(X.charAt(0) != '{' || X.charAt(X.length()-1) != ']') {
 				System.out.println("valid 1");
 				return false;
-			}
+			}			
 			if(X.charAt(i) == '[') {
 				int j=0,y=0;
 				if(!Character.isDigit(X.charAt(i+1))){					
@@ -129,6 +135,24 @@ public class LineChartController {
 			yxis.setLabel("X->");		
 	}
 	public void loadDataFromFile() {
+		if(!lChart.getData().isEmpty()) {
+			Alert alert = new Alert(AlertType.CONFIRMATION);
+			alert.setTitle("ALERT");
+			alert.setHeaderText("Your Chart currently having data.\nBy loading it from file it will clear it");
+			alert.setContentText("Are you sure to overload?");
+
+			Optional<ButtonType> result = alert.showAndWait();
+			if (result.get() == ButtonType.OK){
+				loadDataFromFileConfirmed();
+			} else {
+			    // ... user chose CANCEL or closed the dialog
+			}
+		} else {
+			loadDataFromFileConfirmed();
+		}
+	}
+	public void loadDataFromFileConfirmed() {
+		clearChart();
 		ArrayList<String> seriesArr = fileSystemDemo.readDataFromFile();		
 		Boolean isnull= false;
 		try{if(seriesArr.get(0) == "") {}			
@@ -142,20 +166,28 @@ public class LineChartController {
 					error_label.setText("");
 					error_label.setText("Entered pattern is not valid\nPlease try again!");
 					System.out.println("Invalid Pattern");
-				} else {decodeAndDraw(X,false);}
+				} else {
+					String line = "";
+					if(X.charAt(0) == '{') {						
+						for(int j=0; X.charAt(j+1) != '}'; j++) {
+							line += X.charAt(j+1);
+						}						
+					}
+					decodeAndDraw(line,X,false);
+				}
 			}
 		}
 	}
-	public void decodeAndDraw(String X,Boolean whoCalled) {
+	public void decodeAndDraw(String line,String X,Boolean whoCalled) {
 		error_label.setText("");
 		xVal.setText("");
 		System.out.println("---------------\nxVal\tyVal\n---------------");
 		int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,xindexCounter=0,yindexCounter=0;
 		int[] xValues = new int[arraySize];
 		int[] yValues = new int[arraySize];							
-		
+		//String[] lineNames =new String[arraySize];
 		//Pattern reader
-		for(int i=0;i< X.length();i++) {			
+		for(int i=0;i< X.length();i++) {						
 			if(X.charAt(i) == '[') {
 				int j=0;
 				String xCo = new String();
@@ -176,37 +208,59 @@ public class LineChartController {
 				System.out.println();
 				yValues[yindexCounter]=Integer.parseInt(yCo);
 				yindexCounter++;								
-			} else {}
+			} else {}			
 		}		
 		System.out.println("---------------\nArraySize: "+arraySize+"\nStorage values :");		
 		System.out.println("\tX: "+Arrays.toString(xValues)+"\n\tY: "+Arrays.toString(yValues));
 		System.out.println("IndexCounters:\n\tX: "+xindexCounter+"\n\tY: "+yindexCounter);		
-		drawChart(xValues,yValues,xindexCounter,whoCalled);		
+		drawChart(line,xValues,yValues,xindexCounter,whoCalled);		
 	}
-	public void callWriter(int[] xValues,int[] yValues) {		
-		fileSystemDemo.writeDataInFile(xValues, yValues, "locations.txt",0);
+	public void callWriter(String lineNames,int[] xValues,int[] yValues) {		
+		fileSystemDemo.writeDataInFile(yValues,xValues, lineNames,0);
 	}
 	public void clearChart() {
 		lChart.getData().clear();
 		error_label.setText("Chart Data Cleared!\nClick load data to reload");
 	}
-	public void clearFile() {
-		fileSystemDemo.clearFile("locations.txt");
-		error_label.setText("File is Cleared\nData is permanently lost");
+	public void clearFile() {		
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("ALERT");
+		alert.setHeaderText("Clearing File will permanently delete your data!");
+		alert.setContentText("Are you sure?");
+
+		Optional<ButtonType> result = alert.showAndWait();
+		if (result.get() == ButtonType.OK){
+			fileSystemDemo.clearFile("locations.txt");
+			error_label.setText("File is Cleared\nData is permanently lost");
+		}		
 	}
-	public void exit() {System.exit(0);}
-	public void loadDataInTable() {			
-		//ObservableList<String[]> data = FXCollections.observableArrayList();        
+	public void loadDataInTable() {					        
 		ArrayList<String> data = fileSystemDemo.readDataFromFile();
-		
+		table.setEditable(true);
+		c1.setCellValueFactory(new PropertyValueFactory<>("series"));		
+		c2.setCellValueFactory(new PropertyValueFactory<>("seriesX"));
+		c3.setCellValueFactory(new PropertyValueFactory<>("seriesY"));
+		c1.setSortable(false);
+		c2.setSortable(false);
+		c3.setSortable(false);
+				
 		for(int newSeri=0;newSeri<data.size();newSeri++) {
 			String X = data.get(newSeri);
 			int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,xindexCounter=0,yindexCounter=0;
 			int[] xValues = new int[arraySize];
-			int[] yValues = new int[arraySize];							
+			int[] yValues = new int[arraySize];
 			
-			//Pattern reader
-			for(int i=0;i< X.length();i++) {			
+			String[] lineNames =new String[arraySize];
+			//Pattern decoder
+			for(int i=0;i< X.length();i++) {
+				if(X.charAt(i) == '{') {
+					String line = "";
+					for(int j=0; X.charAt(j+1) != '}'; j++) {
+						line += X.charAt(j+1);
+					}
+					lineNames[i] = line;
+					//System.out.println("Line Name :"+lineNames[i]);
+				}			
 				if(X.charAt(i) == '[') {
 					int j=0;
 					String xCo = new String();
@@ -214,7 +268,7 @@ public class LineChartController {
 						xCo+=X.charAt(j+1);
 						//System.out.print(X.charAt(j+1));
 					}
-					System.out.print("\t");
+					//System.out.print("\t");
 					xValues[xindexCounter]=Integer.parseInt(xCo);
 					xindexCounter++;
 				} else if(X.charAt(i)==',') {
@@ -224,94 +278,37 @@ public class LineChartController {
 						yCo+=X.charAt(j+1);
 						//System.out.print(X.charAt(j+1));
 					}
-					System.out.println();
+					//System.out.println();
 					yValues[yindexCounter]=Integer.parseInt(yCo);
 					yindexCounter++;								
 				} else {}
 			}			
-			table.setEditable(true);
-			TableColumn c1 = new TableColumn("Name");
-			c1.setCellValueFactory(new PropertyValueFactory<>("series"));
-			
-			TableColumn c2 = new TableColumn("X");
-			c2.setCellValueFactory(new PropertyValueFactory<>("seriesX"));
-
-			TableColumn c3 = new TableColumn("Y");
-			c3.setCellValueFactory(new PropertyValueFactory<>("seriesY"));
-			
-			table.getColumns().addAll(c1, c2, c3);
-			System.out.println("Xvales : table" +Arrays.toString(xValues));
-			System.out.println("Yvales : table" +Arrays.toString(yValues));
+			System.out.println("Xvals(table): "+ Arrays.toString(xValues));
+			System.out.println("Yvals(table): "+ Arrays.toString(xValues));					
 			for(int i=0;i<xindexCounter;i++) {
 				String value1 = Integer.toString(xValues[i]);
 				String value2 = Integer.toString(yValues[i]);
 				System.out.println("V1,V2 "+value1+","+value2);
-				LineTableController person = new LineTableController(Integer.toString(i),value1,value2);
-				table.getItems().add(person);
-				
+				LineTableController person = new LineTableController(lineNames[i],value1,value2);
+				table.getItems().add(person);			
 			}
-//			column1.setCellValueFactory(c -> new SimpleStringProperty(new String("456")));
-//			column2.setCellValueFactory(c -> new SimpleStringProperty(new String("456")));
 		}		
 		//table.getItems().addAll("Col1","Col2");
-		a_t.getChildren().add(table);
+		//a_t.getChildren().add(table);
+	}	
+	public void clearTable() {
+		table_error_label.setText("Table it cleared!\n To reload click on load button");
+		table.getItems().clear();
 	}
-	public void load2() {
-		TableColumn<Map, String> c1 = new TableColumn<>("Class A");
-        TableColumn<Map, String> c2 = new TableColumn<>("Class B");
-        TableColumn<Map, String> c3 = new TableColumn<>("Class C");
-        
-        c1.setCellValueFactory(new MapValueFactory(Column1MapKey));
-        c1.setMinWidth(130);
-        c2.setCellValueFactory(new MapValueFactory(Column2MapKey));
-        c2.setMinWidth(130);
-        c3.setCellValueFactory(new MapValueFactory(Column1MapKey));
-        c1.setMinWidth(130);
- 
-        TableView table_view = new TableView<>(generateDataInMap());
- 
-        table_view.setEditable(true);
-        table_view.getSelectionModel().setCellSelectionEnabled(true);
-        table_view.getColumns().setAll(c1, c2, c3);
-        Callback<TableColumn<Map, String>, TableCell<Map, String>>
-        cellFactoryForMap = new Callback<TableColumn<Map, String>,
-        TableCell<Map, String>>() {
-            @Override
-            public TableCell call(TableColumn p) {
-                return new TextFieldTableCell<Object, Object>(new StringConverter<Object>() {
-                    @Override
-                    public String toString(Object t) {
-                    	System.out.println("X: "+t.toString());
-                        return t.toString();
-                    }
-                    @Override
-                    public Object fromString(String string) {
-                    	System.out.println("X: "+string);
-                        return string;
-                    }                                    
-                });
-            }
-		};
-        c1.setCellFactory(cellFactoryForMap);
-        c2.setCellFactory(cellFactoryForMap);
-        c3.setCellFactory(cellFactoryForMap);
-        
-        a_t.getChildren().add(table_view);
+	public void exit() {
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("ALERT");
+		alert.setHeaderText("Your data is been saved!");
+		alert.setContentText("Are you sure you want to exit?");
+
+		Optional<ButtonType> result = alert.showAndWait();
+		if (result.get() == ButtonType.OK){
+			System.exit(0);
+		}		
 	}
-	private ObservableList<Map> generateDataInMap() {
-        int max = 10;
-        ObservableList<Map> allData = FXCollections.observableArrayList();
-        for (int i = 1; i < max; i++) {
-            Map<String, String> dataRow = new HashMap<>();
- 
-            String value1 = "A" + i;
-            String value2 = "B" + i;
-            dataRow.put(Column1MapKey, Integer.toString(i));            
-            dataRow.put(Column1MapKey, value1);
-            dataRow.put(Column2MapKey, value2);
- 
-            allData.add(dataRow);
-        }
-        return allData;
-    }
 }
