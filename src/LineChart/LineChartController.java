@@ -3,11 +3,25 @@ package LineChart;
 import FileSys.fileSystemDemo;
 import DbSys.DbController;
 
+import java.io.File;
+import java.io.IOException;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+
+import org.apache.pdfbox.pdmodel.PDDocument;
+import org.apache.pdfbox.pdmodel.PDPage;
+import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.font.PDType1Font;
+import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+
+import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
+import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -20,7 +34,9 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.image.WritableImage;
 
 public class LineChartController {
 	@FXML private LineChart<Integer, Integer> lChart;
@@ -109,7 +125,8 @@ public class LineChartController {
 		}
 		if(dbEnable.isSelected()) {
 			loadDataFromDb.setDisable(false);
-		}else {
+		}
+		if(!dbEnable.isSelected()){
 			loadDataFromDb.setDisable(true);
 		}			
 	}
@@ -127,7 +144,7 @@ public class LineChartController {
 			error_label.setText("Entered pattern is not valid\nPlease try again!");
 			System.out.println("Invalid Pattern");
 		} else {
-			if(fileEnable.isSelected()) {
+			if(dbEnable.isSelected()) {
 				try {if(!DbController.insertSeries(seriesLabel.getText(),1,X)) {error_label.setText("Error in Database");}} 
 				catch (SQLException e) {e.printStackTrace();}
 			}			
@@ -355,4 +372,67 @@ public class LineChartController {
 		}
 	}
 	
+	public void pdfExtract() {
+		TextInputDialog dialog = new TextInputDialog("Name of pdf file");
+		dialog.setTitle("Save");
+		dialog.setHeaderText(null);
+		dialog.setGraphic(null);
+		dialog.setContentText("Name: ");
+		 
+		Optional<String> result = dialog.showAndWait();
+		 
+		result.ifPresent(name -> {
+				WritableImage nodeshot = lChart.snapshot(new SnapshotParameters(), null);
+		        File file = new File("dat/imgs/chart.png");
+		
+				try {
+				ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
+				} catch (IOException e) {
+					System.out.println("Error in making image!");
+				}
+		        PDDocument doc = new PDDocument();
+		        PDPage page = new PDPage();
+		        PDImageXObject pdimage;
+		        PDPageContentStream content;
+		        try {
+		            pdimage = PDImageXObject.createFromFile("dat/imgs/chart.png",doc);
+		            content = new PDPageContentStream(doc, page);
+		            content.drawImage(pdimage,50, 50);
+		        	content.beginText();                             
+		            content.setFont(PDType1Font.COURIER, 15);                          
+		            content.newLineAtOffset(10, 770);            
+		            String text = "LineChart by Cancer";             
+		            content.showText(text);        
+		            content.endText();
+		            content.close();
+		            doc.addPage(page);
+		            doc.save("dat/pdfs/"+name+".pdf");
+		            doc.close();
+		            System.out.println("DOC\n\tPdf Exported!");
+		            file.delete();
+		        } catch (IOException ex) {
+		            Logger.getLogger(LineChart.class.getName()).log(Level.SEVERE, null, ex);
+		        }
+		});
+    }	
+	public void pngExtract() {
+		TextInputDialog dialog = new TextInputDialog("Name of image file");
+		dialog.setTitle("Save");
+		dialog.setHeaderText(null);
+		dialog.setGraphic(null);
+		dialog.setContentText("Name: ");
+		 
+		Optional<String> result = dialog.showAndWait();
+		 
+		result.ifPresent(name -> {		    
+			WritableImage nodeshot = lChart.snapshot(new SnapshotParameters(), null);
+	        File file = new File("dat/imgs/"+name+".png");
+			try {
+				ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
+				System.out.println("PNG\n\tImage exported");
+			} catch (IOException e) {
+				System.out.println("Error in making image!");
+			}
+		});
+	}
 }

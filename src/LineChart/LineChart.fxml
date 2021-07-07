@@ -14,7 +14,7 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane minHeight="550.0" minWidth="800.0" prefHeight="500.0" prefWidth="801.0" style="-fx-background-color: khaki;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="LineChart.LineChartController">
+<AnchorPane minHeight="550.0" minWidth="800.0" prefHeight="500.0" prefWidth="801.0" style="-fx-background-color: #d8d8d8;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="LineChart.LineChartController">
    <children>
       <TabPane prefHeight="550.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
@@ -53,13 +53,15 @@
                         <CheckBox fx:id="dbEnable" layoutX="688.0" layoutY="375.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable DB" />
                         <CheckBox fx:id="fileEnable" layoutX="688.0" layoutY="348.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable File" />
                         <Line endX="466.0" layoutX="334.0" layoutY="441.0" startX="-334.0" />
+                        <Button layoutX="14.0" layoutY="481.0" mnemonicParsing="false" onAction="#pdfExtract" style="-fx-background-color: #81af6a;" text="Export PDF" textFill="WHITE" />
+                        <Button layoutX="14.0" layoutY="450.0" mnemonicParsing="false" onAction="#pngExtract" style="-fx-background-color: #81af6a;" text="Export image" textFill="WHITE" />
                      </children>
                   </AnchorPane>
             </content>
           </Tab>
           <Tab text="Table">
             <content>
-              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: grey">
+              <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: #d8d8d8;">
                      <children>
                         <Button fx:id="loadDataInTable" disable="true" layoutX="626.0" layoutY="481.0" mnemonicParsing="false" onAction="#loadDataInTable" text="Load Table" />
                         <Button layoutX="734.0" layoutY="481.0" mnemonicParsing="false" onAction="#exit" style="-fx-background-color: #ff2225;" text="Exit" textFill="WHITE" />
