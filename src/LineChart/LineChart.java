@@ -1,5 +1,7 @@
 package LineChart;
 
+import java.io.File;
+import java.net.URL;
 import java.util.Optional;
 
 import javafx.application.Application;
@@ -78,6 +80,8 @@ public class LineChart extends Application{
 //				});
 //			}	
 //		});	
+		//URL url = new File("resources/views/LineChart.fxml").toURI().toURL();
+		//Parent root =FXMLLoader.load(url);
 		Parent root =FXMLLoader.load(getClass().getResource("LineChart.fxml"));
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);

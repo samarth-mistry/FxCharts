@@ -13,7 +13,9 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
@@ -34,8 +36,84 @@ public class LineChartController {
 	@FXML private TableView table;
 	@FXML private TableColumn<String, String> c1;
 	@FXML private TableColumn<String, String> c2;
-	@FXML private TableColumn<String, String> c3;	
+	@FXML private TableColumn<String, String> c3;
+	@FXML private CheckBox dbEnable;
+	@FXML private CheckBox fileEnable;
+	@FXML private Button loadDataFromFile;
+	@FXML private Button loadDataFromDb;
+	@FXML private Button loadDataInTable;	
 	
+	//Clear Functions-----------------------------------------------------------
+	public void clearChart() {
+		lChart.getData().clear();
+		error_label.setText("Chart Data Cleared!\nClick load data to reload");				
+	}
+	public void clearFile() {		
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("ALERT");
+		alert.setHeaderText("Clearing File will permanently delete your data!");
+		alert.setContentText("Are you sure?");
+
+		Optional<ButtonType> result = alert.showAndWait();
+		if (result.get() == ButtonType.OK){
+			fileSystemDemo.clearFile("locations.txt");
+			error_label.setText("File is Cleared\nData is permanently lost");
+		}		
+	}
+	public void clearTable() {
+		table_error_label.setText("Table it cleared!\n To reload click on load button");
+		table.getItems().clear();
+	}
+	public void clearDb() {
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("ALERT");
+		alert.setHeaderText("Clearing DB will permanently delete your data!");
+		alert.setContentText("Are you sure?");
+
+		Optional<ButtonType> result = alert.showAndWait();
+		if (result.get() == ButtonType.OK){
+			DbController.clearSeries();
+			error_label.setText("DB is Cleared\nData is permanently lost");
+		}		
+	}
+	public void exit() {
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("ALERT");
+		alert.setHeaderText("Your data is been saved!");
+		alert.setContentText("Are you sure you want to exit?");
+
+		Optional<ButtonType> result = alert.showAndWait();
+		if (result.get() == ButtonType.OK){
+			System.exit(0);
+		}		
+	}
+	//Config functions Functions-----------------------------------------------------------
+	public void axisRenamed() {
+		lChart.setTitle(lineChartTitle.getText());				
+		xxis.setLabel(xxisLabel.getText());
+		yxis.setLabel(yxisLabel.getText());
+		if(lineChartTitle.getText() == "")
+			lChart.setTitle("Line Chart");
+		if(xxisLabel.getText() == "")
+			xxis.setLabel("X->");
+		if(yxisLabel.getText() == "")
+			yxis.setLabel("X->");		
+	}
+	public void buttonEnabler() {
+		if(fileEnable.isSelected()) {
+			loadDataFromFile.setDisable(false);
+			loadDataInTable.setDisable(false);
+		}else {
+			loadDataInTable.setDisable(true);
+			loadDataFromFile.setDisable(true);
+		}
+		if(dbEnable.isSelected()) {
+			loadDataFromDb.setDisable(false);
+		}else {
+			loadDataFromDb.setDisable(true);
+		}			
+	}
+	//Add Functions-----------------------------------------------------------
 	public void addData() {		
 		System.out.println("#AddData#");
 		String X = "{"+seriesLabel.getText()+"}"+xVal.getText();
@@ -49,11 +127,14 @@ public class LineChartController {
 			error_label.setText("Entered pattern is not valid\nPlease try again!");
 			System.out.println("Invalid Pattern");
 		} else {
-			try {if(!DbController.insertSeries(seriesLabel.getText(),1,X)) {error_label.setText("Error in Database");}} 
-			catch (SQLException e) {e.printStackTrace();}
-			//decodeAndDraw(seriesLabel.getText(),X,true);
+			if(fileEnable.isSelected()) {
+				try {if(!DbController.insertSeries(seriesLabel.getText(),1,X)) {error_label.setText("Error in Database");}} 
+				catch (SQLException e) {e.printStackTrace();}
+			}			
+			decodeAndDraw(seriesLabel.getText(),X,true);
 		}
 	}
+	//Draw & decoding Validations Functions-----------------------------------------------------------
 	private void drawChart(String lineName,int xValues[],int yValues[],int filled,Boolean whoCalled) {
 		try {			
 			@SuppressWarnings("rawtypes")			
@@ -73,10 +154,10 @@ public class LineChartController {
 				yFin[i] = yValues[i];
 			}
 			lChart.getData().add(series);			
-			if(whoCalled) {
-				System.out.println("who Called :"+ whoCalled);
+			if(whoCalled) {				
 				series.setName(seriesLabel.getText());
-				callWriter(lineName, xFin, yFin);
+				if(fileEnable.isSelected())
+					callWriter(lineName, xFin, yFin);
 			}
 		}catch(Exception e) {e.printStackTrace();}
 	}
@@ -113,16 +194,45 @@ public class LineChartController {
 		}
 		return true;
 	}
-	public void axisRenamed() {
-		lChart.setTitle(lineChartTitle.getText());				
-		xxis.setLabel(xxisLabel.getText());
-		yxis.setLabel(yxisLabel.getText());
-		if(lineChartTitle.getText() == "")
-			lChart.setTitle("Line Chart");
-		if(xxisLabel.getText() == "")
-			xxis.setLabel("X->");
-		if(yxisLabel.getText() == "")
-			yxis.setLabel("X->");		
+	private void decodeAndDraw(String line,String X,Boolean whoCalled) {
+		error_label.setText("");
+		xVal.setText("");
+		System.out.println("---------------\nxVal\tyVal\n---------------");
+		int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,xindexCounter=0,yindexCounter=0;
+		int[] xValues = new int[arraySize];
+		int[] yValues = new int[arraySize];									
+		//Pattern reader
+		for(int i=0;i< X.length();i++) {						
+			if(X.charAt(i) == '[') {
+				int j=0;
+				String xCo = new String();
+				for(j=i;X.charAt(j+1)!=',';j++) {					
+					xCo+=X.charAt(j+1);
+					System.out.print(X.charAt(j+1));
+				}
+				System.out.print("\t");
+				xValues[xindexCounter]=Integer.parseInt(xCo);
+				xindexCounter++;
+			} else if(X.charAt(i)==',') {
+				int j=0;
+				String yCo = new String();
+				for(j=i;X.charAt(j+1)!=']';j++) {					
+					yCo+=X.charAt(j+1);
+					System.out.print(X.charAt(j+1));
+				}
+				System.out.println();
+				yValues[yindexCounter]=Integer.parseInt(yCo);
+				yindexCounter++;								
+			} else {}			
+		}		
+		System.out.println("---------------\nArraySize: "+arraySize+"\nStorage values :");		
+		System.out.println("\tX: "+Arrays.toString(xValues)+"\n\tY: "+Arrays.toString(yValues));
+		System.out.println("IndexCounters:\n\tX: "+xindexCounter+"\n\tY: "+yindexCounter);		
+		drawChart(line,xValues,yValues,xindexCounter,whoCalled);		
+	}
+	//loading functions------------------------------------------------------
+	private void callWriter(String lineNames,int[] xValues,int[] yValues) {		
+		fileSystemDemo.writeDataInFile(yValues,xValues, lineNames,0);
 	}
 	public void loadDataFromFile() {
 		if(!lChart.getData().isEmpty()) {
@@ -164,63 +274,7 @@ public class LineChartController {
 		}else {
 			error_label.setText("File is empty!\nPlease add data first");
 		}
-	}
-	public void decodeAndDraw(String line,String X,Boolean whoCalled) {
-		error_label.setText("");
-		xVal.setText("");
-		System.out.println("---------------\nxVal\tyVal\n---------------");
-		int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,xindexCounter=0,yindexCounter=0;
-		int[] xValues = new int[arraySize];
-		int[] yValues = new int[arraySize];							
-		//String[] lineNames =new String[arraySize];
-		//Pattern reader
-		for(int i=0;i< X.length();i++) {						
-			if(X.charAt(i) == '[') {
-				int j=0;
-				String xCo = new String();
-				for(j=i;X.charAt(j+1)!=',';j++) {					
-					xCo+=X.charAt(j+1);
-					System.out.print(X.charAt(j+1));
-				}
-				System.out.print("\t");
-				xValues[xindexCounter]=Integer.parseInt(xCo);
-				xindexCounter++;
-			} else if(X.charAt(i)==',') {
-				int j=0;
-				String yCo = new String();
-				for(j=i;X.charAt(j+1)!=']';j++) {					
-					yCo+=X.charAt(j+1);
-					System.out.print(X.charAt(j+1));
-				}
-				System.out.println();
-				yValues[yindexCounter]=Integer.parseInt(yCo);
-				yindexCounter++;								
-			} else {}			
-		}		
-		System.out.println("---------------\nArraySize: "+arraySize+"\nStorage values :");		
-		System.out.println("\tX: "+Arrays.toString(xValues)+"\n\tY: "+Arrays.toString(yValues));
-		System.out.println("IndexCounters:\n\tX: "+xindexCounter+"\n\tY: "+yindexCounter);		
-		drawChart(line,xValues,yValues,xindexCounter,whoCalled);		
-	}
-	public void callWriter(String lineNames,int[] xValues,int[] yValues) {		
-		fileSystemDemo.writeDataInFile(yValues,xValues, lineNames,0);
-	}
-	public void clearChart() {
-		lChart.getData().clear();
-		error_label.setText("Chart Data Cleared!\nClick load data to reload");				
-	}
-	public void clearFile() {		
-		Alert alert = new Alert(AlertType.CONFIRMATION);
-		alert.setTitle("ALERT");
-		alert.setHeaderText("Clearing File will permanently delete your data!");
-		alert.setContentText("Are you sure?");
-
-		Optional<ButtonType> result = alert.showAndWait();
-		if (result.get() == ButtonType.OK){
-			fileSystemDemo.clearFile("locations.txt");
-			error_label.setText("File is Cleared\nData is permanently lost");
-		}		
-	}
+	}	
 	public void loadDataInTable() {					        
 		ArrayList<String> data = fileSystemDemo.readDataFromFile();
 		table.setEditable(true);
@@ -245,27 +299,22 @@ public class LineChartController {
 					for(int j=0; X.charAt(j+1) != '}'; j++) {
 						line += X.charAt(j+1);
 					}
-					lineNames[i] = line;
-					//System.out.println("Line Name :"+lineNames[i]);
+					lineNames[i] = line;					
 				}			
 				if(X.charAt(i) == '[') {
 					int j=0;
 					String xCo = new String();
 					for(j=i;X.charAt(j+1)!=',';j++) {					
-						xCo+=X.charAt(j+1);
-						//System.out.print(X.charAt(j+1));
+						xCo+=X.charAt(j+1);					
 					}
-					//System.out.print("\t");
 					xValues[xindexCounter]=Integer.parseInt(xCo);
 					xindexCounter++;
 				} else if(X.charAt(i)==',') {
 					int j=0;
 					String yCo = new String();
 					for(j=i;X.charAt(j+1)!=']';j++) {					
-						yCo+=X.charAt(j+1);
-						//System.out.print(X.charAt(j+1));
-					}
-					//System.out.println();
+						yCo+=X.charAt(j+1);					
+					}					
 					yValues[yindexCounter]=Integer.parseInt(yCo);
 					yindexCounter++;								
 				} else {}
@@ -279,37 +328,20 @@ public class LineChartController {
 				LineTableController person = new LineTableController(lineNames[i],value1,value2);
 				table.getItems().add(person);			
 			}
-		}		
-		//table.getItems().addAll("Col1","Col2");
-		//a_t.getChildren().add(table);
+		}			
 	}	
-	public void clearTable() {
-		table_error_label.setText("Table it cleared!\n To reload click on load button");
-		table.getItems().clear();
-	}
-	public void exit() {
-		Alert alert = new Alert(AlertType.CONFIRMATION);
-		alert.setTitle("ALERT");
-		alert.setHeaderText("Your data is been saved!");
-		alert.setContentText("Are you sure you want to exit?");
-
-		Optional<ButtonType> result = alert.showAndWait();
-		if (result.get() == ButtonType.OK){
-			System.exit(0);
-		}		
-	}
 	public void loadDataFromDb() {
-		String X="";
+		clearChart();		
+		ArrayList<String> seriesArr = null;
 		try {
-			X = DbController.getSeries();
+			seriesArr = DbController.getSeries();
 		} catch (SQLException e) {
 			error_label.setText("Error fetching data from DB");
 			e.printStackTrace();
 		}
-		if(X.isEmpty()) {
-			error_label.setText("DB is empty!\nPlease add data first");
-		}else {
-			for(int seriIndex=0;seriIndex< X.length() ;seriIndex++) {
+		if(!seriesArr.isEmpty()) {			
+			for(int seriIndex=0;seriIndex< seriesArr.size();seriIndex++) {
+				String X = seriesArr.get(seriIndex);
 				String line = "";
 				if(X.charAt(0) == '{') {						
 					for(int j=0; X.charAt(j+1) != '}'; j++) {
@@ -318,9 +350,9 @@ public class LineChartController {
 				}
 				decodeAndDraw(line,X,false);
 			}
+		}else {
+			error_label.setText("DB is empty!\nPlease add data first");
 		}
 	}
-	public void clearDb() {
-		DbController.clearSeries();
-	}
+	
 }

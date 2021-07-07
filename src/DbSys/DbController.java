@@ -4,6 +4,7 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
 
 public class DbController {
 	private static Connection conn=null;
@@ -26,31 +27,26 @@ public class DbController {
 		}
 		return false;
 	}
-	public static String getSeries() throws SQLException {
+	public static ArrayList<String> getSeries() throws SQLException {
 		conn = DbConnector.getConnection();
 		String sql = "SELECT data FROM series WHERE chart_id = 1";
 		PreparedStatement pst = conn.prepareStatement(sql);
         ResultSet rs = pst.executeQuery();
-        String data = "";boolean first=true;
+        ArrayList<String> seriesArr = new ArrayList<String>();
         
-        while(rs.next()) {        	
-        	if(first) {
-        		data+=rs.getString("data"); 
-        		first=false;
-        	}
-        	else
-        		data+="\n"+rs.getString("data");
+        while(rs.next()) {        	          
+            seriesArr.add(rs.getString("data"));
         }        
         conn.close();
-        System.out.println("\t"+data);
-        return data;
+        System.out.println("DB\n\t"+seriesArr);
+        return seriesArr;
 	}
 	public static void clearSeries() {
 		String sql="TRUNCATE TABLE series";			
 		conn = DbConnector.getConnection();
 		try {
 			PreparedStatement preparedStatement = conn.prepareStatement(sql);
-			if(preparedStatement.executeUpdate()>-1) {
+			if(preparedStatement.executeUpdate()>-1) {				
 				System.out.println("DB\n\tSeries Table cleared");
 			}
 			conn.close();
