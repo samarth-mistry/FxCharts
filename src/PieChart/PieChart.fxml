@@ -11,9 +11,10 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Circle?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane minHeight="550.0" minWidth="800.0" prefHeight="500.0" prefWidth="801.0" style="-fx-background-color: #d8d8d8;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PieChart.PieChartController">
+<AnchorPane fx:id="anchor" minHeight="550.0" minWidth="800.0" prefHeight="500.0" prefWidth="801.0" style="-fx-background-color: #d8d8d8;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PieChart.PieChartController">
    <children>
       <TabPane prefHeight="550.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
@@ -41,6 +42,7 @@
                         <Button layoutX="14.0" layoutY="481.0" mnemonicParsing="false" onAction="#pdfExtract" style="-fx-background-color: #81af6a;" text="Export PDF" textFill="WHITE" />
                         <Button layoutX="14.0" layoutY="450.0" mnemonicParsing="false" onAction="#pngExtract" style="-fx-background-color: #81af6a;" text="Export image" textFill="WHITE" />
                         <PieChart fx:id="pChart" layoutX="13.0" layoutY="11.0" prefHeight="420.0" prefWidth="473.0" title="PieChart title" />
+                        <Circle fx:id="theameCircle" fill="#666666" layoutX="698.0" layoutY="414.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
                      </children>
                   </AnchorPane>
             </content>

@@ -20,9 +20,12 @@ import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 import DbSys.DbController;
 import FileSys.fileSystemController;
 import LineChart.LineTableController;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.chart.PieChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
@@ -34,6 +37,9 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.WritableImage;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 
 public class PieChartController {
 	@FXML private PieChart pChart;
@@ -48,15 +54,37 @@ public class PieChartController {
 	@FXML private Button loadDataFromFile;
 	@FXML private Button loadDataFromDb;
 	@FXML private Button loadDataInTable;
-
+	@FXML private AnchorPane anchor;
+	@FXML private Circle theameCircle;
+	private boolean theame=true;
+	private ObservableList<PieChart.Data> pie_data;
+	private ArrayList<String> nmArr = new ArrayList<String>();
+	private ArrayList<Double> valArr = new ArrayList<Double>();
+	
+	public void changeTheme() {
+		if(theame) { 
+			anchor.setStyle("-fx-background-color:  #666666");
+			Color c = Color.web("#d8d8d8");
+			theameCircle.setFill(c);
+			theame = false;
+		}
+		else {		
+			anchor.setStyle("-fx-background-color:  #d8d8d8");
+			Color c = Color.web("#666666");
+			theameCircle.setFill(c);
+			theame = true;
+		}
+	}
 	public void clearChart() {
-		
+		pChart.getData().clear();
+		nmArr.clear();
+		valArr.clear();
 		error_label.setText("Chart Data Cleared!\nClick load data to reload");				
 	}
 	public void clearFile() {		
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("ALERT");
-		alert.setHeaderText("Clearing File will permanently delete your data!");
+		alert.setHeaderText("Clearing PieFile will permanently delete your data!");
 		alert.setContentText("Are you sure?");
 
 		Optional<ButtonType> result = alert.showAndWait();
@@ -66,7 +94,7 @@ public class PieChartController {
 		}		
 	}
 	public void clearTable() {
-		table_error_label.setText("Table it cleared!\n To reload click on load button");
+		table_error_label.setText("PieTable it cleared!\n To reload click on load button");
 		table.getItems().clear();
 	}
 	public void clearDb() {
@@ -78,7 +106,7 @@ public class PieChartController {
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
 			DbController.clearSeries();
-			error_label.setText("DB is Cleared\nData is permanently lost");
+			error_label.setText("PieDB is Cleared\nData is permanently lost");
 		}		
 	}
 	public void exit() {
@@ -93,7 +121,11 @@ public class PieChartController {
 		}		
 	}
 	//Config functions Functions-----------------------------------------------------------
-	public void axisRenamed() {			
+	public void axisRenamed() {	
+		if(pieChartTitle.getText().isEmpty())
+			pChart.setTitle("PieChart title");
+		else
+			pChart.setTitle(pieChartTitle.getText());
 	}
 	public void buttonEnabler() {
 		if(fileEnable.isSelected()) {
@@ -111,18 +143,42 @@ public class PieChartController {
 		}			
 	}
 	//Add Functions-----------------------------------------------------------
-	public void addData() {		
-		
+	public void addData() {				
+		if(addValidator()) {
+			error_label.setText("");
+			nmArr.add(nm.getText());
+			valArr.add(Double.parseDouble(val.getText()));
+			drawChart(true);
+		}        	
 	}
 	//Draw & decoding Validations Functions-----------------------------------------------------------
-	private void drawChart(String lineName,int xValues[],int yValues[],int filled,Boolean whoCalled) {
-		
+	private void drawChart(Boolean whoCalled) {		
+		pie_data = FXCollections.observableArrayList();
+		System.out.println("Drawing\n\tString\tDouble\n\t-------------------");
+		for(int i=0; i<nmArr.size();i++) {
+			System.out.println("\t"+nmArr.get(i)+"\t"+valArr.get(i));
+			pie_data.add(new PieChart.Data(nmArr.get(i),valArr.get(i)));
+		}
+		System.out.println("\t-------------------");
+		pChart.setData(pie_data);
 	}
-	private boolean inputValidator(String X) {
+	private boolean addValidator() {
+		String name = nm.getText();
+		String value = val.getText();		
+		if(name.isEmpty()){
+			error_label.setText("Please enter name field");
+			return false;
+		}
+		if(value.isEmpty()){
+			error_label.setText("Please enter value field");
+			return false;
+		}
+	    try {Double doub_val = Double.parseDouble(value);}
+	    catch(NumberFormatException e) {
+	    	error_label.setText("Value field must be a numeric");
+	    	return false;
+	    }
 		return true;
-	}
-	private void decodeAndDraw(String line,String X,Boolean whoCalled) {
-				
 	}
 	//loading functions------------------------------------------------------
 	private void callWriter(String lineNames,int[] xValues,int[] yValues) {		
