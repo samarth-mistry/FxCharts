@@ -1,6 +1,6 @@
 package LineChart;
 
-import FileSys.fileSystemDemo;
+import FileSys.fileSystemController;
 import DbSys.DbController;
 
 import java.io.File;
@@ -57,8 +57,7 @@ public class LineChartController {
 	@FXML private CheckBox fileEnable;
 	@FXML private Button loadDataFromFile;
 	@FXML private Button loadDataFromDb;
-	@FXML private Button loadDataInTable;	
-	
+	@FXML private Button loadDataInTable;			
 	//Clear Functions-----------------------------------------------------------
 	public void clearChart() {
 		lChart.getData().clear();
@@ -72,7 +71,7 @@ public class LineChartController {
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
-			fileSystemDemo.clearFile("locations.txt");
+			fileSystemController.clearFile("locations.txt");
 			error_label.setText("File is Cleared\nData is permanently lost");
 		}		
 	}
@@ -107,7 +106,7 @@ public class LineChartController {
 	public void axisRenamed() {
 		lChart.setTitle(lineChartTitle.getText());				
 		xxis.setLabel(xxisLabel.getText());
-		yxis.setLabel(yxisLabel.getText());
+		yxis.setLabel(yxisLabel.getText());		
 		if(lineChartTitle.getText() == "")
 			lChart.setTitle("Line Chart");
 		if(xxisLabel.getText() == "")
@@ -249,7 +248,7 @@ public class LineChartController {
 	}
 	//loading functions------------------------------------------------------
 	private void callWriter(String lineNames,int[] xValues,int[] yValues) {		
-		fileSystemDemo.writeDataInFile(yValues,xValues, lineNames,0);
+		fileSystemController.writeDataInFile(yValues,xValues, lineNames,0);
 	}
 	public void loadDataFromFile() {
 		if(!lChart.getData().isEmpty()) {
@@ -270,7 +269,7 @@ public class LineChartController {
 	}
 	public void loadDataFromFileConfirmed() {
 		clearChart();
-		ArrayList<String> seriesArr = fileSystemDemo.readDataFromFile();						
+		ArrayList<String> seriesArr = fileSystemController.readDataFromFile();						
 		if(!seriesArr.isEmpty()) {			
 			for(int seriIndex=0;seriIndex< seriesArr.size();seriIndex++) {
 				String X = seriesArr.get(seriIndex);
@@ -293,7 +292,7 @@ public class LineChartController {
 		}
 	}	
 	public void loadDataInTable() {					        
-		ArrayList<String> data = fileSystemDemo.readDataFromFile();
+		ArrayList<String> data = fileSystemController.readDataFromFile();
 		table.setEditable(true);
 		c1.setCellValueFactory(new PropertyValueFactory<>("series"));		
 		c2.setCellValueFactory(new PropertyValueFactory<>("seriesX"));

@@ -82,7 +82,7 @@ public class LineChart extends Application{
 //		});	
 		//URL url = new File("resources/views/LineChart.fxml").toURI().toURL();
 		//Parent root =FXMLLoader.load(url);
-		Parent root =FXMLLoader.load(getClass().getResource("LineChart.fxml"));
+		Parent root =FXMLLoader.load(getClass().getResource("/PieChart/PieChart.fxml"));
 		Scene scene = new Scene(root);
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("LineChart-Cancer's");

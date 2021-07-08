@@ -7,7 +7,7 @@ import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class fileSystemDemo {
+public class fileSystemController {
 	static FileWriter locFile = null;
 	@SuppressWarnings("null")
 	public static void writeDataInFile(int[] xVal,int[] yVal, String lineName, int seriesId) {
