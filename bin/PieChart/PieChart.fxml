@@ -9,6 +9,7 @@
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Circle?>
@@ -22,8 +23,8 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Button layoutX="659.0" layoutY="481.0" mnemonicParsing="false" onAction="#addData" style="-fx-background-color: #60c0da;" text="Add Line" />
-                        <Button layoutX="743.0" layoutY="481.0" mnemonicParsing="false" onAction="#exit" style="-fx-background-color: #ff2225;" text="Exit" textFill="WHITE" />
+                        <Button fx:id="add_data" layoutX="659.0" layoutY="481.0" mnemonicParsing="false" onAction="#addData" style="-fx-background-color: #60c0da;" text="Add Line" />
+                        <Button layoutX="743.0" layoutY="481.0" mnemonicParsing="false" onAction="#exit" style="-fx-background-color: #ff2225; -fx-border-color: black; -fx-border-width: 2px;" text="Exit" textFill="WHITE" />
                         <TextField fx:id="val" layoutX="500.0" layoutY="135.0" onKeyTyped="#axisRenamed" promptText="Value" text="10.8" />
                         <TextField fx:id="nm" layoutX="500.0" layoutY="102.0" onKeyTyped="#axisRenamed" promptText="Name" text="Name" />
                         <Label fx:id="l3" layoutX="709.0" layoutY="139.0" text="Data value" />
@@ -32,10 +33,10 @@
                         <Label fx:id="l1" layoutX="696.0" layoutY="74.0" text="PieChart title" />
                         <Label fx:id="error_label" layoutX="500.0" layoutY="11.0" prefHeight="49.0" prefWidth="289.0" style="-fx-border-color: red;" textFill="#b21e1e" />
                         <Button fx:id="loadDataFromFile" disable="true" layoutX="507.0" layoutY="481.0" mnemonicParsing="false" onAction="#loadDataFromFile" style="-fx-background-color: #60c0da;" text="Load data from file" />
-                        <Button layoutX="410.0" layoutY="481.0" mnemonicParsing="false" onAction="#clearChart" style="-fx-background-color: #ffaa00;" text="Clear chart" />
-                        <Button layoutX="326.0" layoutY="450.0" mnemonicParsing="false" onAction="#clearDb" style="-fx-background-color: #ffaa00;" text="Clear DB" />
+                        <Button layoutX="407.0" layoutY="481.0" mnemonicParsing="false" onAction="#clearChart" style="-fx-background-color: #ffaa00;" text="Clear chart" />
+                        <Button layoutX="314.0" layoutY="451.0" mnemonicParsing="false" onAction="#clearDb" style="-fx-background-color: #ffaa00;" text="Clear DB" />
                         <Button fx:id="loadDataFromDb" disable="true" layoutX="507.0" layoutY="450.0" mnemonicParsing="false" onAction="#loadDataFromDb" style="-fx-background-color: #60c0da;" text="Load data from DB" />
-                        <Button layoutX="327.0" layoutY="481.0" mnemonicParsing="false" onAction="#clearFile" style="-fx-background-color: #ffaa00;" text="Clear file" />
+                        <Button layoutX="315.0" layoutY="482.0" mnemonicParsing="false" onAction="#clearFile" style="-fx-background-color: #ffaa00;" text="Clear file" />
                         <CheckBox fx:id="dbEnable" layoutX="688.0" layoutY="375.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable DB" />
                         <CheckBox fx:id="fileEnable" layoutX="688.0" layoutY="348.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable File" />
                         <Line endX="466.0" layoutX="334.0" layoutY="441.0" startX="-334.0" />
@@ -44,7 +45,10 @@
                         <PieChart fx:id="pChart" layoutX="8.0" layoutY="11.0" onMouseClicked="#zoomNormal" onScroll="#zoomPieChart" prefHeight="420.0" prefWidth="473.0" style="-fx-border-color: #666666;" title="PieChart title" />
                         <Circle fx:id="theameCircle" fill="#666666" layoutX="774.0" layoutY="419.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
                         <Label fx:id="pieValue" layoutX="489.0" layoutY="406.0" prefHeight="25.0" prefWidth="269.0" style="-fx-border-color: black;" />
-                        <Button layoutX="659.0" layoutY="451.0" mnemonicParsing="false" onAction="#removeLast" style="-fx-border-color: #eb8484;" text="Remove last" textFill="#cd3737" />
+                        <Button layoutX="398.0" layoutY="449.0" mnemonicParsing="false" onAction="#removeLast" style="-fx-border-color: #eb8484;" text="Remove last" textFill="#cd3737" />
+                        <TextArea fx:id="bulk" disable="true" layoutX="500.0" layoutY="203.0" prefHeight="84.0" prefWidth="293.0" promptText="Bulk entry here eg. [abc,23.4][efg,34.2]........" />
+                        <Button fx:id="add_b_data" disable="true" layoutX="659.0" layoutY="450.0" mnemonicParsing="false" onAction="#addBulkData" style="-fx-background-color: #60c0da;" text="Add Bulk" />
+                        <CheckBox fx:id="bulkEnable" layoutX="687.0" layoutY="320.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable Bulk" />
                      </children>
                   </AnchorPane>
             </content>
@@ -54,7 +58,7 @@
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: #d8d8d8;">
                      <children>
                         <Button fx:id="loadDataInTable" disable="true" layoutX="626.0" layoutY="481.0" mnemonicParsing="false" onAction="#loadDataInTable" text="Load Table" />
-                        <Button layoutX="734.0" layoutY="481.0" mnemonicParsing="false" onAction="#exit" style="-fx-background-color: #ff2225;" text="Exit" textFill="WHITE" />
+                        <Button layoutX="734.0" layoutY="481.0" mnemonicParsing="false" onAction="#exit" style="-fx-background-color: #ff2225; -fx-border-color: black; -fx-border-width: 2px;" text="Exit" textFill="WHITE" />
                         <TableView fx:id="table" layoutX="8.0" layoutY="8.0" prefHeight="504.0" prefWidth="344.0">
                           <columns>
                             <TableColumn fx:id="c1" prefWidth="132.0" text="Line name" />

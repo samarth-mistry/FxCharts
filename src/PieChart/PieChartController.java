@@ -33,6 +33,7 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
@@ -55,13 +56,16 @@ public class PieChartController {
 	@FXML private TextField pieChartTitle;	
 	@FXML private TextField nm;
 	@FXML private TextField val;
-	@FXML private TextField bulk;
-	@FXML private TableView table;	
+	@FXML private TextArea bulk;
+	@FXML private TableView table;
+	@FXML private CheckBox bulkEnable;
 	@FXML private CheckBox dbEnable;
 	@FXML private CheckBox fileEnable;
 	@FXML private Button loadDataFromFile;
 	@FXML private Button loadDataFromDb;
 	@FXML private Button loadDataInTable;
+	@FXML private Button add_data;
+	@FXML private Button add_b_data;
 	@FXML private AnchorPane anchor;
 	@FXML private Circle theameCircle;
 	private boolean theame=true;
@@ -130,7 +134,7 @@ public class PieChartController {
 	public void removeLast() {
 		int index = nmArr.size() - 1;
 		nmArr.remove(index);
-		valArr.remove(index);
+		valArr.remove(index);		
 		callWriter();
 		loadDataFromFile();
 	}
@@ -154,7 +158,20 @@ public class PieChartController {
 		}
 		if(!dbEnable.isSelected()){
 			loadDataFromDb.setDisable(true);
-		}			
+		}
+		if(bulkEnable.isSelected()){
+			nm.setDisable(true);
+			val.setDisable(true);
+			add_data.setDisable(true);
+			bulk.setDisable(false);
+			add_b_data.setDisable(false);
+		}else {
+			bulk.setDisable(true);
+			add_b_data.setDisable(true);
+			nm.setDisable(false);
+			val.setDisable(false);
+			add_data.setDisable(false);
+		}
 	}
 	public void changeTheme() {
 		if(theame) {	//light
@@ -168,6 +185,7 @@ public class PieChartController {
 			l3.setTextFill(c);
 			fileEnable.setTextFill(c);
 			dbEnable.setTextFill(c);
+			bulkEnable.setTextFill(c);			
 			theameCircle.setFill(c);
 			theame = false;
 		}
@@ -182,11 +200,11 @@ public class PieChartController {
 			l3.setTextFill(c);
 			fileEnable.setTextFill(c);
 			dbEnable.setTextFill(c);
+			bulkEnable.setTextFill(c);			
 			theameCircle.setFill(c);
 			theame = true;
 		}
 	}	
-	//Add Functions-----------------------------------------------------------
 	//Add data functions-----------------------------------------------
 	public void addData() {				
 		if(addValidator()) {
@@ -194,12 +212,17 @@ public class PieChartController {
 			nmArr.add(nm.getText());
 			valArr.add(Double.parseDouble(val.getText()));
 			drawChart(true);
-			callWriter();
+			if(fileEnable.isSelected())
+				callWriter();
 		}        	
 	}
 	public void addBulkData() {
-		if(inputValidator(bulk.getText())) {
+		System.out.println(bulk.getText());
+		//if(inputValidator(bulk.getText())) {
+		if(true) {
 			System.out.println("Valid");
+			nmArr.clear();
+			valArr.clear();
 			String bk = bulk.getText();
 			for(int i=0;i<bk.length();i++) {
 				String tit_1 = "";
@@ -208,14 +231,18 @@ public class PieChartController {
 					for(int j=i;bk.charAt(j+1)!=',';j++) {
 						tit_1 +=bk.charAt(j+1);
 					}
+					nmArr.add(tit_1);
 				}
 				if(bk.charAt(i)==',') {
 					for(int j=i;bk.charAt(j+1)!=']';j++) {
 						tit_2 += bk.charAt(j+1);
 					}
-				}
-				System.out.println("tit_1: "+tit_1+"tit_2: "+tit_2);
+					valArr.add(Double.parseDouble(tit_2));
+				}								
 			}
+			drawChart(true);
+			if(fileEnable.isSelected())
+				callWriter();
 		}
 	}
 	private boolean inputValidator(String X) {
@@ -224,7 +251,7 @@ public class PieChartController {
 			if(X.charAt(i) == '[') {
 				int j=0,y=0;
 				if(!Character.isAlphabetic(X.charAt(i+1))){					
-					//return false;
+					return false;
 				}
 				if(X.charAt(i+1) != ','){
 					for(j=i;Character.isDigit(X.charAt(j+1));j++) {}
