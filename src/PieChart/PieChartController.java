@@ -18,7 +18,7 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import DbSys.DbController;
-import FileSys.fileSystemController;
+import FileSys.pieFileSysController;
 import LineChart.LineTableController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -37,6 +37,7 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -44,7 +45,8 @@ import javafx.scene.shape.Circle;
 public class PieChartController {
 	@FXML private PieChart pChart;
 	@FXML private Label error_label;
-	@FXML private Label table_error_label;	
+	@FXML private Label table_error_label; 
+	@FXML private Label pieValue;	
 	@FXML private TextField pieChartTitle;	
 	@FXML private TextField nm;
 	@FXML private TextField val;
@@ -60,16 +62,20 @@ public class PieChartController {
 	private ObservableList<PieChart.Data> pie_data;
 	private ArrayList<String> nmArr = new ArrayList<String>();
 	private ArrayList<Double> valArr = new ArrayList<Double>();
-	
+	//final Label pieValue = new Label("");
 	public void changeTheme() {
-		if(theame) { 
+		if(theame) {	//light
+			error_label.setTextFill(Color.web("red"));
 			anchor.setStyle("-fx-background-color:  #666666");
+			pChart.setStyle("-fx-border-color:  #d8d8d8");
 			Color c = Color.web("#d8d8d8");
 			theameCircle.setFill(c);
 			theame = false;
 		}
-		else {		
+		else {		//dark
+			error_label.setTextFill(Color.web("pink"));
 			anchor.setStyle("-fx-background-color:  #d8d8d8");
+			pChart.setStyle("-fx-border-color:  #666666");
 			Color c = Color.web("#666666");
 			theameCircle.setFill(c);
 			theame = true;
@@ -149,6 +155,7 @@ public class PieChartController {
 			nmArr.add(nm.getText());
 			valArr.add(Double.parseDouble(val.getText()));
 			drawChart(true);
+			callWriter();
 		}        	
 	}
 	//Draw & decoding Validations Functions-----------------------------------------------------------
@@ -161,6 +168,28 @@ public class PieChartController {
 		}
 		System.out.println("\t-------------------");
 		pChart.setData(pie_data);
+		pieDetailPercentage();
+	}
+	private void pieDetailPercentage() {		
+		pieValue.setTextFill(Color.DARKORANGE);
+        pieValue.setStyle("-fx-font: 14 arial;");
+		for (final PieChart.Data data : pChart.getData()) {
+            data.getNode().addEventHandler(MouseEvent.MOUSE_ENTERED,
+                e -> {                	
+                    double total = 0;
+                    for (PieChart.Data d : pChart.getData()) {
+                        total += d.getPieValue();
+                    }                    
+                    String text = String.format("%.1f%%", 100*data.getPieValue()/total) ;
+                    pieValue.setText(data.getName()+" : "+text);
+                 }
+            );
+            data.getNode().addEventHandler(MouseEvent.MOUSE_EXITED,
+            		e->{            			
+            			pieValue.setText("");
+            		}
+            );
+        }
 	}
 	private boolean addValidator() {
 		String name = nm.getText();
@@ -181,11 +210,37 @@ public class PieChartController {
 		return true;
 	}
 	//loading functions------------------------------------------------------
-	private void callWriter(String lineNames,int[] xValues,int[] yValues) {		
-		fileSystemController.writeDataInFile(yValues,xValues, lineNames,0);
+	private void callWriter() {		
+		pieFileSysController.writeDataInFile(nmArr,valArr);
 	}
 	public void loadDataFromFile() {
-		
+		clearChart();
+		ArrayList<String> read = pieFileSysController.readDataFromFile();
+		for(int seriIndex=0;seriIndex< read.size();seriIndex++) {			
+			String X = read.get(seriIndex);			
+			for(int i=0;i< X.length();i++) {						
+				if(X.charAt(i) == '[') {
+					int j=0;
+					String xCo = new String();
+					for(j=i;X.charAt(j+1)!=',';j++) {					
+						xCo+=X.charAt(j+1);
+						System.out.print(X.charAt(j+1));
+					}
+					System.out.print("\t");
+					nmArr.add(xCo);					
+				} else if(X.charAt(i)==',') {
+					int j=0;
+					String yCo = new String();
+					for(j=i;X.charAt(j+1)!=']';j++) {					
+						yCo+=X.charAt(j+1);
+						System.out.print(X.charAt(j+1));
+					}
+					System.out.println();
+					valArr.add(Double.parseDouble(yCo));												
+				} else {}			
+			}			
+		}	
+		drawChart(false);
 	}
 	public void loadDataFromFileConfirmed() {
 		clearChart();

@@ -1,6 +1,6 @@
 package LineChart;
 
-import FileSys.fileSystemController;
+import FileSys.lineFileSysController;
 import DbSys.DbController;
 
 import java.io.File;
@@ -71,7 +71,7 @@ public class LineChartController {
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
-			fileSystemController.clearFile("locations.txt");
+			lineFileSysController.clearFile("locations.txt");
 			error_label.setText("File is Cleared\nData is permanently lost");
 		}		
 	}
@@ -248,7 +248,7 @@ public class LineChartController {
 	}
 	//loading functions------------------------------------------------------
 	private void callWriter(String lineNames,int[] xValues,int[] yValues) {		
-		fileSystemController.writeDataInFile(yValues,xValues, lineNames,0);
+		lineFileSysController.writeDataInFile(yValues,xValues, lineNames,0);
 	}
 	public void loadDataFromFile() {
 		if(!lChart.getData().isEmpty()) {
@@ -269,7 +269,7 @@ public class LineChartController {
 	}
 	public void loadDataFromFileConfirmed() {
 		clearChart();
-		ArrayList<String> seriesArr = fileSystemController.readDataFromFile();						
+		ArrayList<String> seriesArr = lineFileSysController.readDataFromFile();						
 		if(!seriesArr.isEmpty()) {			
 			for(int seriIndex=0;seriIndex< seriesArr.size();seriIndex++) {
 				String X = seriesArr.get(seriIndex);
@@ -292,7 +292,7 @@ public class LineChartController {
 		}
 	}	
 	public void loadDataInTable() {					        
-		ArrayList<String> data = fileSystemController.readDataFromFile();
+		ArrayList<String> data = lineFileSysController.readDataFromFile();
 		table.setEditable(true);
 		c1.setCellValueFactory(new PropertyValueFactory<>("series"));		
 		c2.setCellValueFactory(new PropertyValueFactory<>("seriesX"));
