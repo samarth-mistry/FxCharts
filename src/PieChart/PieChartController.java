@@ -25,6 +25,7 @@ import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.chart.LineChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -125,6 +126,13 @@ public class PieChartController {
 		if (result.get() == ButtonType.OK){
 			System.exit(0);
 		}		
+	}
+	public void removeLast() {
+		int index = nmArr.size() - 1;
+		nmArr.remove(index);
+		valArr.remove(index);
+		callWriter();
+		loadDataFromFile();
 	}
 	//Config functions Functions-----------------------------------------------------------
 	public void axisRenamed() {	
@@ -262,7 +270,38 @@ public class PieChartController {
 		Optional<String> result = dialog.showAndWait();
 		 
 		result.ifPresent(name -> {
-				
+			WritableImage nodeshot = pChart.snapshot(new SnapshotParameters(), null);
+	        File file = new File("dat/imgs/chart.png");
+	
+			try {
+			ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
+			} catch (IOException e) {
+				System.out.println("Error in making image!");
+			}
+	        PDDocument doc = new PDDocument();
+	        PDPage page = new PDPage();
+	        PDImageXObject pdimage;
+	        PDPageContentStream content;
+	        try {
+	            pdimage = PDImageXObject.createFromFile("dat/imgs/chart.png",doc);
+	            content = new PDPageContentStream(doc, page);
+	            content.drawImage(pdimage,50, 50);
+	        	content.beginText();                             
+	            content.setFont(PDType1Font.COURIER, 15);                          
+	            content.newLineAtOffset(10, 770);            
+	            String text = "LineChart by Cancer";             
+	            content.showText(text);        
+	            content.endText();
+	            content.close();
+	            doc.addPage(page);
+	            doc.save("dat/pdfs/"+name+".pdf");
+	            doc.close();
+	            System.out.println("DOC\n\tPdf Exported!");
+	            error_label.setText("PDF exported");
+	            file.delete();
+	        } catch (IOException ex) {
+	            Logger.getLogger(LineChart.class.getName()).log(Level.SEVERE, null, ex);
+	        }
 		});
     }	
 	public void pngExtract() {
@@ -275,7 +314,15 @@ public class PieChartController {
 		Optional<String> result = dialog.showAndWait();
 		 
 		result.ifPresent(name -> {		    
-			
+			WritableImage nodeshot = pChart.snapshot(new SnapshotParameters(), null);
+	        File file = new File("dat/imgs/"+name+".png");
+			try {
+				ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
+				System.out.println("PNG\n\tImage exported");
+				error_label.setText("PNG exported");
+			} catch (IOException e) {
+				System.out.println("Error in making image!");
+			}
 		});
 	}
 }

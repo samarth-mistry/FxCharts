@@ -24,13 +24,13 @@
                      <children>
                         <Button layoutX="659.0" layoutY="481.0" mnemonicParsing="false" onAction="#addData" style="-fx-background-color: #60c0da;" text="Add Line" />
                         <Button layoutX="743.0" layoutY="481.0" mnemonicParsing="false" onAction="#exit" style="-fx-background-color: #ff2225;" text="Exit" textFill="WHITE" />
-                        <TextField fx:id="val" layoutX="500.0" layoutY="135.0" onKeyTyped="#axisRenamed" promptText="Value" text="10" />
+                        <TextField fx:id="val" layoutX="500.0" layoutY="135.0" onKeyTyped="#axisRenamed" promptText="Value" text="10.8" />
                         <TextField fx:id="nm" layoutX="500.0" layoutY="102.0" onKeyTyped="#axisRenamed" promptText="Name" text="Name" />
                         <Label layoutX="709.0" layoutY="139.0" text="Data value" />
                         <Label layoutX="708.0" layoutY="106.0" text="Data name" />
                         <TextField fx:id="pieChartTitle" layoutX="500.0" layoutY="70.0" onKeyTyped="#axisRenamed" promptText="Title for PieChart" />
                         <Label layoutX="696.0" layoutY="74.0" text="PieChart title" />
-                        <Label fx:id="error_label" layoutX="500.0" layoutY="11.0" prefHeight="49.0" prefWidth="289.0" style="-fx-border-color: red;" textFill="#fc0a0a" />
+                        <Label fx:id="error_label" layoutX="500.0" layoutY="11.0" prefHeight="49.0" prefWidth="289.0" style="-fx-border-color: red;" textFill="#b21e1e" />
                         <Button fx:id="loadDataFromFile" disable="true" layoutX="507.0" layoutY="481.0" mnemonicParsing="false" onAction="#loadDataFromFile" style="-fx-background-color: #60c0da;" text="Load data from file" />
                         <Button layoutX="410.0" layoutY="481.0" mnemonicParsing="false" onAction="#clearChart" style="-fx-background-color: #ffaa00;" text="Clear chart" />
                         <Button layoutX="326.0" layoutY="450.0" mnemonicParsing="false" onAction="#clearDb" style="-fx-background-color: #ffaa00;" text="Clear DB" />
@@ -42,8 +42,9 @@
                         <Button layoutX="14.0" layoutY="481.0" mnemonicParsing="false" onAction="#pdfExtract" style="-fx-background-color: #81af6a;" text="Export PDF" textFill="WHITE" />
                         <Button layoutX="14.0" layoutY="450.0" mnemonicParsing="false" onAction="#pngExtract" style="-fx-background-color: #81af6a;" text="Export image" textFill="WHITE" />
                         <PieChart fx:id="pChart" layoutX="8.0" layoutY="11.0" prefHeight="420.0" prefWidth="473.0" style="-fx-border-color: #666666;" title="PieChart title" />
-                        <Circle fx:id="theameCircle" fill="#666666" layoutX="698.0" layoutY="414.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
-                        <Label fx:id="pieValue" layoutX="500.0" layoutY="406.0" prefHeight="25.0" prefWidth="102.0" style="-fx-border-color: black;" />
+                        <Circle fx:id="theameCircle" fill="#666666" layoutX="774.0" layoutY="419.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
+                        <Label fx:id="pieValue" layoutX="489.0" layoutY="406.0" prefHeight="25.0" prefWidth="269.0" style="-fx-border-color: black;" />
+                        <Button layoutX="659.0" layoutY="451.0" mnemonicParsing="false" onAction="#removeLast" style="-fx-border-color: #eb8484;" text="Remove last" textFill="#cd3737" />
                      </children>
                   </AnchorPane>
             </content>
