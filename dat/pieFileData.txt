@@ -1,4 +1,3 @@
-[Anuj,42.8]
-[Samarth,96.7]
-[Zellu,90.8]
-[Fattdo,100.0]
+[Name,10.8]
+[Name,10.8]
+[Name,10.8]

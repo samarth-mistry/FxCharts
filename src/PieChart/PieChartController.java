@@ -39,6 +39,7 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
@@ -47,10 +48,14 @@ public class PieChartController {
 	@FXML private PieChart pChart;
 	@FXML private Label error_label;
 	@FXML private Label table_error_label; 
-	@FXML private Label pieValue;	
+	@FXML private Label pieValue;
+	@FXML private Label l3;
+	@FXML private Label l2;
+	@FXML private Label l1;
 	@FXML private TextField pieChartTitle;	
 	@FXML private TextField nm;
 	@FXML private TextField val;
+	@FXML private TextField bulk;
 	@FXML private TableView table;	
 	@FXML private CheckBox dbEnable;
 	@FXML private CheckBox fileEnable;
@@ -63,25 +68,20 @@ public class PieChartController {
 	private ObservableList<PieChart.Data> pie_data;
 	private ArrayList<String> nmArr = new ArrayList<String>();
 	private ArrayList<Double> valArr = new ArrayList<Double>();
-	//final Label pieValue = new Label("");
-	public void changeTheme() {
-		if(theame) {	//light
-			error_label.setTextFill(Color.web("red"));
-			anchor.setStyle("-fx-background-color:  #666666");
-			pChart.setStyle("-fx-border-color:  #d8d8d8");
-			Color c = Color.web("#d8d8d8");
-			theameCircle.setFill(c);
-			theame = false;
-		}
-		else {		//dark
-			error_label.setTextFill(Color.web("pink"));
-			anchor.setStyle("-fx-background-color:  #d8d8d8");
-			pChart.setStyle("-fx-border-color:  #666666");
-			Color c = Color.web("#666666");
-			theameCircle.setFill(c);
-			theame = true;
-		}
+	final double SCALE_DELTA = 1.1;
+	//Zooming-------------------------------------------------
+	public void zoomPieChart(ScrollEvent event) {
+		 double scaleFactor = (event.getDeltaY() > 0) ? SCALE_DELTA : 1 / SCALE_DELTA;
+        pChart.setScaleX(pChart.getScaleX() * scaleFactor);
+        pChart.setScaleY(pChart.getScaleY() * scaleFactor);
 	}
+	public void zoomNormal(MouseEvent e) {				    
+	    if (e.getClickCount() == 2) {
+	        pChart.setScaleX(1.0);
+	        pChart.setScaleY(1.0);
+	    }		    
+	}
+	//Clearing functions----------------------------------------------
 	public void clearChart() {
 		pChart.getData().clear();
 		nmArr.clear();
@@ -96,7 +96,7 @@ public class PieChartController {
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
-				
+			pieFileSysController.clearFile("pieFileData.txt");	
 			error_label.setText("File is Cleared\nData is permanently lost");
 		}		
 	}
@@ -112,7 +112,7 @@ public class PieChartController {
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
-			DbController.clearSeries();
+			//DbController.clearSeries();
 			error_label.setText("PieDB is Cleared\nData is permanently lost");
 		}		
 	}
@@ -156,7 +156,38 @@ public class PieChartController {
 			loadDataFromDb.setDisable(true);
 		}			
 	}
+	public void changeTheme() {
+		if(theame) {	//light
+			error_label.setTextFill(Color.web("red"));
+			anchor.setStyle("-fx-background-color:  #666666");
+			pChart.setStyle("-fx-border-color:  #d8d8d8");
+			pieValue.setStyle("-fx-border-color:  #d8d8d8");
+			Color c = Color.web("#d8d8d8");
+			l1.setTextFill(c);
+			l2.setTextFill(c);
+			l3.setTextFill(c);
+			fileEnable.setTextFill(c);
+			dbEnable.setTextFill(c);
+			theameCircle.setFill(c);
+			theame = false;
+		}
+		else {		//dark
+			error_label.setTextFill(Color.web("pink"));
+			anchor.setStyle("-fx-background-color:  #d8d8d8");
+			pChart.setStyle("-fx-border-color:  #666666");
+			pieValue.setStyle("-fx-border-color:  #666666");
+			Color c = Color.web("#666666");
+			l1.setTextFill(c);
+			l2.setTextFill(c);
+			l3.setTextFill(c);
+			fileEnable.setTextFill(c);
+			dbEnable.setTextFill(c);
+			theameCircle.setFill(c);
+			theame = true;
+		}
+	}	
 	//Add Functions-----------------------------------------------------------
+	//Add data functions-----------------------------------------------
 	public void addData() {				
 		if(addValidator()) {
 			error_label.setText("");
@@ -165,6 +196,55 @@ public class PieChartController {
 			drawChart(true);
 			callWriter();
 		}        	
+	}
+	public void addBulkData() {
+		if(inputValidator(bulk.getText())) {
+			System.out.println("Valid");
+			String bk = bulk.getText();
+			for(int i=0;i<bk.length();i++) {
+				String tit_1 = "";
+				String tit_2 = "";
+				if(bk.charAt(i)=='[') {
+					for(int j=i;bk.charAt(j+1)!=',';j++) {
+						tit_1 +=bk.charAt(j+1);
+					}
+				}
+				if(bk.charAt(i)==',') {
+					for(int j=i;bk.charAt(j+1)!=']';j++) {
+						tit_2 += bk.charAt(j+1);
+					}
+				}
+				System.out.println("tit_1: "+tit_1+"tit_2: "+tit_2);
+			}
+		}
+	}
+	private boolean inputValidator(String X) {
+		System.out.println("#PatternValidator#");		
+		for(int i=0;i< X.length();i++) {								
+			if(X.charAt(i) == '[') {
+				int j=0,y=0;
+				if(!Character.isAlphabetic(X.charAt(i+1))){					
+					//return false;
+				}
+				if(X.charAt(i+1) != ','){
+					for(j=i;Character.isDigit(X.charAt(j+1));j++) {}
+					//System.out.println("valid 2.1: "+j);
+					if(X.charAt(j+1) !=',') {
+						return false;
+					}
+					if(X.charAt(j+2) != ']'){
+						for(y=j+2;Character.isDigit(X.charAt(y+1));y++) {}											
+					}
+				}
+				if(X.charAt(j+1) != ','){									
+					return false;
+				}else {j=0;}				
+				if(X.charAt(y+1) != ']'){
+					return false;
+				}
+			}			
+		}
+		return true;
 	}
 	//Draw & decoding Validations Functions-----------------------------------------------------------
 	private void drawChart(Boolean whoCalled) {		
@@ -222,6 +302,17 @@ public class PieChartController {
 		pieFileSysController.writeDataInFile(nmArr,valArr);
 	}
 	public void loadDataFromFile() {
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("ALERT");
+		alert.setHeaderText("Clearing PieFile will permanently delete your data!");
+		alert.setContentText("Are you sure?");
+
+		Optional<ButtonType> result = alert.showAndWait();
+		if (result.get() == ButtonType.OK){
+			loadDataFromFileConfirmed();			
+		}		
+	}
+	public void loadDataFromFileConfirmed() {
 		clearChart();
 		ArrayList<String> read = pieFileSysController.readDataFromFile();
 		for(int seriIndex=0;seriIndex< read.size();seriIndex++) {			
@@ -248,11 +339,7 @@ public class PieChartController {
 				} else {}			
 			}			
 		}	
-		drawChart(false);
-	}
-	public void loadDataFromFileConfirmed() {
-		clearChart();
-		
+		drawChart(false);	
 	}	
 	public void loadDataInTable() {					        
 				
@@ -260,6 +347,7 @@ public class PieChartController {
 	public void loadDataFromDb() {
 		
 	}	
+	//Export functions------------------------------
 	public void pdfExtract() {
 		TextInputDialog dialog = new TextInputDialog("Name of pdf file");
 		dialog.setTitle("Save");
