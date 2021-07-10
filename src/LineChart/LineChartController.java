@@ -45,6 +45,7 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.scene.text.Font;
 
 public class LineChartController {
 	@FXML private LineChart<Integer, Integer> lChart;
@@ -78,17 +79,17 @@ public class LineChartController {
 	final double SCALE_DELTA = 1.1;
 	
 	//Zooming-------------------------------------------------
-		public void zoomLineChart(ScrollEvent event) {
-			 double scaleFactor = (event.getDeltaY() > 0) ? SCALE_DELTA : 1 / SCALE_DELTA;
-	        lChart.setScaleX(lChart.getScaleX() * scaleFactor);
-	        lChart.setScaleY(lChart.getScaleY() * scaleFactor);
-		}
-		public void zoomNormal(MouseEvent e) {				    
-		    if (e.getClickCount() == 2) {
-		        lChart.setScaleX(1.0);
-		        lChart.setScaleY(1.0);
-		    }		    
-		}
+	public void zoomLineChart(ScrollEvent event) {
+		 double scaleFactor = (event.getDeltaY() > 0) ? SCALE_DELTA : 1 / SCALE_DELTA;
+        lChart.setScaleX(lChart.getScaleX() * scaleFactor);
+        lChart.setScaleY(lChart.getScaleY() * scaleFactor);
+	}
+	public void zoomNormal(MouseEvent e) {				    
+	    if (e.getClickCount() == 2) {
+	        lChart.setScaleX(1.0);
+	        lChart.setScaleY(1.0);
+	    }		    
+	}
 	//Clear Functions-----------------------------------------------------------
 	public void clearChart() {
 		lChart.getData().clear();
@@ -139,7 +140,7 @@ public class LineChartController {
 		xxis.setLabel(xxisLabel.getText());
 		yxis.setLabel(yxisLabel.getText());		
 		if(lineChartTitle.getText() == "")
-			lChart.setTitle("Line Chart");
+			lChart.setTitle("Line Chart");		
 		if(xxisLabel.getText() == "")
 			xxis.setLabel("X->");
 		if(yxisLabel.getText() == "")
@@ -167,8 +168,12 @@ public class LineChartController {
 			error_label.setStyle("-fx-border-color: red");
 			anchor.setStyle("-fx-background-color:  #666666");
 			lChart.setStyle("-fx-border-color: #d8d8d8");
+		    lChart.setStyle("-fx-text-fill: black");
 			lineValue.setStyle("-fx-border-color: #d8d8d8");
-			lineValue.setTextFill(c);			
+			lineValue.setTextFill(c);
+			xxis.setTickLabelFill(c);yxis.setTickLabelFill(c);			
+			xxis.setStyle("-fx-text-fill: black");
+			yxis.setStyle("-fx-text-fill: black");			
 			l1.setTextFill(c);
 			l2.setTextFill(c);
 			l3.setTextFill(c);
@@ -184,8 +189,13 @@ public class LineChartController {
 			error_label.setStyle("-fx-border-color:  pink");
 			anchor.setStyle("-fx-background-color:  #d8d8d8");
 			lChart.setStyle("-fx-border-color: #666666");
+			lChart.setStyle("-fx-text-fill: white");
 			lineValue.setStyle("-fx-border-color: #666666");
-			lineValue.setTextFill(c);			
+			lineValue.setTextFill(c);
+			xxis.setTickLabelFill(c);
+			yxis.setTickLabelFill(c);
+			xxis.setStyle("-fx-text-fill: white");
+			yxis.setStyle("-fx-text-fill: white");
 			l1.setTextFill(c);
 			l2.setTextFill(c);
 			l3.setTextFill(c);
@@ -232,9 +242,7 @@ public class LineChartController {
 	    chartBackground.setOnMouseMoved(new EventHandler<MouseEvent>() {
 	        @Override public void handle(MouseEvent mouseEvent) {
 	        	lineValue.setText(
-	            String.format(
-	              "(%.2f, %.2f)",
-	              xAxis.getValueForDisplay(mouseEvent.getX()),
+	            String.format("(%.2f, %.2f)",xAxis.getValueForDisplay(mouseEvent.getX()),
 	              yAxis.getValueForDisplay(mouseEvent.getY())
 	            )
 	          );
@@ -249,11 +257,9 @@ public class LineChartController {
 	private void drawChart(String lineName,int xValues[],int yValues[],int filled,Boolean whoCalled) {
 		try {			
 			@SuppressWarnings("rawtypes")			
-			XYChart.Series series = new XYChart.Series();
-			
+			XYChart.Series series = new XYChart.Series();			
 			int i=0;
 			for(i=0;i<filled;i++) {
-				//System.out.println("("+xValues[i]+","+yValues[i]+")");
 				if(!whoCalled) {
 					series.setName(lineName);
 				}
@@ -437,8 +443,8 @@ public class LineChartController {
 				String value1 = Integer.toString(xValues[i]);
 				String value2 = Integer.toString(yValues[i]);
 				System.out.println("V1,V2 "+value1+","+value2);
-				LineTableController person = new LineTableController(lineNames[i],value1,value2);
-				table.getItems().add(person);			
+				LineTableController row = new LineTableController(lineNames[i],value1,value2);
+				table.getItems().add(row);			
 			}
 		}			
 	}	
@@ -466,7 +472,7 @@ public class LineChartController {
 			error_label.setText("DB is empty!\nPlease add data first");
 		}
 	}
-	
+	//Exports--------------------------------------------
 	public void pdfExtract() {
 		TextInputDialog dialog = new TextInputDialog("Name of pdf file");
 		dialog.setTitle("Save");

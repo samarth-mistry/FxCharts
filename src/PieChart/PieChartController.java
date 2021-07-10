@@ -2,9 +2,7 @@ package PieChart;
 
 import java.io.File;
 import java.io.IOException;
-import java.sql.SQLException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -16,8 +14,6 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
-
-import DbSys.DbController;
 import FileSys.pieFileSysController;
 import LineChart.LineTableController;
 import javafx.collections.FXCollections;
@@ -32,10 +28,10 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.WritableImage;
@@ -44,6 +40,9 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.stage.FileChooser;
+import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Stage;
 
 public class PieChartController {
 	@FXML private PieChart pChart;
@@ -58,6 +57,8 @@ public class PieChartController {
 	@FXML private TextField val;
 	@FXML private TextArea bulk;
 	@FXML private TableView table;
+	@FXML private TableColumn<String, String> c1;
+	@FXML private TableColumn<String, String> c2;
 	@FXML private CheckBox bulkEnable;
 	@FXML private CheckBox dbEnable;
 	@FXML private CheckBox fileEnable;
@@ -68,6 +69,7 @@ public class PieChartController {
 	@FXML private Button add_b_data;
 	@FXML private AnchorPane anchor;
 	@FXML private Circle theameCircle;
+	final Stage primaryStage = null;
 	private boolean theame=true;
 	private ObservableList<PieChart.Data> pie_data;
 	private ArrayList<String> nmArr = new ArrayList<String>();
@@ -217,10 +219,9 @@ public class PieChartController {
 		}        	
 	}
 	public void addBulkData() {
-		System.out.println(bulk.getText());
-		//if(inputValidator(bulk.getText())) {
-		if(true) {
-			System.out.println("Valid");
+		//System.out.println(bulk.getText());
+		if(bulkValidator()) {		
+			//System.out.println("Valid");
 			nmArr.clear();
 			valArr.clear();
 			String bk = bulk.getText();
@@ -243,6 +244,8 @@ public class PieChartController {
 			drawChart(true);
 			if(fileEnable.isSelected())
 				callWriter();
+		}else {
+			error_label.setText("Invalid input in bulk data enter.\n Please check again");
 		}
 	}
 	//Draw & decoding Validations Functions-----------------------------------------------------------
@@ -257,9 +260,7 @@ public class PieChartController {
 		pChart.setData(pie_data);
 		pieDetailPercentage();
 	}
-	private void pieDetailPercentage() {		
-		pieValue.setTextFill(Color.DARKORANGE);
-        pieValue.setStyle("-fx-font: 14 arial;");
+	private void pieDetailPercentage() {				        
 		for (final PieChart.Data data : pChart.getData()) {
             data.getNode().addEventHandler(MouseEvent.MOUSE_ENTERED,
                 e -> {                	
@@ -289,11 +290,42 @@ public class PieChartController {
 			error_label.setText("Please enter value field");
 			return false;
 		}
-	    try {Double doub_val = Double.parseDouble(value);}
+	    try {Double.parseDouble(value);}
 	    catch(NumberFormatException e) {
 	    	error_label.setText("Value field must be a numeric");
 	    	return false;
 	    }
+		return true;
+	}
+	public boolean bulkValidator() {
+		String bk = bulk.getText();
+		for(int i=0; i<bk.length();i++) {
+			if(bk.charAt(i) == '[') {
+				for(int j=i;bk.charAt(j+1) != ',';j++) {
+					if(bk.charAt(j+1) == ']') {
+						System.out.println("valid-1");
+						return false;			
+					}
+				}
+			}
+			if(bk.charAt(i) == ',') {
+				String dbl="";
+				for(int j=i+1;bk.charAt(j+1) != ']';j++) {
+					if(bk.charAt(j+1)==',') {										
+						System.out.println("valid-2");
+						return false;
+					}
+					if(bk.charAt(j+1)==']') {
+						System.out.println("valid-3");
+						return false;
+					}
+					dbl += bk.charAt(j);					
+					try {						
+						Double.parseDouble(dbl);
+					}catch(NumberFormatException e) {System.out.println("valid-4");return false;}
+				}
+			}
+		}
 		return true;
 	}
 	//loading functions------------------------------------------------------
@@ -340,23 +372,29 @@ public class PieChartController {
 		}	
 		drawChart(false);	
 	}	
-	public void loadDataInTable() {					        
-				
+	public void loadDataInTable() {
+		//loadDataFromFile();
+		table.setEditable(true);
+		c1.setCellValueFactory(new PropertyValueFactory<>("s"));		
+		c2.setCellValueFactory(new PropertyValueFactory<>("d"));		
+		c1.setSortable(false);
+		c2.setSortable(false);
+		for(int i=0;i<nmArr.size();i++) {
+			PieTableController row = new PieTableController(nmArr.get(i),valArr.get(i));
+			table.getItems().add(row);			
+		}
 	}	
 	public void loadDataFromDb() {
 		
 	}	
 	//Export functions------------------------------
 	public void pdfExtract() {
-		TextInputDialog dialog = new TextInputDialog("Name of pdf file");
-		dialog.setTitle("Save");
-		dialog.setHeaderText(null);
-		dialog.setGraphic(null);
-		dialog.setContentText("Name: ");
-		 
-		Optional<String> result = dialog.showAndWait();
-		 
-		result.ifPresent(name -> {
+		  FileChooser fileChooser = new FileChooser();
+	      fileChooser.setTitle("Save");
+	      fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));
+	      File pdffile = fileChooser.showSaveDialog(primaryStage);
+	      
+	      if (pdffile != null) {
 			WritableImage nodeshot = pChart.snapshot(new SnapshotParameters(), null);
 	        File file = new File("dat/imgs/chart.png");
 	
@@ -381,7 +419,7 @@ public class PieChartController {
 	            content.endText();
 	            content.close();
 	            doc.addPage(page);
-	            doc.save("dat/pdfs/"+name+".pdf");
+	            doc.save(pdffile.getPath()+".pdf");
 	            doc.close();
 	            System.out.println("DOC\n\tPdf Exported!");
 	            error_label.setText("PDF exported");
@@ -389,27 +427,24 @@ public class PieChartController {
 	        } catch (IOException ex) {
 	            Logger.getLogger(LineChart.class.getName()).log(Level.SEVERE, null, ex);
 	        }
-		});
+	      }	      
     }	
 	public void pngExtract() {
-		TextInputDialog dialog = new TextInputDialog("Name of image file");
-		dialog.setTitle("Save");
-		dialog.setHeaderText(null);
-		dialog.setGraphic(null);
-		dialog.setContentText("Name: ");
-		 
-		Optional<String> result = dialog.showAndWait();
-		 
-		result.ifPresent(name -> {		    
-			WritableImage nodeshot = pChart.snapshot(new SnapshotParameters(), null);
-	        File file = new File("dat/imgs/"+name+".png");
-			try {
-				ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
-				System.out.println("PNG\n\tImage exported");
-				error_label.setText("PNG exported");
-			} catch (IOException e) {
-				System.out.println("Error in making image!");
-			}
-		});
-	}
+	   	FileChooser fileChooser = new FileChooser();
+	      fileChooser.setTitle("Save");
+	      fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));
+	      File file = fileChooser.showSaveDialog(primaryStage);
+	      
+          if (file != null) {              	            
+		        WritableImage nodeshot = pChart.snapshot(new SnapshotParameters(), null);
+		        file = new File(file.getAbsolutePath()+".png");
+				try {
+					ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
+					System.out.println("PNG\n\tImage exported");
+					error_label.setText("PNG exported");
+				} catch (IOException e) {
+					System.out.println("Error in making image!");
+				}
+          }	      
+	}	
 }
