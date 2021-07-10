@@ -12,9 +12,10 @@
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.shape.Circle?>
 <?import javafx.scene.shape.Line?>
 
-<AnchorPane minHeight="550.0" minWidth="800.0" prefHeight="500.0" prefWidth="801.0" style="-fx-background-color: #d8d8d8;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="LineChart.LineChartController">
+<AnchorPane fx:id="anchor" minHeight="550.0" minWidth="800.0" prefHeight="500.0" prefWidth="801.0" style="-fx-background-color: #d8d8d8;" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="LineChart.LineChartController">
    <children>
       <TabPane prefHeight="550.0" prefWidth="800.0" tabClosingPolicy="UNAVAILABLE">
         <tabs>
@@ -22,7 +23,7 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <LineChart fx:id="lChart" title="LineChart Title">
+                        <LineChart fx:id="lChart" onMouseClicked="#zoomNormal" onScroll="#zoomLineChart" prefHeight="440.0" prefWidth="490.0" title="LineChart Title">
                            <xAxis>
                               <NumberAxis side="BOTTOM" fx:id="xxis" />
                            </xAxis>
@@ -31,19 +32,19 @@
                            </yAxis>
                         </LineChart>
                         <TextField layoutX="500.0" layoutY="267.0" prefHeight="56.0" prefWidth="283.0" promptText="Enter Pattern for the Series" text="[9,10][10,9][14,13][4,4]" fx:id="xVal" />
-                        <Button layoutX="659.0" layoutY="481.0" mnemonicParsing="false" onAction="#addData" style="-fx-background-color: #60c0da;" text="Add Line" />
+                        <Button fx:id="add_data" layoutX="659.0" layoutY="481.0" mnemonicParsing="false" onAction="#addData" style="-fx-background-color: #60c0da;" text="Add Line" />
                         <Button layoutX="743.0" layoutY="481.0" mnemonicParsing="false" onAction="#exit" style="-fx-background-color: #ff2225;" text="Exit" textFill="WHITE" />
                         <Label layoutX="500.0" layoutY="211.0" prefHeight="24.0" prefWidth="274.0" text="NOTE: Enter the pattern like :" textFill="#ae9999" />
                         <Label layoutX="500.0" layoutY="235.0" prefHeight="24.0" prefWidth="155.0" text="[&lt;X&gt;,&lt;Y&gt;][&lt;X&gt;,&lt;Y&gt;]" textFill="#ae9999" />
                         <Label layoutX="658.0" layoutY="235.0" prefHeight="24.0" prefWidth="125.0" text="eg. [1,2][3,3][4,5]" textFill="#ae9999" />
                         <TextField fx:id="seriesLabel" layoutX="500.0" layoutY="168.0" promptText="Label for line" text="Line" />
-                        <Label layoutX="720.0" layoutY="172.0" text="Line name" />
+                        <Label fx:id="l4" layoutX="720.0" layoutY="172.0" text="Line name" />
                         <TextField fx:id="yxisLabel" layoutX="500.0" layoutY="135.0" onKeyTyped="#axisRenamed" promptText="Label of Y-axis" text="Y" />
                         <TextField layoutX="500.0" layoutY="102.0" onKeyTyped="#axisRenamed" promptText="Label of X-axis" text="X" fx:id="xxisLabel" />
-                        <Label layoutX="709.0" layoutY="139.0" text="Y-axis name" />
-                        <Label layoutX="708.0" layoutY="106.0" text="X-axis name" />
+                        <Label fx:id="l3" layoutX="709.0" layoutY="139.0" text="Y-axis name" />
+                        <Label fx:id="l2" layoutX="708.0" layoutY="106.0" text="X-axis name" />
                         <TextField fx:id="lineChartTitle" layoutX="500.0" layoutY="70.0" onKeyTyped="#axisRenamed" promptText="Title" />
-                        <Label layoutX="696.0" layoutY="74.0" text="LineChart title" />
+                        <Label fx:id="l1" layoutX="696.0" layoutY="74.0" text="LineChart title" />
                         <Label fx:id="error_label" layoutX="500.0" layoutY="16.0" prefHeight="49.0" prefWidth="289.0" style="-fx-border-color: red;" textFill="#fc0a0a" />
                         <Button fx:id="loadDataFromFile" disable="true" layoutX="507.0" layoutY="481.0" mnemonicParsing="false" onAction="#loadDataFromFile" style="-fx-background-color: #60c0da;" text="Load data from file" />
                         <Button layoutX="410.0" layoutY="481.0" mnemonicParsing="false" onAction="#clearChart" style="-fx-background-color: #ffaa00;" text="Clear chart" />
@@ -84,5 +85,7 @@
           </Tab>
         </tabs>
       </TabPane>
+      <Circle fx:id="theameCircle" fill="#666666" layoutX="782.0" layoutY="454.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
+      <Label fx:id="lineValue" layoutX="494.0" layoutY="441.0" prefHeight="25.0" prefWidth="269.0" style="-fx-border-color: black;" />
    </children>
 </AnchorPane>

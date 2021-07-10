@@ -245,34 +245,6 @@ public class PieChartController {
 				callWriter();
 		}
 	}
-	private boolean inputValidator(String X) {
-		System.out.println("#PatternValidator#");		
-		for(int i=0;i< X.length();i++) {								
-			if(X.charAt(i) == '[') {
-				int j=0,y=0;
-				if(!Character.isAlphabetic(X.charAt(i+1))){					
-					return false;
-				}
-				if(X.charAt(i+1) != ','){
-					for(j=i;Character.isDigit(X.charAt(j+1));j++) {}
-					//System.out.println("valid 2.1: "+j);
-					if(X.charAt(j+1) !=',') {
-						return false;
-					}
-					if(X.charAt(j+2) != ']'){
-						for(y=j+2;Character.isDigit(X.charAt(y+1));y++) {}											
-					}
-				}
-				if(X.charAt(j+1) != ','){									
-					return false;
-				}else {j=0;}				
-				if(X.charAt(y+1) != ']'){
-					return false;
-				}
-			}			
-		}
-		return true;
-	}
 	//Draw & decoding Validations Functions-----------------------------------------------------------
 	private void drawChart(Boolean whoCalled) {		
 		pie_data = FXCollections.observableArrayList();
@@ -404,7 +376,7 @@ public class PieChartController {
 	        	content.beginText();                             
 	            content.setFont(PDType1Font.COURIER, 15);                          
 	            content.newLineAtOffset(10, 770);            
-	            String text = "LineChart by Cancer";             
+	            String text = "PieChart by Cancer";             
 	            content.showText(text);        
 	            content.endText();
 	            content.close();

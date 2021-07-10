@@ -20,8 +20,11 @@ import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
+import javafx.scene.chart.Axis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
@@ -37,11 +40,21 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.MouseEvent;
+import javafx.scene.input.ScrollEvent;
+import javafx.scene.layout.AnchorPane;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Circle;
 
 public class LineChartController {
 	@FXML private LineChart<Integer, Integer> lChart;
 	@FXML private Label error_label;
 	@FXML private Label table_error_label;
+	@FXML private Label lineValue;
+	@FXML private Label l4;
+	@FXML private Label l3;
+	@FXML private Label l2;
+	@FXML private Label l1;
 	@FXML private TextField xVal;
 	@FXML private TextField lineChartTitle;
 	@FXML private TextField seriesLabel;
@@ -57,7 +70,25 @@ public class LineChartController {
 	@FXML private CheckBox fileEnable;
 	@FXML private Button loadDataFromFile;
 	@FXML private Button loadDataFromDb;
-	@FXML private Button loadDataInTable;			
+	@FXML private Button loadDataInTable;
+	@FXML private Button add_data;	
+	@FXML private AnchorPane anchor;
+	@FXML private Circle theameCircle;
+	private boolean theame=true;
+	final double SCALE_DELTA = 1.1;
+	
+	//Zooming-------------------------------------------------
+		public void zoomLineChart(ScrollEvent event) {
+			 double scaleFactor = (event.getDeltaY() > 0) ? SCALE_DELTA : 1 / SCALE_DELTA;
+	        lChart.setScaleX(lChart.getScaleX() * scaleFactor);
+	        lChart.setScaleY(lChart.getScaleY() * scaleFactor);
+		}
+		public void zoomNormal(MouseEvent e) {				    
+		    if (e.getClickCount() == 2) {
+		        lChart.setScaleX(1.0);
+		        lChart.setScaleY(1.0);
+		    }		    
+		}
 	//Clear Functions-----------------------------------------------------------
 	public void clearChart() {
 		lChart.getData().clear();
@@ -129,6 +160,42 @@ public class LineChartController {
 			loadDataFromDb.setDisable(true);
 		}			
 	}
+	public void changeTheme() {
+		if(theame) {	//light
+			Color c = Color.web("#d8d8d8");
+			error_label.setTextFill(Color.web("red"));
+			error_label.setStyle("-fx-border-color: red");
+			anchor.setStyle("-fx-background-color:  #666666");
+			lChart.setStyle("-fx-border-color: #d8d8d8");
+			lineValue.setStyle("-fx-border-color: #d8d8d8");
+			lineValue.setTextFill(c);			
+			l1.setTextFill(c);
+			l2.setTextFill(c);
+			l3.setTextFill(c);
+			l4.setTextFill(c);
+			fileEnable.setTextFill(c);
+			dbEnable.setTextFill(c);					
+			theameCircle.setFill(c);
+			theame = false;
+		}
+		else {		//dark
+			Color c = Color.web("#666666");
+			error_label.setTextFill(Color.web("pink"));
+			error_label.setStyle("-fx-border-color:  pink");
+			anchor.setStyle("-fx-background-color:  #d8d8d8");
+			lChart.setStyle("-fx-border-color: #666666");
+			lineValue.setStyle("-fx-border-color: #666666");
+			lineValue.setTextFill(c);			
+			l1.setTextFill(c);
+			l2.setTextFill(c);
+			l3.setTextFill(c);
+			l4.setTextFill(c);
+			fileEnable.setTextFill(c);
+			dbEnable.setTextFill(c);					
+			theameCircle.setFill(c);
+			theame = true;
+		}
+	}
 	//Add Functions-----------------------------------------------------------
 	public void addData() {		
 		System.out.println("#AddData#");
@@ -148,13 +215,42 @@ public class LineChartController {
 				catch (SQLException e) {e.printStackTrace();}
 			}			
 			decodeAndDraw(seriesLabel.getText(),X,true);
+			cursorMoni();
 		}
 	}
 	//Draw & decoding Validations Functions-----------------------------------------------------------
+	private void cursorMoni() {
+	    final Axis<Integer> xAxis = lChart.getXAxis();
+	    final Axis<Integer> yAxis = lChart.getYAxis();	    
+
+	    final Node chartBackground = lChart.lookup(".chart-plot-background");
+	    for (Node n: chartBackground.getParent().getChildrenUnmodifiable()) {
+	      if (n != chartBackground && n != xAxis && n != yAxis) {
+	        n.setMouseTransparent(true);
+	      }
+	    }	    	    
+	    chartBackground.setOnMouseMoved(new EventHandler<MouseEvent>() {
+	        @Override public void handle(MouseEvent mouseEvent) {
+	        	lineValue.setText(
+	            String.format(
+	              "(%.2f, %.2f)",
+	              xAxis.getValueForDisplay(mouseEvent.getX()),
+	              yAxis.getValueForDisplay(mouseEvent.getY())
+	            )
+	          );
+	        }
+	      });
+	    chartBackground.setOnMouseExited(new EventHandler<MouseEvent>() {
+	        public void handle(MouseEvent mouseEvent) {
+	     	  lineValue.setText("");	    	  
+	         }
+	    });
+	 }
 	private void drawChart(String lineName,int xValues[],int yValues[],int filled,Boolean whoCalled) {
 		try {			
 			@SuppressWarnings("rawtypes")			
-			XYChart.Series series = new XYChart.Series();						
+			XYChart.Series series = new XYChart.Series();
+			
 			int i=0;
 			for(i=0;i<filled;i++) {
 				//System.out.println("("+xValues[i]+","+yValues[i]+")");
