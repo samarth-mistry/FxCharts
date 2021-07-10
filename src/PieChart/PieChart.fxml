@@ -71,6 +71,7 @@
                         <Label fx:id="table_error_label" layoutX="497.0" layoutY="14.0" prefHeight="49.0" prefWidth="289.0" style="-fx-border-color: red;" textFill="#fc0a0a" />
                         <Button layoutX="517.0" layoutY="481.0" mnemonicParsing="false" onAction="#clearTable" style="-fx-background-color: #ffaa00;" text="Clear table" />
                         <Button layoutX="421.0" layoutY="481.0" mnemonicParsing="false" onAction="#clearFile" style="-fx-background-color: #ffaa00;" text="Clear file" />
+                        <Button layoutX="421.0" layoutY="446.0" mnemonicParsing="false" onAction="#csvExtract" style="-fx-background-color: #81af6a;" text="Export CSV" textFill="WHITE" />
                      </children>
                   </AnchorPane>
             </content>

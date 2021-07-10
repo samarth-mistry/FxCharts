@@ -1,7 +1,10 @@
 package PieChart;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -430,7 +433,7 @@ public class PieChartController {
 	      }	      
     }	
 	public void pngExtract() {
-	   	FileChooser fileChooser = new FileChooser();
+		  FileChooser fileChooser = new FileChooser();
 	      fileChooser.setTitle("Save");
 	      fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));
 	      File file = fileChooser.showSaveDialog(primaryStage);
@@ -446,5 +449,28 @@ public class PieChartController {
 					System.out.println("Error in making image!");
 				}
           }	      
-	}	
+	}
+	public void csvExtract() throws IOException {
+	    FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save");
+        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV", "*.csv"));
+        File file = fileChooser.showSaveDialog(primaryStage);
+      
+        if(file != null) {        	
+        	final ObservableList<PieTableController> data = FXCollections.observableArrayList();
+    		for(int i=0;i<nmArr.size();i++)
+    			data.add(new PieTableController(nmArr.get(i),valArr.get(i)));
+    		Writer writer = null;
+            try {        	
+            	file = new File(file.getAbsolutePath()+".csv");
+                writer = new BufferedWriter(new FileWriter(file));
+                for (PieTableController person : data) {
+                    String text = person.getS() + "," + person.getD() +"\n";
+                    writer.write(text);
+                    System.out.println("Export CSV\n\t CSV exported");
+                }
+            } catch (Exception ex) {ex.printStackTrace();System.out.println("Export CSV\n\t CSV exported error");}
+            finally {writer.flush();writer.close();}
+        }		
+    }	
 }
