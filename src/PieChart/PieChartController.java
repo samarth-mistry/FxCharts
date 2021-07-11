@@ -2,6 +2,8 @@ package PieChart;
 
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
@@ -17,6 +19,14 @@ import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
+
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
 import FileSys.pieFileSysController;
 import LineChart.LineTableController;
 import javafx.collections.FXCollections;
@@ -143,7 +153,7 @@ public class PieChartController {
 		callWriter();
 		loadDataFromFile();
 	}
-	//Config functions Functions-----------------------------------------------------------
+	//Configuration functions Functions-----------------------------------------------------------
 	public void axisRenamed() {	
 		if(pieChartTitle.getText().isEmpty())
 			pChart.setTitle("PieChart title");
@@ -221,12 +231,10 @@ public class PieChartController {
 				callWriter();
 		}        	
 	}
-	public void addBulkData() {
-		//System.out.println(bulk.getText());
-		if(bulkValidator()) {		
-			//System.out.println("Valid");
-			nmArr.clear();
-			valArr.clear();
+	public void addBulkData() {		
+		if(bulkValidator()) {					
+			//nmArr.clear();
+			//valArr.clear();
 			String bk = bulk.getText();
 			for(int i=0;i<bk.length();i++) {
 				String tit_1 = "";
@@ -473,4 +481,33 @@ public class PieChartController {
             finally {writer.flush();writer.close();}
         }		
     }	
+	public void pdfTableExtract() throws DocumentException, FileNotFoundException {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Save");
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("pdf", "*.pdf"));
+		File file = fileChooser.showSaveDialog(primaryStage);
+	      
+        if (file != null) {
+        	loadDataInTable();
+        	file = new File(file.getAbsolutePath()+".pdf");
+        	Document report= new Document();
+            PdfWriter.getInstance(report, new FileOutputStream(file));
+            report.open();                        
+            PdfPTable report_table = new PdfPTable(2);
+
+            for(int i=0;i<table.getItems().size();i++) {
+            	report_table.addCell(getCell(((PieTableController) table.getItems().get(i)).getS(),PdfPCell.ALIGN_CENTER ));
+            	report_table.addCell(getCell(((PieTableController) table.getItems().get(i)).getD().toString(),PdfPCell.ALIGN_CENTER ));            	
+            }
+            report.add(report_table);
+            report.close();
+            System.out.println("Export\n\tPie Table exported!");
+		}
+    }
+	private PdfPCell getCell(String text, int alignment) {
+        PdfPCell cell = new PdfPCell(new Phrase(text));
+        cell.setPadding(0);
+        cell.setHorizontalAlignment(alignment);        
+        return cell;
+    }
 }
