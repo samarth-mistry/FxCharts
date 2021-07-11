@@ -9,5 +9,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaFX GL"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/XAMPP conn"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/PdfBox"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ITextPdf"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

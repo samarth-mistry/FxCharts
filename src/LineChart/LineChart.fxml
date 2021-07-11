@@ -56,6 +56,8 @@
                         <Line endX="466.0" layoutX="334.0" layoutY="441.0" startX="-334.0" />
                         <Button layoutX="14.0" layoutY="481.0" mnemonicParsing="false" onAction="#pdfExtract" style="-fx-background-color: #81af6a;" text="Export PDF" textFill="WHITE" />
                         <Button layoutX="14.0" layoutY="450.0" mnemonicParsing="false" onAction="#pngExtract" style="-fx-background-color: #81af6a;" text="Export image" textFill="WHITE" />
+                        <Circle fx:id="theameCircle" fill="#666666" layoutX="780.0" layoutY="417.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
+                        <Label fx:id="lineValue" layoutX="496.0" layoutY="404.0" prefHeight="25.0" prefWidth="269.0" style="-fx-border-color: black;" />
                      </children>
                   </AnchorPane>
             </content>
@@ -64,8 +66,8 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0" style="-fx-background-color: #d8d8d8;">
                      <children>
-                        <Button fx:id="loadDataInTable" disable="true" layoutX="626.0" layoutY="481.0" mnemonicParsing="false" onAction="#loadDataInTable" text="Load Table" />
-                        <Button layoutX="734.0" layoutY="481.0" mnemonicParsing="false" onAction="#exit" style="-fx-background-color: #ff2225;" text="Exit" textFill="WHITE" />
+                        <Button fx:id="loadDataInTable" disable="true" layoutX="627.0" layoutY="483.0" mnemonicParsing="false" onAction="#loadDataInTable" style="-fx-background-color: #60c0da;" text="Load Table" />
+                        <Button layoutX="734.0" layoutY="484.0" mnemonicParsing="false" onAction="#exit" style="-fx-background-color: #ff2225;" text="Exit" textFill="WHITE" />
                         <TableView fx:id="table" layoutX="8.0" layoutY="8.0" prefHeight="504.0" prefWidth="344.0">
                           <columns>
                             <TableColumn fx:id="c1" prefWidth="132.0" text="Line name" />
@@ -77,15 +79,16 @@
                            </opaqueInsets>
                         </TableView>
                         <Label fx:id="table_error_label" layoutX="497.0" layoutY="14.0" prefHeight="49.0" prefWidth="289.0" style="-fx-border-color: red;" textFill="#fc0a0a" />
-                        <Button layoutX="517.0" layoutY="481.0" mnemonicParsing="false" onAction="#clearTable" style="-fx-background-color: #ffaa00;" text="Clear table" />
-                        <Button layoutX="421.0" layoutY="481.0" mnemonicParsing="false" onAction="#clearFile" style="-fx-background-color: #ffaa00;" text="Clear file" />
+                        <Button layoutX="517.0" layoutY="484.0" mnemonicParsing="false" onAction="#clearTable" style="-fx-background-color: #ffaa00;" text="Clear table" />
+                        <Button layoutX="517.0" layoutY="453.0" mnemonicParsing="false" onAction="#clearFile" style="-fx-background-color: #ffaa00;" text="Clear file" />
+                        <Button layoutX="363.0" layoutY="453.0" mnemonicParsing="false" onAction="#csvExtract" prefHeight="22.0" prefWidth="91.0" style="-fx-background-color: #81af6a;" text="Export CSV" textFill="WHITE" />
+                        <Button layoutX="363.0" layoutY="485.0" mnemonicParsing="false" onAction="#pdfTableExtract" style="-fx-background-color: #81af6a;" text="Export table to PDF" textFill="WHITE" />
+                        <Line endX="313.0" layoutX="464.0" layoutY="445.0" startX="-100.0" />
                      </children>
                   </AnchorPane>
             </content>
           </Tab>
         </tabs>
       </TabPane>
-      <Circle fx:id="theameCircle" fill="#666666" layoutX="782.0" layoutY="454.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
-      <Label fx:id="lineValue" layoutX="494.0" layoutY="441.0" prefHeight="25.0" prefWidth="269.0" style="-fx-border-color: black;" />
    </children>
 </AnchorPane>

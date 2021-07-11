@@ -1,10 +1,16 @@
 package LineChart;
 
 import FileSys.lineFileSysController;
+import PieChart.PieTableController;
 import DbSys.DbController;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
+import java.io.Writer;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -12,13 +18,23 @@ import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
+import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
+import com.itextpdf.text.Document;
+import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Element;
+import com.itextpdf.text.Phrase;
+import com.itextpdf.text.pdf.PdfPCell;
+import com.itextpdf.text.pdf.PdfPTable;
+import com.itextpdf.text.pdf.PdfWriter;
+
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
@@ -46,6 +62,9 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.text.Font;
+import javafx.stage.FileChooser;
+import javafx.stage.Stage;
+import javafx.stage.FileChooser.ExtensionFilter;
 
 public class LineChartController {
 	@FXML private LineChart<Integer, Integer> lChart;
@@ -76,6 +95,7 @@ public class LineChartController {
 	@FXML private AnchorPane anchor;
 	@FXML private Circle theameCircle;
 	private boolean theame=true;
+	final Stage primaryStage = null;
 	final double SCALE_DELTA = 1.1;
 	
 	//Zooming-------------------------------------------------
@@ -436,13 +456,10 @@ public class LineChartController {
 					yValues[yindexCounter]=Integer.parseInt(yCo);
 					yindexCounter++;								
 				} else {}
-			}			
-			System.out.println("Xvals(table): "+ Arrays.toString(xValues));
-			System.out.println("Yvals(table): "+ Arrays.toString(xValues));					
+			}
 			for(int i=0;i<xindexCounter;i++) {
 				String value1 = Integer.toString(xValues[i]);
-				String value2 = Integer.toString(yValues[i]);
-				System.out.println("V1,V2 "+value1+","+value2);
+				String value2 = Integer.toString(yValues[i]);				
 				LineTableController row = new LineTableController(lineNames[i],value1,value2);
 				table.getItems().add(row);			
 			}
@@ -474,17 +491,14 @@ public class LineChartController {
 	}
 	//Exports--------------------------------------------
 	public void pdfExtract() {
-		TextInputDialog dialog = new TextInputDialog("Name of pdf file");
-		dialog.setTitle("Save");
-		dialog.setHeaderText(null);
-		dialog.setGraphic(null);
-		dialog.setContentText("Name: ");
-		 
-		Optional<String> result = dialog.showAndWait();
-		 
-		result.ifPresent(name -> {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Save");
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));
+		File file = fileChooser.showSaveDialog(primaryStage);
+	      
+        if (file != null) {
 				WritableImage nodeshot = lChart.snapshot(new SnapshotParameters(), null);
-		        File file = new File("dat/imgs/chart.png");
+		        File imgfile = new File("dat/imgs/chart.png");
 		
 				try {
 				ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
@@ -507,33 +521,121 @@ public class LineChartController {
 		            content.endText();
 		            content.close();
 		            doc.addPage(page);
-		            doc.save("dat/pdfs/"+name+".pdf");
+		            doc.save(file.getAbsolutePath()+".pdf");
 		            doc.close();
 		            System.out.println("DOC\n\tPdf Exported!");
-		            file.delete();
+		            imgfile.delete();
 		        } catch (IOException ex) {
 		            Logger.getLogger(LineChart.class.getName()).log(Level.SEVERE, null, ex);
 		        }
-		});
+		}
     }	
 	public void pngExtract() {
-		TextInputDialog dialog = new TextInputDialog("Name of image file");
-		dialog.setTitle("Save");
-		dialog.setHeaderText(null);
-		dialog.setGraphic(null);
-		dialog.setContentText("Name: ");
-		 
-		Optional<String> result = dialog.showAndWait();
-		 
-		result.ifPresent(name -> {		    
+		  FileChooser fileChooser = new FileChooser();
+	      fileChooser.setTitle("Save");
+	      fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));
+	      File file = fileChooser.showSaveDialog(primaryStage);
+	      
+          if (file != null) {		    
 			WritableImage nodeshot = lChart.snapshot(new SnapshotParameters(), null);
-	        File file = new File("dat/imgs/"+name+".png");
+			file = new File(file.getAbsolutePath()+".png");
 			try {
 				ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
 				System.out.println("PNG\n\tImage exported");
 			} catch (IOException e) {
 				System.out.println("Error in making image!");
 			}
-		});
+		}
 	}
+	public void csvExtract() throws IOException {
+	    FileChooser fileChooser = new FileChooser();
+        fileChooser.setTitle("Save");
+        fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV", "*.csv"));
+        File file = fileChooser.showSaveDialog(primaryStage);
+        final ObservableList<LineTableController> obdata = FXCollections.observableArrayList();
+        ArrayList<String> data = lineFileSysController.readDataFromFile();						
+        for(int newSeri=0;newSeri<data.size();newSeri++) {
+			String X = data.get(newSeri);
+			int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,xindexCounter=0,yindexCounter=0;
+			int[] xValues = new int[arraySize];
+			int[] yValues = new int[arraySize];
+			
+			String[] lineNames =new String[arraySize];
+			//Pattern decoder
+			for(int i=0;i< X.length();i++) {
+				if(X.charAt(i) == '{') {
+					String line = "";
+					for(int j=0; X.charAt(j+1) != '}'; j++) {
+						line += X.charAt(j+1);
+					}
+					lineNames[i] = line;					
+				}			
+				if(X.charAt(i) == '[') {
+					int j=0;
+					String xCo = new String();
+					for(j=i;X.charAt(j+1)!=',';j++) {					
+						xCo+=X.charAt(j+1);					
+					}
+					xValues[xindexCounter]=Integer.parseInt(xCo);
+					xindexCounter++;
+				} else if(X.charAt(i)==',') {
+					int j=0;
+					String yCo = new String();
+					for(j=i;X.charAt(j+1)!=']';j++) {					
+						yCo+=X.charAt(j+1);					
+					}					
+					yValues[yindexCounter]=Integer.parseInt(yCo);
+					yindexCounter++;								
+				} else {}
+			}								
+			for(int i=0;i<xindexCounter;i++) {
+				String value1 = Integer.toString(xValues[i]);
+				String value2 = Integer.toString(yValues[i]);
+									    	
+    			obdata.add(new LineTableController(lineNames[i],value1,value2));							
+			}					
+		}        
+        Writer writer = null;
+        try {        	
+        	file = new File(file.getAbsolutePath()+".csv");
+            writer = new BufferedWriter(new FileWriter(file));
+            for (LineTableController person : obdata) {
+                String text = person.getSeries() + "," + person.getSeriesX() +","+ person.getSeriesY()+"\n";
+                writer.write(text);                
+            }
+            System.out.println("Export CSV\n\t CSV exported");
+        } catch (Exception ex) {ex.printStackTrace();System.out.println("Export CSV\n\t CSV exported error");}
+        finally {writer.flush();writer.close();}        	
+    }
+	public void pdfTableExtract() throws DocumentException, FileNotFoundException {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Save");
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("pdf", "*.pdf"));
+		File file = fileChooser.showSaveDialog(primaryStage);
+	      
+        if (file != null) {
+        	loadDataInTable();
+        	file = new File(file.getAbsolutePath()+".pdf");
+        	Document report= new Document();
+            PdfWriter.getInstance(report, new FileOutputStream(file));
+            report.open();            
+            //we have four columns in our table
+            PdfPTable report_table = new PdfPTable(3);
+
+            for(int i=0;i<table.getItems().size();i++) {
+            	report_table.addCell(getCell(((LineTableController) table.getItems().get(i)).getSeries(),PdfPCell.ALIGN_CENTER ));
+            	report_table.addCell(getCell(((LineTableController) table.getItems().get(i)).getSeriesX(),PdfPCell.ALIGN_CENTER ));
+            	report_table.addCell(getCell(((LineTableController) table.getItems().get(i)).getSeriesY(),PdfPCell.ALIGN_CENTER ));
+            }
+            report.add(report_table);
+            report.close();
+            System.out.println("Export\n\tLine Table exported!");
+		}
+    }
+	private PdfPCell getCell(String text, int alignment) {
+        PdfPCell cell = new PdfPCell(new Phrase(text));
+        cell.setPadding(0);
+        cell.setHorizontalAlignment(alignment);        
+        return cell;
+    }
 }
