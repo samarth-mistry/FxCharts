@@ -308,7 +308,7 @@ public class BarChartController {
 			}
 		}catch(Exception e) {e.printStackTrace();}
 	}
-	private void drawBulkChart(String lineName,Number yValues[],int filled,Boolean whoCalled) {
+	private void drawBulkChart(String barName,Number yValues[],int filled,Boolean whoCalled) {
 		System.out.println("#drawBulkChart");
 		if(!bulkNames.isEmpty()) {
 			try {								
@@ -316,8 +316,9 @@ public class BarChartController {
 				int i=0;
 				for(i=0;i<filled;i++) {
 					if(!whoCalled) {
-						series.setName(lineName);
+						series.setName(barName);
 					}
+					System.out.println("Plotting: "+bulkNames.get(i)+yValues[i]);
 					series.getData().add(new XYChart.Data<String, Number>(bulkNames.get(i),yValues[i]));
 				}			
 				Number[] yFin= new Number[i];
@@ -327,7 +328,7 @@ public class BarChartController {
 				if(whoCalled) {				//add function is calling them 	
 					series.setName(seriesLabel.getText());
 					if(fileEnable.isSelected()) {
-						callWriter(lineName,bulkNames, yFin);
+						callWriter(barName,bulkNames, yFin);
 					}
 				}
 				bChart.getData().add(series);				
@@ -519,14 +520,16 @@ public class BarChartController {
 					}
 					System.out.println("\tBulkNames: "+bulkNames);
 				}
-				if(X.charAt(seriIndex)==',') {					
-					String xCo = new String();
-					for(int j=seriIndex;X.charAt(j+1) != ']';j++) {					
-						xCo+=X.charAt(j+1);					
-					}					
-					yValues[yindexCounter]=Double.parseDouble(xCo);
-					yindexCounter++;					
-				}				
+				for(int k=0;k<X.length();k++) {
+					if(X.charAt(k)==',') {					
+						String xCo = new String();
+						for(int j=k;X.charAt(j+1) != ']';j++) {					
+							xCo+=X.charAt(j+1);					
+						}					
+						yValues[yindexCounter]=Double.parseDouble(xCo);
+						yindexCounter++;					
+					}				
+				}
 				drawBulkChart(line,yValues,yindexCounter,false);
 			}
 		}else {
