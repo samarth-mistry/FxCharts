@@ -74,10 +74,13 @@ public class BarChartController {
 	@FXML private Label error_label;
 	@FXML private Label table_error_label;
 	@FXML private Label lineValue;
+	@FXML private Label l6;
+	@FXML private Label l5;
 	@FXML private Label l4;
 	@FXML private Label l3;
 	@FXML private Label l2;
 	@FXML private Label l1;
+	@FXML private TextArea bulkNms;
 	@FXML private TextArea bulk;
 	@FXML private TextField nm;
 	@FXML private TextField val;
@@ -93,16 +96,19 @@ public class BarChartController {
 	@FXML private TableColumn<String, String> c3;
 	@FXML private CheckBox dbEnable;
 	@FXML private CheckBox fileEnable;
+	@FXML private CheckBox bulkEnable;
 	@FXML private Button loadDataFromFile;
 	@FXML private Button loadDataFromDb;
 	@FXML private Button loadDataInTable;
-	@FXML private Button add_data;	
+	@FXML private Button add_data;
+	@FXML private Button add_b_data;
+	@FXML private Button add_b_nms;
 	@FXML private AnchorPane anchor;
 	@FXML private Circle theameCircle;
 	private boolean theame=true;
 	final Stage primaryStage = null;
 	final double SCALE_DELTA = 1.1;
-	
+	private ArrayList<String> bulkNames = new ArrayList<String>();
 	//Zooming-------------------------------------------------
 	public void zoomLineChart(ScrollEvent event) {
 		 double scaleFactor = (event.getDeltaY() > 0) ? SCALE_DELTA : 1 / SCALE_DELTA;
@@ -184,7 +190,22 @@ public class BarChartController {
 		}
 		if(!dbEnable.isSelected()){
 			loadDataFromDb.setDisable(true);
-		}			
+		}
+		if(bulkEnable.isSelected()){
+			nm.setDisable(true);
+			val.setDisable(true);
+			add_data.setDisable(true);			
+			bulkNms.setDisable(false);
+			add_b_nms.setDisable(false);
+		}else {
+			bulk.setDisable(true);
+			bulkNms.setDisable(true);
+			add_b_nms.setDisable(true);
+			add_b_data.setDisable(true);
+			nm.setDisable(false);
+			val.setDisable(false);
+			add_data.setDisable(false);
+		}
 	}
 	public void changeTheme() {
 		if(theame) {	//light
@@ -203,6 +224,9 @@ public class BarChartController {
 			l2.setTextFill(c);
 			l3.setTextFill(c);
 			l4.setTextFill(c);
+			l5.setTextFill(c);
+			l6.setTextFill(c);
+			bulkEnable.setTextFill(c);
 			fileEnable.setTextFill(c);
 			dbEnable.setTextFill(c);					
 			theameCircle.setFill(c);
@@ -225,6 +249,9 @@ public class BarChartController {
 			l2.setTextFill(c);
 			l3.setTextFill(c);
 			l4.setTextFill(c);
+			l5.setTextFill(c);
+			l6.setTextFill(c);
+			bulkEnable.setTextFill(c);
 			fileEnable.setTextFill(c);
 			dbEnable.setTextFill(c);					
 			theameCircle.setFill(c);
@@ -233,9 +260,26 @@ public class BarChartController {
 	}
 	//Add Functions-----------------------------------------------------------
 	public void addData() {		
-		System.out.println("#AddBarData#");
+		System.out.println("#AddSinBarData#");
+		String X = bulk.getText();
+		if(nm.getText().isEmpty() || val.getText().isEmpty())
+			error_label.setText("Enter both name and value before adding");
+		else if(seriesLabel == null)
+			error_label.setText("Please enter the name of Bar");
+		else {
+			if(dblChecker(X)) {
+				if(dbEnable.isSelected()) {
+					try {if(!DbController.insertSeries(seriesLabel.getText(),1,X)) {error_label.setText("Error in Database");}} 
+					catch (SQLException e) {e.printStackTrace();}
+				}
+				drawSinChart(true);
+			}else
+				error_label.setText("Value of val must be number");
+		}
+	}
+	public void addBulkData() {
 		String X = "{"+seriesLabel.getText()+"}"+bulk.getText();
-		if(bulk.getText().isEmpty())
+		if(bulkNms.getText().isEmpty())
 			error_label.setText("Enter Pattern before adding");
 		else if(seriesLabel == null) {
 			error_label.setText("Please enter the name of Bar");
@@ -248,62 +292,71 @@ public class BarChartController {
 			if(dbEnable.isSelected()) {
 				try {if(!DbController.insertSeries(seriesLabel.getText(),1,X)) {error_label.setText("Error in Database");}} 
 				catch (SQLException e) {e.printStackTrace();}
-			}			
+			}
 			decodeAndDraw(seriesLabel.getText(),X,true);
 			//cursorMoni();			
 		}
 	}
 	//Draw & decoding Validations Functions-----------------------------------------------------------
-	private void cursorMoni() {
-	    final Axis<String> xAxis = bChart.getXAxis();
-	    final Axis<Number> yAxis = bChart.getYAxis();	    
-
-	    final Node chartBackground = bChart.lookup(".chart-plot-background");
-	    for (Node n: chartBackground.getParent().getChildrenUnmodifiable()) {
-	      if (n != chartBackground && n != xAxis && n != yAxis) {
-	        n.setMouseTransparent(true);
-	      }
-	    }	    	    
-	    chartBackground.setOnMouseMoved(new EventHandler<MouseEvent>() {
-	        @Override public void handle(MouseEvent mouseEvent) {
-	        	lineValue.setText(
-	            String.format("(%.2f, %.2f)",xAxis.getValueForDisplay(mouseEvent.getX()),
-	              yAxis.getValueForDisplay(mouseEvent.getY())
-	            )
-	          );
-	        }
-	      });
-	    chartBackground.setOnMouseExited(new EventHandler<MouseEvent>() {
-	        public void handle(MouseEvent mouseEvent) {
-	     	  lineValue.setText("");	    	  
-	         }
-	    });
-	}
-	private void drawBulkChart(String lineName,String xValues[],Number yValues[],int filled,Boolean whoCalled) {
+	private void drawSinChart(Boolean whoCalled) {
+		System.out.println("#drawSinChart");
 		try {								
-			XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();			
-			int i=0;
-			for(i=0;i<filled;i++) {
-				if(!whoCalled) {
-					series.setName(lineName);
-				}
-				series.getData().add(new XYChart.Data<String, Number>(xValues[i],yValues[i]));
-			}
-			String[] xFin= new String[i];
-			Number[] yFin= new Number[i];
-			for(i=0;i<filled;i++) {
-				xFin[i] = xValues[i];
-				yFin[i] = yValues[i];
-			}
-			bChart.getData().add(series);			
+			XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();
+			series.getData().add(new XYChart.Data<String, Number>(nm.getText(),Double.parseDouble(val.getText())));
+			bChart.getData().add(series);
 			if(whoCalled) {				
 				series.setName(seriesLabel.getText());
-//				if(fileEnable.isSelected()) {
-//					//callWriter(lineName, xFin, yFin);
-//				}
 			}
-			//drawSampleBar();
 		}catch(Exception e) {e.printStackTrace();}
+	}
+	private void drawBulkChart(String lineName,Number yValues[],int filled,Boolean whoCalled) {
+		System.out.println("#drawBulkChart");
+		if(!bulkNames.isEmpty()) {
+			try {								
+				XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();			
+				int i=0;
+				for(i=0;i<filled;i++) {
+					if(!whoCalled) {
+						series.setName(lineName);
+					}
+					series.getData().add(new XYChart.Data<String, Number>(bulkNames.get(i),yValues[i]));
+				}			
+				Number[] yFin= new Number[i];
+				for(i=0;i<filled;i++) {				
+					yFin[i] = yValues[i];
+				}							
+				if(whoCalled) {				
+					series.setName(seriesLabel.getText());
+	//				if(fileEnable.isSelected()) {
+	//					//callWriter(lineName, xFin, yFin);
+	//				}
+				}
+				bChart.getData().add(series);
+				//drawSampleBar();
+			}catch(Exception e) {e.printStackTrace();}
+		}
+	}
+	public void setBulkNames() {
+		System.out.println("#setBulkNames");
+		if(bulkNms.getText().isEmpty()) {
+			error_label.setText("Please enter names for bar first");			
+		}else {
+			String X = bulkNms.getText();
+			for(int i=0;i< X.length();i++) {						
+				if(X.charAt(i) == '[') {					
+					String xCo = new String();
+					for(int  j=i;X.charAt(j+1)!=']';j++) {					
+						xCo+=X.charAt(j+1);						
+					}											
+					bulkNames.add(xCo);								
+				}		
+			}
+			System.out.println("\tBulkNames: "+bulkNames);
+			bulkNms.setDisable(true);	
+			add_b_nms.setDisable(true);
+			add_b_data.setDisable(false);
+			bulk.setDisable(false);				
+		}		
 	}
 	public void drawSampleBar() {
 		bChart.getData().clear();
@@ -377,40 +430,43 @@ public class BarChartController {
 		return true;
 	}
 	private void decodeAndDraw(String line,String X,Boolean whoCalled) {
+		System.out.println("#decodeAndDraw");
+		if(bulkNames.isEmpty()) {
+			setBulkNames();
+		}		
 		error_label.setText("");
 		bulk.setText("");
 		System.out.println("---------------\nxVal\tyVal\n---------------");
-		int arraySize = (X.length()-((X.length())/5)*3)/2 + 2,xindexCounter=0,yindexCounter=0;
-		String[] xValues = new String[arraySize];
+		int arraySize = (X.length()-((X.length())/5)*3)/2 + 2,yindexCounter=0;
 		Number[] yValues = new Number[arraySize];									
 		//Pattern reader
+		int bulkCounter = 0;
 		for(int i=0;i< X.length();i++) {						
 			if(X.charAt(i) == '[') {
-				int j=0;
+				System.out.print(bulkNames.get(bulkCounter)+"\t");
 				String xCo = new String();
-				for(j=i;X.charAt(j+1)!=',';j++) {					
+				for(int  j=i;X.charAt(j+1)!=']';j++) {					
 					xCo+=X.charAt(j+1);
 					System.out.print(X.charAt(j+1));
-				}		
-				System.out.println("\t");
-				xValues[xindexCounter]=xCo;
-				xindexCounter++;
-			} else if(X.charAt(i)==',') {
-				int j=0;
-				String yCo = new String();
-				for(j=i;X.charAt(j+1)!=']';j++) {					
-					yCo+=X.charAt(j+1);
-					System.out.print(X.charAt(j+1));
-				}
+				}						
 				System.out.println();
-				yValues[yindexCounter]=Double.parseDouble(yCo);
-				yindexCounter++;								
-			} else {}			
+				yValues[yindexCounter]=Double.parseDouble(xCo);
+				yindexCounter++;
+				bulkCounter++;				
+			}		
 		}
-		System.out.println("---------------\nArraySize: "+arraySize+"\nStorage values :");		
-		System.out.println("\tX: "+Arrays.toString(xValues)+"\n\tY: "+Arrays.toString(yValues));
-		System.out.println("IndexCounters:\n\tX: "+xindexCounter+"\tY: "+yindexCounter);		
-		drawBulkChart(line,xValues,yValues,xindexCounter,whoCalled);		
+		System.out.println("---------------\nStorage values :");		
+		System.out.println("\tX: "+bulkNames+"\n\tY: "+Arrays.toString(yValues));
+		System.out.println("IndexCounters:\n\tY: "+yindexCounter);		
+		drawBulkChart(line,yValues,yindexCounter,whoCalled);		
+	}
+	private boolean dblChecker(String x) {
+		try {Double.parseDouble(x);}
+	    catch(NumberFormatException e) {
+	    	error_label.setText("Value field must be a numeric");
+	    	return false;
+	    }
+		return true;
 	}
 	//loading functions------------------------------------------------------
 	private void callWriter(String lineNames,int[] xValues,int[] yValues) {		

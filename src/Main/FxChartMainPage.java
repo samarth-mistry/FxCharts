@@ -26,11 +26,11 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 public class FxChartMainPage extends Application{
 	public void start(Stage primaryStage) throws Exception {	
-		//auth(primaryStage);
+		auth(primaryStage);
 		//chartSelector(primaryStage);
 		//URL url = new File("resources/views/LineChart.fxml").toURI().toURL();
 		//Parent root =FXMLLoader.load(url);
-		setStage(primaryStage,"Bar chart");
+		//setStage(primaryStage,"Bar chart");
 	}
 	private void chartSelector(Stage primaryStage) throws IOException {
 		String chrt[] = {"Pie chart", "Line chart", "Stacked chart", "Bar chart"};

@@ -25,8 +25,8 @@
             <content>
               <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                      <children>
-                        <Button fx:id="add_data" layoutX="659.0" layoutY="481.0" mnemonicParsing="false" onAction="#addData" style="-fx-background-color: #60c0da;" text="Add Line" />
-                        <Button layoutX="743.0" layoutY="481.0" mnemonicParsing="false" onAction="#exit" style="-fx-background-color: #ff2225;" text="Exit" textFill="WHITE" />
+                        <Button fx:id="add_data" layoutX="468.0" layoutY="481.0" mnemonicParsing="false" onAction="#addData" style="-fx-background-color: #60c0da;" text="Add Line" />
+                        <Button layoutX="552.0" layoutY="481.0" mnemonicParsing="false" onAction="#exit" style="-fx-background-color: #ff2225;" text="Exit" textFill="WHITE" />
                         <TextField fx:id="seriesLabel" layoutX="500.0" layoutY="168.0" promptText="Label for line" text="Line" />
                         <Label fx:id="l4" layoutX="720.0" layoutY="172.0" text="Line name" />
                         <TextField fx:id="yxisLabel" layoutX="500.0" layoutY="135.0" onKeyTyped="#axisRenamed" promptText="Label of Y-axis" text="Y" />
@@ -34,20 +34,20 @@
                         <Label fx:id="l3" layoutX="709.0" layoutY="139.0" text="Y-axis name" />
                         <Label fx:id="l2" layoutX="708.0" layoutY="106.0" text="X-axis name" />
                         <TextField fx:id="barChartTitle" layoutX="500.0" layoutY="70.0" onKeyTyped="#axisRenamed" promptText="Title" />
-                        <Label fx:id="l1" layoutX="696.0" layoutY="74.0" text="BarChart title" />
+                        <Label fx:id="l1" layoutX="699.0" layoutY="74.0" text="BarChart title" />
                         <Label fx:id="error_label" layoutX="500.0" layoutY="16.0" prefHeight="49.0" prefWidth="289.0" style="-fx-border-color: red;" textFill="#fc0a0a" />
-                        <Button fx:id="loadDataFromFile" disable="true" layoutX="507.0" layoutY="481.0" mnemonicParsing="false" onAction="#loadDataFromFile" style="-fx-background-color: #60c0da;" text="Load data from file" />
-                        <Button layoutX="410.0" layoutY="481.0" mnemonicParsing="false" onAction="#clearChart" style="-fx-background-color: #ffaa00;" text="Clear chart" />
-                        <Button layoutX="326.0" layoutY="450.0" mnemonicParsing="false" onAction="#clearDb" style="-fx-background-color: #ffaa00;" text="Clear DB" />
-                        <Button fx:id="loadDataFromDb" disable="true" layoutX="507.0" layoutY="450.0" mnemonicParsing="false" onAction="#loadDataFromDb" style="-fx-background-color: #60c0da;" text="Load data from DB" />
-                        <Button layoutX="327.0" layoutY="481.0" mnemonicParsing="false" onAction="#clearFile" style="-fx-background-color: #ffaa00;" text="Clear file" />
-                        <CheckBox fx:id="dbEnable" layoutX="688.0" layoutY="375.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable DB" />
-                        <CheckBox fx:id="fileEnable" layoutX="688.0" layoutY="348.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable File" />
+                        <Button fx:id="loadDataFromFile" disable="true" layoutX="316.0" layoutY="481.0" mnemonicParsing="false" onAction="#loadDataFromFile" style="-fx-background-color: #60c0da;" text="Load data from file" />
+                        <Button layoutX="219.0" layoutY="481.0" mnemonicParsing="false" onAction="#clearChart" style="-fx-background-color: #ffaa00;" text="Clear chart" />
+                        <Button layoutX="135.0" layoutY="450.0" mnemonicParsing="false" onAction="#clearDb" style="-fx-background-color: #ffaa00;" text="Clear DB" />
+                        <Button fx:id="loadDataFromDb" disable="true" layoutX="316.0" layoutY="450.0" mnemonicParsing="false" onAction="#loadDataFromDb" style="-fx-background-color: #60c0da;" text="Load data from DB" />
+                        <Button layoutX="136.0" layoutY="481.0" mnemonicParsing="false" onAction="#clearFile" style="-fx-background-color: #ffaa00;" text="Clear file" />
+                        <CheckBox fx:id="dbEnable" layoutX="688.0" layoutY="496.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable DB" />
+                        <CheckBox fx:id="fileEnable" layoutX="687.0" layoutY="470.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable File" />
                         <Line endX="466.0" layoutX="334.0" layoutY="441.0" startX="-334.0" />
                         <Button layoutX="14.0" layoutY="481.0" mnemonicParsing="false" onAction="#pdfExtract" style="-fx-background-color: #81af6a;" text="Export PDF" textFill="WHITE" />
                         <Button layoutX="14.0" layoutY="450.0" mnemonicParsing="false" onAction="#pngExtract" style="-fx-background-color: #81af6a;" text="Export image" textFill="WHITE" />
-                        <Circle fx:id="theameCircle" fill="#666666" layoutX="780.0" layoutY="417.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
-                        <Label fx:id="lineValue" layoutX="496.0" layoutY="404.0" prefHeight="25.0" prefWidth="269.0" style="-fx-border-color: black;" />
+                        <Circle fx:id="theameCircle" fill="#666666" layoutX="618.0" layoutY="496.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
+                        <Label fx:id="lineValue" layoutX="510.0" layoutY="407.0" prefHeight="25.0" prefWidth="269.0" style="-fx-border-color: black;" />
                         <BarChart fx:id="bChart" layoutX="5.0" layoutY="4.0" prefHeight="428.0" prefWidth="486.0" title="BarChart title">
                           <xAxis>
                             <CategoryAxis side="BOTTOM" fx:id="xxis" />
@@ -58,10 +58,13 @@
                         </BarChart>
                         <TextField fx:id="val" layoutX="500.0" layoutY="231.0" promptText="Value" text="10.8" />
                         <TextField fx:id="nm" layoutX="500.0" layoutY="200.0" promptText="Name" text="Name" />
-                        <Label fx:id="l31" layoutX="701.0" layoutY="235.0" text="Data value" />
-                        <Label fx:id="l21" layoutX="698.0" layoutY="204.0" text="Data name" />
-                        <CheckBox fx:id="bulkEnable" layoutX="507.0" layoutY="375.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable Bulk" />
-                        <TextArea fx:id="bulk" disable="true" layoutX="498.0" layoutY="260.0" prefHeight="84.0" prefWidth="293.0" promptText="Bulk entry here eg. [abc,23.4][efg,34.2]........" />
+                        <Label fx:id="l6" layoutX="715.0" layoutY="235.0" text="Data value" />
+                        <Label fx:id="l5" layoutX="715.0" layoutY="204.0" text="Data name" />
+                        <CheckBox fx:id="bulkEnable" layoutX="686.0" layoutY="445.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable Bulk" />
+                        <TextArea fx:id="bulk" disable="true" layoutX="498.0" layoutY="312.0" prefHeight="84.0" prefWidth="293.0" promptText="Bulk entry here eg. [abc,23.4][efg,34.2]........" />
+                        <Button fx:id="add_b_data" disable="true" layoutX="469.0" layoutY="450.0" mnemonicParsing="false" onAction="#addBulkData" style="-fx-background-color: #60c0da;" text="Add Bulk" />
+                        <TextArea fx:id="bulkNms" disable="true" layoutX="502.0" layoutY="262.0" prefHeight="41.0" prefWidth="289.0" promptText="Enter Bulk Names          eg. [Name1][Name2][.....]..." />
+                        <Button fx:id="add_b_nms" disable="true" layoutX="548.0" layoutY="451.0" mnemonicParsing="false" onAction="#setBulkNames" style="-fx-background-color: #60c0da;" text="Add Bulk Names" />
                      </children>
                   </AnchorPane>
             </content>
