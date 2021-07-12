@@ -1,6 +1,6 @@
 package BarChart;
 
-import FileSys.lineFileSysController;
+import FileSys.barFileSysController;
 import PieChart.PieTableController;
 import DbSys.DbController;
 
@@ -123,7 +123,7 @@ public class BarChartController {
 	}
 	//Clear Functions-----------------------------------------------------------
 	public void clearChart() {
-		bChart.getData().clear();
+		bChart.getData().clear();		
 		error_label.setText("Chart Data Cleared!\nClick load data to reload");				
 	}
 	public void clearFile() {		
@@ -134,7 +134,7 @@ public class BarChartController {
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
-			lineFileSysController.clearFile("locations.txt");
+			barFileSysController.clearFile("locations.txt");
 			error_label.setText("File is Cleared\nData is permanently lost");
 		}		
 	}
@@ -284,7 +284,7 @@ public class BarChartController {
 		else if(seriesLabel == null) {
 			error_label.setText("Please enter the name of Bar");
 		}
-		else if(false) {			//!inputValidator(X)
+		else if(!inputValidator(X)) {
 			error_label.setText("");
 			error_label.setText("Entered pattern is not valid\nPlease try again!");
 			System.out.println("Invalid Pattern");
@@ -293,8 +293,7 @@ public class BarChartController {
 				try {if(!DbController.insertSeries(seriesLabel.getText(),1,X)) {error_label.setText("Error in Database");}} 
 				catch (SQLException e) {e.printStackTrace();}
 			}
-			decodeAndDraw(seriesLabel.getText(),X,true);
-			//cursorMoni();			
+			decodeAndDraw(seriesLabel.getText(),X,true);					
 		}
 	}
 	//Draw & decoding Validations Functions-----------------------------------------------------------
@@ -325,14 +324,13 @@ public class BarChartController {
 				for(i=0;i<filled;i++) {				
 					yFin[i] = yValues[i];
 				}							
-				if(whoCalled) {				
+				if(whoCalled) {				//add function is calling them 	
 					series.setName(seriesLabel.getText());
-	//				if(fileEnable.isSelected()) {
-	//					//callWriter(lineName, xFin, yFin);
-	//				}
+					if(fileEnable.isSelected()) {
+						callWriter(lineName,bulkNames, yFin);
+					}
 				}
-				bChart.getData().add(series);
-				//drawSampleBar();
+				bChart.getData().add(series);				
 			}catch(Exception e) {e.printStackTrace();}
 		}
 	}
@@ -341,15 +339,25 @@ public class BarChartController {
 		if(bulkNms.getText().isEmpty()) {
 			error_label.setText("Please enter names for bar first");			
 		}else {
-			String X = bulkNms.getText();
-			for(int i=0;i< X.length();i++) {						
+			String X = bulkNms.getText();						
+			for(int i=0;i< X.length();i++) {
 				if(X.charAt(i) == '[') {					
 					String xCo = new String();
-					for(int  j=i;X.charAt(j+1)!=']';j++) {					
-						xCo+=X.charAt(j+1);						
-					}											
+					for(int j=i;X.charAt(j+1)!=',';j++) {					
+						xCo+=X.charAt(j+1);
+						System.out.print(X.charAt(j+1));
+					}
+					System.out.print("\t");
+					bulkNames.add(xCo);					
+				} else if(X.charAt(i)==',') {					
+					String xCo = new String();
+					for(int j=i;X.charAt(j+1)!=',' && X.charAt(j+1) != ']' ;j++) {					
+						xCo+=X.charAt(j+1);
+						System.out.print(X.charAt(j+1));
+					}
+					System.out.println();
 					bulkNames.add(xCo);								
-				}		
+				} else {}					
 			}
 			System.out.println("\tBulkNames: "+bulkNames);
 			bulkNms.setDisable(true);	
@@ -396,40 +404,28 @@ public class BarChartController {
                 
         bChart.getData().addAll(series1, series2, series3);
 	}
-	private boolean inputValidator(String X) {
-		System.out.println("#PatternValidator#");		
+	private boolean inputValidator(String X) {		
+		System.out.println("#PatternValidator#");										
 		for(int i=0;i< X.length();i++) {
-			
-			if(X.charAt(0) != '{' || X.charAt(X.length()-1) != ']') {
-				System.out.println("valid 1");
-				return false;
-			}			
-			if(X.charAt(i) == '[') {
-				int j=0,y=0;
-				if(!Character.isDigit(X.charAt(i+1))){					
+			if(X.charAt(i) == '[') {					
+				String xCo = new String();
+				for(int j=i;X.charAt(j+1)!=',' && X.charAt(j+1)!=']';j++) {					
+					xCo+=X.charAt(j+1);					
+				}				
+				if(!dblChecker(xCo))
+					return false;					
+			} else if(X.charAt(i)==',') {					
+				String xCo = new String();
+				for(int j=i;X.charAt(j+1)!=',' && X.charAt(j+1) != ']' ;j++) {					
+					xCo+=X.charAt(j+1);					
+				}						
+				if(!dblChecker(xCo))
 					return false;
-				}
-				if(X.charAt(i+1) != ','){
-					for(j=i;Character.isDigit(X.charAt(j+1));j++) {}
-					//System.out.println("valid 2.1: "+j);
-					if(X.charAt(j+1) !=',') {
-						return false;
-					}
-					if(X.charAt(j+2) != ']'){
-						for(y=j+2;Character.isDigit(X.charAt(y+1));y++) {}											
-					}
-				}
-				if(X.charAt(j+1) != ','){									
-					return false;
-				}else {j=0;}				
-				if(X.charAt(y+1) != ']'){
-					return false;
-				}
-			}			
+			} else {}					
 		}
 		return true;
 	}
-	private void decodeAndDraw(String line,String X,Boolean whoCalled) {
+	private void decodeAndDraw(String bar,String X,Boolean whoCalled) {
 		System.out.println("#decodeAndDraw");
 		if(bulkNames.isEmpty()) {
 			setBulkNames();
@@ -440,25 +436,32 @@ public class BarChartController {
 		int arraySize = (X.length()-((X.length())/5)*3)/2 + 2,yindexCounter=0;
 		Number[] yValues = new Number[arraySize];									
 		//Pattern reader
-		int bulkCounter = 0;
-		for(int i=0;i< X.length();i++) {						
-			if(X.charAt(i) == '[') {
-				System.out.print(bulkNames.get(bulkCounter)+"\t");
+		int bulkCounter = 0;						
+		for(int i=0;i< X.length();i++) {
+			if(X.charAt(i) == '[') {					
 				String xCo = new String();
-				for(int  j=i;X.charAt(j+1)!=']';j++) {					
-					xCo+=X.charAt(j+1);
-					System.out.print(X.charAt(j+1));
-				}						
-				System.out.println();
+				for(int j=i;X.charAt(j+1)!=',' && X.charAt(j+1) != ']';j++) {
+					xCo+=X.charAt(j+1);					
+				}
+				System.out.println(bulkNames.get(bulkCounter)+"\t"+xCo);
 				yValues[yindexCounter]=Double.parseDouble(xCo);
 				yindexCounter++;
-				bulkCounter++;				
-			}		
+				bulkCounter++;					
+			} else if(X.charAt(i)==',') {					
+				String xCo = new String();
+				for(int j=i;X.charAt(j+1)!=',' && X.charAt(j+1) != ']' ;j++) {					
+					xCo+=X.charAt(j+1);					
+				}
+				System.out.println(bulkNames.get(bulkCounter)+"\t"+xCo);
+				yValues[yindexCounter]=Double.parseDouble(xCo);
+				yindexCounter++;
+				bulkCounter++;								
+			} else {}					
 		}
 		System.out.println("---------------\nStorage values :");		
 		System.out.println("\tX: "+bulkNames+"\n\tY: "+Arrays.toString(yValues));
 		System.out.println("IndexCounters:\n\tY: "+yindexCounter);		
-		drawBulkChart(line,yValues,yindexCounter,whoCalled);		
+		drawBulkChart(bar,yValues,yindexCounter,whoCalled);		
 	}
 	private boolean dblChecker(String x) {
 		try {Double.parseDouble(x);}
@@ -469,8 +472,8 @@ public class BarChartController {
 		return true;
 	}
 	//loading functions------------------------------------------------------
-	private void callWriter(String lineNames,int[] xValues,int[] yValues) {		
-		lineFileSysController.writeDataInFile(yValues,xValues, lineNames,0);
+	private void callWriter(String barNames,ArrayList<String> xValues,Number[] yFin) {		
+		barFileSysController.writeDataInFile(xValues,yFin, barNames,0);
 	}
 	public void loadDataFromFile() {
 		if(!bChart.getData().isEmpty()) {
@@ -491,30 +494,47 @@ public class BarChartController {
 	}
 	public void loadDataFromFileConfirmed() {
 		clearChart();
-		ArrayList<String> seriesArr = lineFileSysController.readDataFromFile();						
+		bulkNames.clear();
+		ArrayList<String> seriesArr = barFileSysController.readDataFromFile();		
 		if(!seriesArr.isEmpty()) {			
-			for(int seriIndex=0;seriIndex< seriesArr.size();seriIndex++) {
-				String X = seriesArr.get(seriIndex);
-				if(!inputValidator(X)) {
-					error_label.setText("");
-					error_label.setText("Entered pattern is not valid\nPlease try again!");
-					System.out.println("Invalid Pattern");
-				} else {
-					String line = "";
-					if(X.charAt(0) == '{') {						
-						for(int j=0; X.charAt(j+1) != '}'; j++) {
-							line += X.charAt(j+1);
-						}						
-					}
-					decodeAndDraw(line,X,false);
+			for(int seriIndex=0;seriIndex< seriesArr.size();seriIndex++) {																				
+				String X = seriesArr.get(seriIndex);	
+				int arraySize = (X.length()-((X.length())/5)*3)/2 + 2,yindexCounter=0;
+				Number[] yValues = new Number[arraySize];
+				String line = "";
+				if(X.charAt(0) == '{') {						
+					for(int j=0; X.charAt(j+1) != '}'; j++) {
+						line += X.charAt(j+1);
+					}						
 				}
+				if(seriIndex == 0) {
+					for(int k=0;k<X.length();k++) {
+						if(X.charAt(k)=='[') {
+							String str4blk = "";
+							for(int j=k;X.charAt(j+1) != ',';j++) {
+								str4blk+=X.charAt(j+1);
+							}
+							bulkNames.add(str4blk);
+						}
+					}
+					System.out.println("\tBulkNames: "+bulkNames);
+				}
+				if(X.charAt(seriIndex)==',') {					
+					String xCo = new String();
+					for(int j=seriIndex;X.charAt(j+1) != ']';j++) {					
+						xCo+=X.charAt(j+1);					
+					}					
+					yValues[yindexCounter]=Double.parseDouble(xCo);
+					yindexCounter++;					
+				}				
+				drawBulkChart(line,yValues,yindexCounter,false);
 			}
 		}else {
 			error_label.setText("File is empty!\nPlease add data first");
 		}
 	}	
 	public void loadDataInTable() {					        
-		ArrayList<String> data = lineFileSysController.readDataFromFile();
+		ArrayList<String> data = barFileSysController.readDataFromFile();
 		table.setEditable(true);
 		c1.setCellValueFactory(new PropertyValueFactory<>("series"));		
 		c2.setCellValueFactory(new PropertyValueFactory<>("seriesX"));
@@ -653,7 +673,7 @@ public class BarChartController {
         fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV", "*.csv"));
         File file = fileChooser.showSaveDialog(primaryStage);
         final ObservableList<BarTableController> obdata = FXCollections.observableArrayList();
-        ArrayList<String> data = lineFileSysController.readDataFromFile();						
+        ArrayList<String> data = barFileSysController.readDataFromFile();						
         for(int newSeri=0;newSeri<data.size();newSeri++) {
 			String X = data.get(newSeri);
 			int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,xindexCounter=0,yindexCounter=0;
