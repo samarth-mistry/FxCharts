@@ -46,6 +46,7 @@ import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -57,6 +58,7 @@ import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.MouseEvent;
@@ -120,6 +122,19 @@ public class BarChartController {
 	        bChart.setScaleX(1.0);
 	        bChart.setScaleY(1.0);
 	    }		    
+	}
+	public void barValuePlotter() {
+		bChart.setOnMouseEntered(mouseEvent -> {
+			for (final Series<String, Number> series : bChart.getData()) {			
+		        for (final XYChart.Data<String, Number> data : series.getData()) {	        	
+		            Tooltip tooltip = new Tooltip();
+		            tooltip.setText(data.getXValue().toString() +" "+ 
+		                         data.getYValue().toString());
+		            Tooltip.install(data.getNode(), tooltip);
+		        }
+		    }
+    	});
+		System.out.println("Plotter");		
 	}
 	//Clear Functions-----------------------------------------------------------
 	public void clearChart() {
@@ -331,7 +346,8 @@ public class BarChartController {
 						callWriter(barName,bulkNames, yFin);
 					}
 				}
-				bChart.getData().add(series);				
+				bChart.getData().add(series);
+				//barValuePlotter();
 			}catch(Exception e) {e.printStackTrace();}
 		}
 	}

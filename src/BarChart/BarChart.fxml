@@ -48,14 +48,6 @@
                         <Button layoutX="14.0" layoutY="450.0" mnemonicParsing="false" onAction="#pngExtract" style="-fx-background-color: #81af6a;" text="Export image" textFill="WHITE" />
                         <Circle fx:id="theameCircle" fill="#666666" layoutX="618.0" layoutY="496.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
                         <Label fx:id="lineValue" layoutX="510.0" layoutY="407.0" prefHeight="25.0" prefWidth="269.0" style="-fx-border-color: black;" />
-                        <BarChart fx:id="bChart" layoutX="5.0" layoutY="4.0" prefHeight="428.0" prefWidth="486.0" title="BarChart title">
-                          <xAxis>
-                            <CategoryAxis side="BOTTOM" fx:id="xxis" />
-                          </xAxis>
-                          <yAxis>
-                            <NumberAxis fx:id="yxis" side="LEFT" />
-                          </yAxis>
-                        </BarChart>
                         <TextField fx:id="val" layoutX="500.0" layoutY="231.0" promptText="Value" text="10.8" />
                         <TextField fx:id="nm" layoutX="500.0" layoutY="200.0" promptText="Name" text="Name" />
                         <Label fx:id="l6" layoutX="715.0" layoutY="235.0" text="Data value" />
@@ -65,6 +57,14 @@
                         <Button fx:id="add_b_data" disable="true" layoutX="469.0" layoutY="450.0" mnemonicParsing="false" onAction="#addBulkData" style="-fx-background-color: #60c0da;" text="Add Bulk" />
                         <TextArea fx:id="bulkNms" disable="true" layoutX="502.0" layoutY="262.0" prefHeight="41.0" prefWidth="289.0" promptText="Enter Bulk Names          eg. [Name1][Name2][.....]..." />
                         <Button fx:id="add_b_nms" disable="true" layoutX="548.0" layoutY="451.0" mnemonicParsing="false" onAction="#setBulkNames" style="-fx-background-color: #60c0da;" text="Add Bulk Names" />
+                        <BarChart fx:id="bChart" layoutX="5.0" layoutY="4.0" onMouseClicked="#zoomNormal" onScroll="#zoomLineChart" prefHeight="428.0" prefWidth="486.0" title="BarChart title">
+                          <xAxis>
+                            <CategoryAxis side="BOTTOM" fx:id="xxis" />
+                          </xAxis>
+                          <yAxis>
+                            <NumberAxis fx:id="yxis" side="LEFT" />
+                          </yAxis>
+                        </BarChart>                        
                      </children>
                   </AnchorPane>
             </content>
