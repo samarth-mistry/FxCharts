@@ -646,7 +646,7 @@ public class BarChartController {
 	      
         if (file != null) {
 				WritableImage nodeshot = bChart.snapshot(new SnapshotParameters(), null);
-		        File imgfile = new File("dat/imgs/chart.png");
+		        File imgfile = new File("84h8chart.png");
 		
 				try {
 					ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
@@ -658,7 +658,7 @@ public class BarChartController {
 		        PDImageXObject pdimage;
 		        PDPageContentStream content;
 		        try {
-		            pdimage = PDImageXObject.createFromFile("dat/imgs/chart.png",doc);
+		            pdimage = PDImageXObject.createFromFile("84h8chart.png",doc);
 		            content = new PDPageContentStream(doc, page);
 		            content.drawImage(pdimage,50, 50);
 		        	content.beginText();                             
@@ -674,6 +674,7 @@ public class BarChartController {
 		            System.out.println("DOC\n\tPdf Exported!");
 		            imgfile.delete();
 		        } catch (IOException ex) {
+		        	error_label.setText("Error occured in exporting PDF");		    
 		            Logger.getLogger(BarChart.class.getName()).log(Level.SEVERE, null, ex);
 		        }
 		}
