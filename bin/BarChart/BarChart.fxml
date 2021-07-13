@@ -47,7 +47,7 @@
                         <Button layoutX="14.0" layoutY="481.0" mnemonicParsing="false" onAction="#pdfExtract" style="-fx-background-color: #81af6a;" text="Export PDF" textFill="WHITE" />
                         <Button layoutX="14.0" layoutY="450.0" mnemonicParsing="false" onAction="#pngExtract" style="-fx-background-color: #81af6a;" text="Export image" textFill="WHITE" />
                         <Circle fx:id="theameCircle" fill="#666666" layoutX="618.0" layoutY="496.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
-                        <Label fx:id="lineValue" layoutX="510.0" layoutY="407.0" prefHeight="25.0" prefWidth="269.0" style="-fx-border-color: black;" />
+                        <Label fx:id="barValue" layoutX="510.0" layoutY="407.0" prefHeight="25.0" prefWidth="269.0" style="-fx-border-color: black;" />
                         <TextField fx:id="val" layoutX="500.0" layoutY="231.0" promptText="Value" text="10.8" />
                         <TextField fx:id="nm" layoutX="500.0" layoutY="200.0" promptText="Name" text="Name" />
                         <Label fx:id="l6" layoutX="715.0" layoutY="235.0" text="Data value" />

@@ -45,6 +45,7 @@ import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Alert;
@@ -75,7 +76,7 @@ public class BarChartController {
 	@FXML private BarChart<String, Number> bChart;
 	@FXML private Label error_label;
 	@FXML private Label table_error_label;
-	@FXML private Label lineValue;
+	@FXML private Label barValue;
 	@FXML private Label l6;
 	@FXML private Label l5;
 	@FXML private Label l4;
@@ -123,18 +124,21 @@ public class BarChartController {
 	        bChart.setScaleY(1.0);
 	    }		    
 	}
-	public void barValuePlotter() {
-		bChart.setOnMouseEntered(mouseEvent -> {
-			for (final Series<String, Number> series : bChart.getData()) {			
-		        for (final XYChart.Data<String, Number> data : series.getData()) {	        	
-		            Tooltip tooltip = new Tooltip();
-		            tooltip.setText(data.getXValue().toString() +" "+ 
-		                         data.getYValue().toString());
-		            Tooltip.install(data.getNode(), tooltip);
-		        }
-		    }
-    	});
-		System.out.println("Plotter");		
+	public void barValuePlotter() {				
+		for (final Series<String, Number> series : bChart.getData()) {			
+	        for (final XYChart.Data<String, Number> data : series.getData()) {
+	        	data.getNode().addEventHandler(MouseEvent.MOUSE_ENTERED,
+                    e -> {                	                                            
+                        barValue.setText(data.getXValue().toString()+" : "+data.getYValue().toString());                        
+                     }
+                );
+                data.getNode().addEventHandler(MouseEvent.MOUSE_EXITED,
+            		e->{            			
+            			barValue.setText("");
+            		}
+                );	            
+	        }
+	    }    							
 	}
 	//Clear Functions-----------------------------------------------------------
 	public void clearChart() {
@@ -230,8 +234,8 @@ public class BarChartController {
 			anchor.setStyle("-fx-background-color:  #666666");
 			bChart.setStyle("-fx-border-color: #d8d8d8");
 		    bChart.setStyle("-fx-text-fill: black");
-			lineValue.setStyle("-fx-border-color: #d8d8d8");
-			lineValue.setTextFill(c);
+			barValue.setStyle("-fx-border-color: #d8d8d8");
+			barValue.setTextFill(c);
 			xxis.setTickLabelFill(c);yxis.setTickLabelFill(c);			
 			xxis.setStyle("-fx-text-fill: black");
 			yxis.setStyle("-fx-text-fill: black");			
@@ -254,8 +258,8 @@ public class BarChartController {
 			anchor.setStyle("-fx-background-color:  #d8d8d8");
 			bChart.setStyle("-fx-border-color: #666666");
 			bChart.setStyle("-fx-text-fill: white");
-			lineValue.setStyle("-fx-border-color: #666666");
-			lineValue.setTextFill(c);
+			barValue.setStyle("-fx-border-color: #666666");
+			barValue.setTextFill(c);
 			xxis.setTickLabelFill(c);
 			yxis.setTickLabelFill(c);
 			xxis.setStyle("-fx-text-fill: white");
@@ -347,9 +351,9 @@ public class BarChartController {
 					}
 				}
 				bChart.getData().add(series);
-				//barValuePlotter();
+				barValuePlotter();
 			}catch(Exception e) {e.printStackTrace();}
-		}
+		}		
 	}
 	public void setBulkNames() {
 		System.out.println("#setBulkNames");
