@@ -93,7 +93,7 @@ public class BarChartController {
 	@FXML private TextField yxisLabel;
 	@FXML private CategoryAxis xxis;
 	@FXML private NumberAxis yxis;
-	@FXML private TableView table;
+	@FXML private TableView<BarTableController> table;
 	@FXML private TableColumn<String, String> c1;
 	@FXML private TableColumn<String, String> c2;
 	@FXML private TableColumn<String, String> c3;
@@ -106,7 +106,8 @@ public class BarChartController {
 	@FXML private Button add_data;
 	@FXML private Button add_b_data;
 	@FXML private Button add_b_nms;
-	@FXML private AnchorPane anchor;
+	@FXML private AnchorPane anchor1;
+	@FXML private AnchorPane anchor2;
 	@FXML private Circle theameCircle;
 	private boolean theame=true;
 	final Stage primaryStage = null;
@@ -231,7 +232,8 @@ public class BarChartController {
 			Color c = Color.web("#d8d8d8");
 			error_label.setTextFill(Color.web("red"));
 			error_label.setStyle("-fx-border-color: red");
-			anchor.setStyle("-fx-background-color:  #666666");
+			anchor1.setStyle("-fx-background-color:  #666666");
+			anchor2.setStyle("-fx-background-color:  #666666");
 			bChart.setStyle("-fx-border-color: #d8d8d8");
 		    bChart.setStyle("-fx-text-fill: black");
 			barValue.setStyle("-fx-border-color: #d8d8d8");
@@ -255,7 +257,8 @@ public class BarChartController {
 			Color c = Color.web("#666666");
 			error_label.setTextFill(Color.web("pink"));
 			error_label.setStyle("-fx-border-color:  pink");
-			anchor.setStyle("-fx-background-color:  #d8d8d8");
+			anchor1.setStyle("-fx-background-color:  #d8d8d8");
+			anchor2.setStyle("-fx-background-color:  #d8d8d8");
 			bChart.setStyle("-fx-border-color: #666666");
 			bChart.setStyle("-fx-text-fill: white");
 			barValue.setStyle("-fx-border-color: #666666");
@@ -565,46 +568,48 @@ public class BarChartController {
 		c1.setSortable(false);
 		c2.setSortable(false);
 		c3.setSortable(false);
-				
-		for(int newSeri=0;newSeri<data.size();newSeri++) {
-			String X = data.get(newSeri);
-			int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,xindexCounter=0,yindexCounter=0;
-			int[] xValues = new int[arraySize];
-			int[] yValues = new int[arraySize];
-			
-			String[] lineNames =new String[arraySize];
-			//Pattern decoder
-			for(int i=0;i< X.length();i++) {
-				if(X.charAt(i) == '{') {
-					String line = "";
-					for(int j=0; X.charAt(j+1) != '}'; j++) {
-						line += X.charAt(j+1);
+		
+		if(!data.isEmpty()) {			
+			for(int seriIndex=0;seriIndex< data.size();seriIndex++) {																				
+				String X = data.get(seriIndex);	
+				int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,yindexCounter=0;
+				String[] lineNames =new String[arraySize];
+				Number[] yValues = new Number[arraySize];				
+				String line = "";
+								
+				for(int k=0;k<X.length();k++) {
+					if(X.charAt(k) == '{') {						
+						for(int j=0; X.charAt(j+1) != '}'; j++) {
+							line += X.charAt(j+1);
+						}
+						lineNames[k] = line;
 					}
-					lineNames[i] = line;					
-				}			
-				if(X.charAt(i) == '[') {
-					int j=0;
-					String xCo = new String();
-					for(j=i;X.charAt(j+1)!=',';j++) {					
-						xCo+=X.charAt(j+1);					
+					if(X.charAt(k)=='[') {
+						String str4blk = "";
+						for(int j=k;X.charAt(j+1) != ',';j++) {
+							str4blk+=X.charAt(j+1);
+						}
+						bulkNames.add(str4blk);
 					}
-					xValues[xindexCounter]=Integer.parseInt(xCo);
-					xindexCounter++;
-				} else if(X.charAt(i)==',') {
-					int j=0;
-					String yCo = new String();
-					for(j=i;X.charAt(j+1)!=']';j++) {					
-						yCo+=X.charAt(j+1);					
-					}					
-					yValues[yindexCounter]=Integer.parseInt(yCo);
-					yindexCounter++;								
-				} else {}
-			}
-			for(int i=0;i<xindexCounter;i++) {
-				String value1 = Integer.toString(xValues[i]);
-				String value2 = Integer.toString(yValues[i]);				
-				BarTableController row = new BarTableController(lineNames[i],value1,value2);
-				table.getItems().add(row);			
+				}
+				//System.out.println("\tBulkNames: "+bulkNames);			
+				for(int k=0;k<X.length();k++) {
+					if(X.charAt(k)==',') {					
+						String xCo = new String();
+						for(int j=k;X.charAt(j+1) != ']';j++) {					
+							xCo+=X.charAt(j+1);					
+						}					
+						yValues[yindexCounter]=Double.parseDouble(xCo);
+						yindexCounter++;					
+					}				
+				}
+				for(int i=0;i<yindexCounter;i++) {
+					String value1 = bulkNames.get(i);
+					Number value2 = yValues[i];
+										    	
+					BarTableController row = new BarTableController(lineNames[i],value1,value2);
+					table.getItems().add(row);										
+				}
 			}
 		}			
 	}	
@@ -644,7 +649,7 @@ public class BarChartController {
 		        File imgfile = new File("dat/imgs/chart.png");
 		
 				try {
-				ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
+					ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
 				} catch (IOException e) {
 					System.out.println("Error in making image!");
 				}
@@ -669,7 +674,7 @@ public class BarChartController {
 		            System.out.println("DOC\n\tPdf Exported!");
 		            imgfile.delete();
 		        } catch (IOException ex) {
-		            Logger.getLogger(LineChart.class.getName()).log(Level.SEVERE, null, ex);
+		            Logger.getLogger(BarChart.class.getName()).log(Level.SEVERE, null, ex);
 		        }
 		}
     }	
@@ -690,65 +695,69 @@ public class BarChartController {
 			}
 		}
 	}
+	@SuppressWarnings("null")
 	public void csvExtract() throws IOException {
 	    FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save");
         fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV", "*.csv"));
         File file = fileChooser.showSaveDialog(primaryStage);
         final ObservableList<BarTableController> obdata = FXCollections.observableArrayList();
-        ArrayList<String> data = barFileSysController.readDataFromFile();						
-        for(int newSeri=0;newSeri<data.size();newSeri++) {
-			String X = data.get(newSeri);
-			int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,xindexCounter=0,yindexCounter=0;
-			int[] xValues = new int[arraySize];
-			int[] yValues = new int[arraySize];
-			
-			String[] lineNames =new String[arraySize];
-			//Pattern decoder
-			for(int i=0;i< X.length();i++) {
-				if(X.charAt(i) == '{') {
-					String line = "";
-					for(int j=0; X.charAt(j+1) != '}'; j++) {
-						line += X.charAt(j+1);
+        ArrayList<String> data = barFileSysController.readDataFromFile();              
+        if(!data.isEmpty()) {			
+			for(int seriIndex=0;seriIndex< data.size();seriIndex++) {																				
+				String X = data.get(seriIndex);	
+				int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,yindexCounter=0;
+				String[] lineNames =new String[arraySize];
+				Number[] yValues = new Number[arraySize];				
+				String line = "";
+								
+				for(int k=0;k<X.length();k++) {
+					if(X.charAt(k) == '{') {						
+						for(int j=0; X.charAt(j+1) != '}'; j++) {
+							line += X.charAt(j+1);
+						}
+						lineNames[k] = line;
 					}
-					lineNames[i] = line;					
-				}			
-				if(X.charAt(i) == '[') {
-					int j=0;
-					String xCo = new String();
-					for(j=i;X.charAt(j+1)!=',';j++) {					
-						xCo+=X.charAt(j+1);					
+					if(X.charAt(k)=='[') {
+						String str4blk = "";
+						for(int j=k;X.charAt(j+1) != ',';j++) {
+							str4blk+=X.charAt(j+1);
+						}
+						bulkNames.add(str4blk);
 					}
-					xValues[xindexCounter]=Integer.parseInt(xCo);
-					xindexCounter++;
-				} else if(X.charAt(i)==',') {
-					int j=0;
-					String yCo = new String();
-					for(j=i;X.charAt(j+1)!=']';j++) {					
-						yCo+=X.charAt(j+1);					
-					}					
-					yValues[yindexCounter]=Integer.parseInt(yCo);
-					yindexCounter++;								
-				} else {}
-			}								
-			for(int i=0;i<xindexCounter;i++) {
-				String value1 = Integer.toString(xValues[i]);
-				String value2 = Integer.toString(yValues[i]);
-									    	
-    			obdata.add(new BarTableController(lineNames[i],value1,value2));							
-			}					
-		}        
-        Writer writer = null;
-        try {        	
-        	file = new File(file.getAbsolutePath()+".csv");
-            writer = new BufferedWriter(new FileWriter(file));
-            for (BarTableController person : obdata) {
-                String text = person.getSeries() + "," + person.getSeriesX() +","+ person.getSeriesY()+"\n";
-                writer.write(text);                
-            }
-            System.out.println("Export CSV\n\t CSV exported");
-        } catch (Exception ex) {ex.printStackTrace();System.out.println("Export CSV\n\t CSV exported error");}
-        finally {writer.flush();writer.close();}        	
+				}
+				//System.out.println("\tBulkNames: "+bulkNames);			
+				for(int k=0;k<X.length();k++) {
+					if(X.charAt(k)==',') {					
+						String xCo = new String();
+						for(int j=k;X.charAt(j+1) != ']';j++) {					
+							xCo+=X.charAt(j+1);					
+						}					
+						yValues[yindexCounter]=Double.parseDouble(xCo);
+						yindexCounter++;					
+					}				
+				}
+				for(int i=0;i<yindexCounter;i++) {
+					String value1 = bulkNames.get(i);
+					Number value2 = yValues[i];
+										    	
+	    			obdata.add(new BarTableController(lineNames[i],value1,value2));							
+				}				
+			}
+			Writer writer = null;
+	        try {        	
+	        	file = new File(file.getAbsolutePath()+".csv");
+	            writer = new BufferedWriter(new FileWriter(file));
+	            for (BarTableController person : obdata) {
+	                String text = person.getSeries() + "," + person.getSeriesX() +","+ person.getSeriesY()+"\n";
+	                writer.write(text);                
+	            }
+	            System.out.println("Export CSV\n\t CSV exported");
+	        } catch (Exception ex) {ex.printStackTrace();System.out.println("Export CSV\n\t CSV exported error");}
+	        finally {writer.flush();writer.close();}
+		}else {
+			error_label.setText("File is empty!\nPlease add data first for exporting");
+		}																		                       
     }
 	public void pdfTableExtract() throws DocumentException, FileNotFoundException {
 		FileChooser fileChooser = new FileChooser();
@@ -768,7 +777,7 @@ public class BarChartController {
             for(int i=0;i<table.getItems().size();i++) {
             	report_table.addCell(getCell(((BarTableController) table.getItems().get(i)).getSeries(),PdfPCell.ALIGN_CENTER ));
             	report_table.addCell(getCell(((BarTableController) table.getItems().get(i)).getSeriesX(),PdfPCell.ALIGN_CENTER ));
-            	report_table.addCell(getCell(((BarTableController) table.getItems().get(i)).getSeriesY(),PdfPCell.ALIGN_CENTER ));
+            	report_table.addCell(getCell(((BarTableController) table.getItems().get(i)).getSeriesY().toString(),PdfPCell.ALIGN_CENTER ));
             }
             report.add(report_table);
             report.close();

@@ -3,21 +3,21 @@ package BarChart;
 public class BarTableController {
 	private String series;
     private String seriesX;
-    private String seriesY;
+    private Number seriesY;
 
-    public BarTableController(String series, String seriesX, String seriesY) {
+    public BarTableController(String series, String seriesX, Number value2) {
         this.series = series;
         this.seriesX = seriesX;
-        this.seriesY = seriesY;
+        this.seriesY = value2;
     }
 
-    public String getSeries() {
-        return series;
+    public String getSeries() {    	
+		return series;
     }
     public String getSeriesX() {
         return seriesX;
     }
-    public String getSeriesY() {
+    public Number getSeriesY() {
         return seriesY;
     }
 }
