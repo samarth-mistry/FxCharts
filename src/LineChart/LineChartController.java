@@ -93,6 +93,8 @@ public class LineChartController {
 	@FXML private Button loadDataInTable;
 	@FXML private Button add_data;	
 	@FXML private AnchorPane anchor;
+	@FXML private AnchorPane anchor1;
+	@FXML private AnchorPane anchor2;
 	@FXML private Circle theameCircle;
 	private boolean theame=true;
 	final Stage primaryStage = null;
@@ -186,7 +188,8 @@ public class LineChartController {
 			Color c = Color.web("#d8d8d8");
 			error_label.setTextFill(Color.web("red"));
 			error_label.setStyle("-fx-border-color: red");
-			anchor.setStyle("-fx-background-color:  #666666");
+			anchor1.setStyle("-fx-background-color:  #666666");
+			anchor2.setStyle("-fx-background-color:  #666666");
 			lChart.setStyle("-fx-border-color: #d8d8d8");
 		    lChart.setStyle("-fx-text-fill: black");
 			lineValue.setStyle("-fx-border-color: #d8d8d8");
@@ -207,7 +210,8 @@ public class LineChartController {
 			Color c = Color.web("#666666");
 			error_label.setTextFill(Color.web("pink"));
 			error_label.setStyle("-fx-border-color:  pink");
-			anchor.setStyle("-fx-background-color:  #d8d8d8");
+			anchor1.setStyle("-fx-background-color:  #d8d8d8");
+			anchor2.setStyle("-fx-background-color:  #d8d8d8");
 			lChart.setStyle("-fx-border-color: #666666");
 			lChart.setStyle("-fx-text-fill: white");
 			lineValue.setStyle("-fx-border-color: #666666");

@@ -110,6 +110,7 @@ public class BarChartController {
 	@FXML private Button add_data;
 	@FXML private Button add_b_data;
 	@FXML private Button add_b_nms;
+	@FXML private AnchorPane anchor;
 	@FXML private AnchorPane anchor1;
 	@FXML private AnchorPane anchor2;
 	@FXML private Circle theameCircle;	    
@@ -121,35 +122,39 @@ public class BarChartController {
     final KeyCombination altj= new KeyCodeCombination(KeyCode.J, KeyCombination.ALT_DOWN);
     final KeyCombination altk= new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN);
     final KeyCombination altl= new KeyCodeCombination(KeyCode.L, KeyCombination.ALT_DOWN);
-    final KeyCombination altb= new KeyCodeCombination(KeyCode.B, KeyCombination.ALT_DOWN);
-    final KeyCombination altf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
-    final KeyCombination altd= new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlb= new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrld= new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrlPrintPDF = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrlPrintPNG = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
-	@FXML
-    void btnOnKeyPressed(KeyEvent event) {	
-		if (alt1.match(event)) {setBulkNames();bulk.requestFocus();}
-		if (alt2.match(event)) {addBulkData();bulk.requestFocus();}
-		if (alt2.match(event)) {addBulkData();bulk.requestFocus();}
-		
-		if (altEnter.match(event)) {addData();nm.requestFocus();}
-		if (altT.match(event)) {changeTheme();}
-		
+    @FXML void bulkNamesPressed(KeyEvent event) {
+    	if (alt1.match(event)) 						
+			setBulkNames();		
+    }
+    @FXML void bulkEntriesPressed(KeyEvent event) {
+    	if (alt2.match(event)) {addBulkData();}
+    }
+    @FXML void nmValEntriesPressed(KeyEvent event) {
+    	if (altEnter.match(event)) {addData();}
+    }
+	@FXML void btnOnKeyPressed(KeyEvent event) {									
+		if (altT.match(event)) {changeTheme();}		
 		if (altj.match(event)) {clearChart();}
 		if (altk.match(event)) {clearFile();}
-		if (altl.match(event)) {clearDb();}
-		
-		if (altb.match(event)) {
-			if(bulkEnable.isSelected())
+		if (altl.match(event)) {clearDb();}		
+		if (ctrlb.match(event)) {
+			if(bulkEnable.isSelected()) {
 				bulkEnable.setSelected(false);
+				bulkNms.requestFocus();
+			}
 			else
 				bulkEnable.setSelected(true);
 			
 			buttonEnabler();
 		}
-		if (altf.match(event)) {
+		if (ctrlf.match(event)) {
 			if(fileEnable.isSelected())
 				fileEnable.setSelected(false);
 			else
@@ -157,15 +162,14 @@ public class BarChartController {
 			
 			buttonEnabler();
 		}
-		if (altd.match(event)) {
+		if (ctrld.match(event)) {
 			if(dbEnable.isSelected())
 				dbEnable.setSelected(false);
 			else
 				dbEnable.setSelected(true);
 			
 			buttonEnabler();
-		}
-		
+		}		
         if (ctrlPrintPDF.match(event)) {pdfExtract();}
         if (ctrlPrintPNG.match(event)) {pngExtract();}
         if (ctrlQ.match(event)) {exit();}
@@ -179,7 +183,7 @@ public class BarChartController {
 				error_label.setText("Error Occured!");
 				e.printStackTrace();
 			}
-        }                
+        }           
 	}
 	private boolean theame=true;
 	final Stage primaryStage = null;
@@ -267,7 +271,7 @@ public class BarChartController {
 		if(xxisLabel.getText() == "")
 			xxis.setLabel("X->");
 		if(yxisLabel.getText() == "")
-			yxis.setLabel("X->");		
+			yxis.setLabel("Y->");		
 	}
 	public void buttonEnabler() {
 		if(fileEnable.isSelected()) {
@@ -524,6 +528,7 @@ public class BarChartController {
 	private void decodeAndDraw(String bar,String X,Boolean whoCalled) {
 		System.out.println("#decodeAndDraw");
 		if(bulkNames.isEmpty()) {
+			System.out.println("decode setting again");
 			setBulkNames();
 		}		
 		error_label.setText("");

@@ -81,6 +81,8 @@ public class PieChartController {
 	@FXML private Button add_data;
 	@FXML private Button add_b_data;
 	@FXML private AnchorPane anchor;
+	@FXML private AnchorPane anchor1;
+	@FXML private AnchorPane anchor2;
 	@FXML private Circle theameCircle;
 	final Stage primaryStage = null;
 	private boolean theame=true;
