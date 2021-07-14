@@ -62,6 +62,10 @@ import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -108,7 +112,75 @@ public class BarChartController {
 	@FXML private Button add_b_nms;
 	@FXML private AnchorPane anchor1;
 	@FXML private AnchorPane anchor2;
-	@FXML private Circle theameCircle;
+	@FXML private Circle theameCircle;	    
+    final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN);
+    final KeyCombination alt1= new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.ALT_DOWN);
+    final KeyCombination alt2= new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.ALT_DOWN);
+    final KeyCombination alt3= new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.ALT_DOWN);
+    final KeyCombination altT= new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
+    final KeyCombination altj= new KeyCodeCombination(KeyCode.J, KeyCombination.ALT_DOWN);
+    final KeyCombination altk= new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN);
+    final KeyCombination altl= new KeyCodeCombination(KeyCode.L, KeyCombination.ALT_DOWN);
+    final KeyCombination altb= new KeyCodeCombination(KeyCode.B, KeyCombination.ALT_DOWN);
+    final KeyCombination altf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+    final KeyCombination altd= new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlPrintPDF = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlPrintPNG = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
+	@FXML
+    void btnOnKeyPressed(KeyEvent event) {	
+		if (alt1.match(event)) {setBulkNames();bulk.requestFocus();}
+		if (alt2.match(event)) {addBulkData();bulk.requestFocus();}
+		if (alt2.match(event)) {addBulkData();bulk.requestFocus();}
+		
+		if (altEnter.match(event)) {addData();nm.requestFocus();}
+		if (altT.match(event)) {changeTheme();}
+		
+		if (altj.match(event)) {clearChart();}
+		if (altk.match(event)) {clearFile();}
+		if (altl.match(event)) {clearDb();}
+		
+		if (altb.match(event)) {
+			if(bulkEnable.isSelected())
+				bulkEnable.setSelected(false);
+			else
+				bulkEnable.setSelected(true);
+			
+			buttonEnabler();
+		}
+		if (altf.match(event)) {
+			if(fileEnable.isSelected())
+				fileEnable.setSelected(false);
+			else
+				fileEnable.setSelected(true);
+			
+			buttonEnabler();
+		}
+		if (altd.match(event)) {
+			if(dbEnable.isSelected())
+				dbEnable.setSelected(false);
+			else
+				dbEnable.setSelected(true);
+			
+			buttonEnabler();
+		}
+		
+        if (ctrlPrintPDF.match(event)) {pdfExtract();}
+        if (ctrlPrintPNG.match(event)) {pngExtract();}
+        if (ctrlQ.match(event)) {exit();}
+        if (ctrlPrintTPDF.match(event)) {        	
+        	try {
+				pdfTableExtract();
+			} catch (FileNotFoundException e) {
+				error_label.setText("Error Occured!");
+				e.printStackTrace();
+			} catch (DocumentException e) {
+				error_label.setText("Error Occured!");
+				e.printStackTrace();
+			}
+        }                
+	}
 	private boolean theame=true;
 	final Stage primaryStage = null;
 	final double SCALE_DELTA = 1.1;
@@ -125,7 +197,7 @@ public class BarChartController {
 	        bChart.setScaleY(1.0);
 	    }		    
 	}
-	public void barValuePlotter() {				
+	public void barValuePlotter() {		
 		for (final Series<String, Number> series : bChart.getData()) {			
 	        for (final XYChart.Data<String, Number> data : series.getData()) {
 	        	data.getNode().addEventHandler(MouseEvent.MOUSE_ENTERED,
@@ -140,7 +212,7 @@ public class BarChartController {
                 );	            
 	        }
 	    }    							
-	}
+	}	
 	//Clear Functions-----------------------------------------------------------
 	public void clearChart() {
 		bChart.getData().clear();		
@@ -154,7 +226,7 @@ public class BarChartController {
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
-			barFileSysController.clearFile("locations.txt");
+			barFileSysController.clearFile("barFileData.txt");
 			error_label.setText("File is Cleared\nData is permanently lost");
 		}		
 	}
@@ -283,7 +355,7 @@ public class BarChartController {
 	//Add Functions-----------------------------------------------------------
 	public void addData() {		
 		System.out.println("#AddSinBarData#");
-		String X = bulk.getText();
+		String X = val.getText();
 		if(nm.getText().isEmpty() || val.getText().isEmpty())
 			error_label.setText("Enter both name and value before adding");
 		else if(seriesLabel == null)
@@ -696,7 +768,6 @@ public class BarChartController {
 			}
 		}
 	}
-	@SuppressWarnings("null")
 	public void csvExtract() throws IOException {
 	    FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save");
