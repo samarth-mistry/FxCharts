@@ -14,20 +14,21 @@
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.shape.Line?>
+<?import javafx.scene.text.Font?>
 
 <AnchorPane fx:id="anchor" prefHeight="600.0" prefWidth="1339.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="BarChart.BarChartController">
    <children>
-      <TextField fx:id="barChartTitle" layoutX="9.0" layoutY="185.0" onKeyTyped="#axisRenamed" promptText="Title" />
-      <TextField layoutX="9.0" layoutY="217.0" onKeyTyped="#axisRenamed" promptText="Label of X-axis" text="X" fx:id="xxisLabel" />
-      <TextField fx:id="yxisLabel" layoutX="9.0" layoutY="250.0" onKeyTyped="#axisRenamed" promptText="Label of Y-axis" text="Y" />
+      <TextField fx:id="barChartTitle" layoutX="9.0" layoutY="185.0" onKeyReleased="#btnOnKeyPressed" onKeyTyped="#axisRenamed" promptText="Title" />
+      <TextField layoutX="9.0" layoutY="217.0" onKeyReleased="#btnOnKeyPressed" onKeyTyped="#axisRenamed" promptText="Label of X-axis" text="X" fx:id="xxisLabel" />
+      <TextField fx:id="yxisLabel" layoutX="9.0" layoutY="250.0" onKeyReleased="#btnOnKeyPressed" onKeyTyped="#axisRenamed" promptText="Label of Y-axis" text="Y" />
       <TextField fx:id="seriesLabel" layoutX="9.0" layoutY="283.0" promptText="Label for line" text="Line" />
       <TextField fx:id="nm" layoutX="9.0" layoutY="315.0" onKeyReleased="#nmValEntriesPressed" promptText="Name" text="Name" />
       <TextField fx:id="val" layoutX="9.0" layoutY="346.0" onKeyReleased="#nmValEntriesPressed" promptText="Value" text="10.8" />
       <TextArea fx:id="bulkNms" disable="true" layoutX="9.0" layoutY="377.0" onKeyReleased="#bulkNamesPressed" prefHeight="41.0" prefWidth="281.0" promptText="Enter Bulk Names          eg. [Name1][Name2][.....]..." />
       <TextArea fx:id="bulk" disable="true" layoutX="9.0" layoutY="427.0" onKeyReleased="#bulkEntriesPressed" prefHeight="84.0" prefWidth="281.0" promptText="Bulk entry here eg. [abc,23.4][efg,34.2]........" />
-      <CheckBox fx:id="bulkEnable" layoutX="606.0" layoutY="524.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable Bulk" />
-      <CheckBox fx:id="fileEnable" layoutX="606.0" layoutY="546.0" mnemonicParsing="false" onAction="#buttonEnabler" prefHeight="18.0" prefWidth="101.0" text="Enable File" />
-      <CheckBox fx:id="dbEnable" layoutX="606.0" layoutY="568.0" mnemonicParsing="false" onAction="#buttonEnabler" prefHeight="18.0" prefWidth="96.0" text="Enable DB" />
+      <CheckBox fx:id="bulkEnable" layoutX="606.0" layoutY="524.0" mnemonicParsing="false" onAction="#buttonEnabler" onKeyReleased="#btnOnKeyPressed" text="Enable Bulk" />
+      <CheckBox fx:id="fileEnable" layoutX="606.0" layoutY="546.0" mnemonicParsing="false" onAction="#buttonEnabler" onKeyReleased="#btnOnKeyPressed" prefHeight="18.0" prefWidth="101.0" text="Enable File" />
+      <CheckBox fx:id="dbEnable" layoutX="606.0" layoutY="568.0" mnemonicParsing="false" onAction="#buttonEnabler" onKeyReleased="#btnOnKeyPressed" prefHeight="18.0" prefWidth="96.0" text="Enable DB" />
       <Button fx:id="add_data" layoutX="221.0" layoutY="529.0" mnemonicParsing="false" onAction="#addData" prefHeight="24.0" prefWidth="88.0" style="-fx-background-color: #60c0da;" text="Add Line" />
       <Button layoutX="738.0" layoutY="565.0" mnemonicParsing="false" onAction="#exit" style="-fx-background-color: #ff2225;" text="Exit" textFill="WHITE" />
       <Button fx:id="loadDataFromFile" disable="true" layoutX="452.0" layoutY="560.0" mnemonicParsing="false" onAction="#loadDataFromFile" style="-fx-background-color: #60c0da;" text="Load data from file" />
@@ -44,8 +45,14 @@
       <Label fx:id="l3" layoutX="188.0" layoutY="254.0" text="Y-axis name" />
       <Label fx:id="l2" layoutX="187.0" layoutY="221.0" text="X-axis name" />
       <Label fx:id="l1" layoutX="188.0" layoutY="189.0" text="BarChart title" />
-      <Label fx:id="error_label" layoutX="310.0" layoutY="14.0" prefHeight="25.0" prefWidth="651.0" style="-fx-border-color: red;" textFill="#fc0a0a" />
-      <Label fx:id="barValue" layoutX="411.0" layoutY="487.0" prefHeight="25.0" prefWidth="486.0" style="-fx-border-color: black;" />
+      <Label fx:id="error_label" alignment="CENTER" layoutX="296.0" layoutY="14.0" prefHeight="25.0" prefWidth="681.0" style="-fx-border-color: black;" textFill="#e01f8d" wrapText="true">
+         <font>
+            <Font name="System Bold Italic" size="14.0" />
+         </font></Label>
+      <Label fx:id="barValue" alignment="CENTER" layoutX="411.0" layoutY="487.0" prefHeight="25.0" prefWidth="486.0" style="-fx-border-color: black;">
+         <font>
+            <Font name="DejaVu Sans Bold" size="16.0" />
+         </font></Label>
       <Label fx:id="l6" layoutX="189.0" layoutY="350.0" text="Data value" />
       <Label fx:id="l5" layoutX="189.0" layoutY="319.0" text="Data name" />
       <Line endX="979.0" layoutX="344.0" layoutY="521.0" startX="-334.0" />

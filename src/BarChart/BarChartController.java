@@ -224,7 +224,7 @@ public class BarChartController {
 	//Clear Functions-----------------------------------------------------------
 	public void clearChart() {
 		bChart.getData().clear();		
-		error_label.setText("Chart Data Cleared!\nClick load data to reload");				
+		error_label.setText("Chart Data Cleared! Click load data to reload");				
 	}
 	public void clearFile() {		
 		Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -235,7 +235,7 @@ public class BarChartController {
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
 			barFileSysController.clearFile("barFileData.txt");
-			error_label.setText("File is Cleared\nData is permanently lost");
+			error_label.setText("File is Cleared. Data is permanently lost");
 		}		
 	}
 	public void clearTable() {
@@ -251,7 +251,7 @@ public class BarChartController {
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
 			DbController.clearSeries();
-			error_label.setText("DB is Cleared\nData is permanently lost");
+			error_label.setText("DB is Cleared. Data is permanently lost");
 		}		
 	}
 	public void exit() {
@@ -309,9 +309,8 @@ public class BarChartController {
 	}
 	public void changeTheme() {
 		if(theame) {	//light
-			Color c = Color.web("#d8d8d8");
-			error_label.setTextFill(Color.web("red"));
-			error_label.setStyle("-fx-border-color: red");
+			Color c = Color.web("#d8d8d8");			//white color	
+			error_label.setStyle("-fx-border-color: white");
 			anchor.setStyle("-fx-background-color:  #666666");
 			//anchor2.setStyle("-fx-background-color:  #666666");
 			bChart.setStyle("-fx-border-color: #d8d8d8");
@@ -334,9 +333,8 @@ public class BarChartController {
 			theame = false;
 		}
 		else {		//dark
-			Color c = Color.web("#666666");
-			error_label.setTextFill(Color.web("pink"));
-			error_label.setStyle("-fx-border-color:  pink");
+			Color c = Color.web("#666666");			
+			error_label.setStyle("-fx-border-color: black");
 			anchor.setStyle("-fx-background-color:  #d8d8d8");
 			//anchor2.setStyle("-fx-background-color:  #d8d8d8");
 			bChart.setStyle("-fx-border-color: #666666");
@@ -396,7 +394,13 @@ public class BarChartController {
 				catch (SQLException e) {e.printStackTrace();}
 			}
 			decodeAndDraw(seriesLabel.getText(),X,true);
-			loadDataInTable();
+			table.setEditable(true);
+			c1.setCellValueFactory(new PropertyValueFactory<>("series"));		
+			c2.setCellValueFactory(new PropertyValueFactory<>("seriesX"));
+			c3.setCellValueFactory(new PropertyValueFactory<>("seriesY"));
+			c1.setSortable(false);
+			c2.setSortable(false);
+			c3.setSortable(false);
 		}
 	}
 	//Draw & decoding Validations Functions-----------------------------------------------------------
@@ -420,9 +424,14 @@ public class BarChartController {
 				for(i=0;i<filled;i++) {
 					if(!whoCalled) {
 						series.setName(barName);
-					}
-					System.out.println("Plotting: "+bulkNames.get(i)+yValues[i]);
+					}					
 					series.getData().add(new XYChart.Data<String, Number>(bulkNames.get(i),yValues[i]));
+					BarTableController row;
+					if(i==0)
+						row = new BarTableController(barName,bulkNames.get(i),yValues[i]);
+					else
+						row = new BarTableController("",bulkNames.get(i),yValues[i]);
+					table.getItems().add(row);										
 				}			
 				Number[] yFin= new Number[i];
 				for(i=0;i<filled;i++) {				
