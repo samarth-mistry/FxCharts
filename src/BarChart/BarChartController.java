@@ -1,9 +1,7 @@
 package BarChart;
 
 import FileSys.barFileSysController;
-import PieChart.PieTableController;
 import DbSys.DbController;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -17,7 +15,9 @@ import java.util.Arrays;
 import java.util.Optional;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.imageio.ImageIO;
+
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
@@ -25,9 +25,9 @@ import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
+import com.itextpdf.awt.geom.Dimension;
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Element;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
@@ -36,16 +36,11 @@ import com.itextpdf.text.pdf.PdfWriter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
-import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
-import javafx.scene.chart.Axis;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
-import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
-import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Alert;
@@ -58,8 +53,6 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.control.Tooltip;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
@@ -71,7 +64,6 @@ import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -270,6 +262,8 @@ public class BarChartController {
 		bChart.setTitle(barChartTitle.getText());				
 		xxis.setLabel(xxisLabel.getText());
 		yxis.setLabel(yxisLabel.getText());		
+		c2.setText(xxisLabel.getText());
+		c3.setText(yxisLabel.getText());
 		if(barChartTitle.getText() == "")
 			bChart.setTitle("Line Chart");		
 		if(xxisLabel.getText() == "")
@@ -480,44 +474,7 @@ public class BarChartController {
 			bulk.setDisable(false);				
 		}		
 	}
-	public void drawSampleBar() {
-		bChart.getData().clear();
-		bChart.setTitle("Country Summary");
-        xxis.setLabel("Country");       
-        yxis.setLabel("Value");
-        
-        final String austria = "Austria";
-        final String brazil = "Brazil";
-        final String france = "France";
-        final String italy = "Italy";
-        final String usa = "USA";
-        
-        XYChart.Series series1 = new XYChart.Series();
-        series1.setName("2003");       
-        series1.getData().add(new XYChart.Data(austria, 25601.34));
-        series1.getData().add(new XYChart.Data(brazil, 20148.82));
-        series1.getData().add(new XYChart.Data(france, 10000));
-        series1.getData().add(new XYChart.Data(italy, 35407.15));
-        series1.getData().add(new XYChart.Data(usa, 12000));      
-        
-        XYChart.Series series2 = new XYChart.Series();
-        series2.setName("2004");
-        series2.getData().add(new XYChart.Data(austria, 57401.85));
-        series2.getData().add(new XYChart.Data(brazil, 41941.19));
-        series2.getData().add(new XYChart.Data(france, 45263.37));
-        series2.getData().add(new XYChart.Data(italy, 117320.16));
-        series2.getData().add(new XYChart.Data(usa, 14845.27));  
-        
-        XYChart.Series series3 = new XYChart.Series();
-        series3.setName("2005");
-        series3.getData().add(new XYChart.Data(austria, 45000.65));
-        series3.getData().add(new XYChart.Data(brazil, 44835.76));
-        series3.getData().add(new XYChart.Data(france, 18722.18));
-        series3.getData().add(new XYChart.Data(italy, 17557.31));
-        series3.getData().add(new XYChart.Data(usa, 92633.68));  
-                
-        bChart.getData().addAll(series1, series2, series3);
-	}
+
 	private boolean inputValidator(String X) {		
 		System.out.println("#PatternValidator#");										
 		for(int i=0;i< X.length();i++) {
@@ -737,25 +694,24 @@ public class BarChartController {
 	      
         if (file != null) {
 				WritableImage nodeshot = bChart.snapshot(new SnapshotParameters(), null);
-		        File imgfile = new File("84h8chart.png");
-		
+		        File imgfile = new File("dat/imgs/bchart.png");		        
 				try {
-					ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
+					ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", imgfile);
 				} catch (IOException e) {
 					System.out.println("Error in making image!");
 				}
 		        PDDocument doc = new PDDocument();
 		        PDPage page = new PDPage();
 		        PDImageXObject pdimage;
-		        PDPageContentStream content;
-		        try {
-		            pdimage = PDImageXObject.createFromFile("84h8chart.png",doc);
+		        PDPageContentStream content;	            		        
+		        try {		        	
+		            pdimage = PDImageXObject.createFromFile("dat/imgs/bchart.png",doc);		            		           
 		            content = new PDPageContentStream(doc, page);
-		            content.drawImage(pdimage,50, 50);
+		            content.drawImage(pdimage,-17,350);
 		        	content.beginText();                             
 		            content.setFont(PDType1Font.COURIER, 15);                          
-		            content.newLineAtOffset(10, 770);            
-		            String text = "LineChart by Cancer";             
+		            content.newLineAtOffset(420, 770);            
+		            String text = "BarChart by Cancer";             
 		            content.showText(text);        
 		            content.endText();
 		            content.close();
@@ -764,10 +720,11 @@ public class BarChartController {
 		            doc.close();
 		            System.out.println("DOC\n\tPdf Exported!");
 		            imgfile.delete();
+		            error_label.setText("PDF exported successfully");
 		        } catch (IOException ex) {
 		        	error_label.setText("Error occured in exporting PDF");		    
 		            Logger.getLogger(BarChart.class.getName()).log(Level.SEVERE, null, ex);
-		        }
+		        } 
 		}
     }	
 	public void pngExtract() {
