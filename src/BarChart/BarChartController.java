@@ -117,8 +117,7 @@ public class BarChartController {
     final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN);
     final KeyCombination alt1= new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.ALT_DOWN);
     final KeyCombination alt2= new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.ALT_DOWN);
-    final KeyCombination alt3= new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.ALT_DOWN);
-    final KeyCombination altT= new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
+    final KeyCombination alt3= new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.ALT_DOWN);    
     final KeyCombination altj= new KeyCodeCombination(KeyCode.J, KeyCombination.ALT_DOWN);
     final KeyCombination altk= new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN);
     final KeyCombination altl= new KeyCodeCombination(KeyCode.L, KeyCombination.ALT_DOWN);
@@ -129,51 +128,54 @@ public class BarChartController {
     final KeyCombination ctrlPrintPNG = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
+    final KeyCombination altT= new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
     @FXML void bulkNamesPressed(KeyEvent event) {
-    	if (alt1.match(event)) 						
-			setBulkNames();		
+    	if (altEnter.match(event)){setBulkNames();event.consume();}
+    	else {btnOnKeyPressed(event);event.consume();}
     }
     @FXML void bulkEntriesPressed(KeyEvent event) {
-    	if (alt2.match(event)) {addBulkData();}
+    	if (altEnter.match(event)) {addBulkData();event.consume();}
+    	else {btnOnKeyPressed(event);event.consume();}
     }
     @FXML void nmValEntriesPressed(KeyEvent event) {
-    	if (altEnter.match(event)) {addData();}
+    	if (altEnter.match(event)) {addData();event.consume();}
+    	else {btnOnKeyPressed(event);event.consume();}
     }
 	@FXML void btnOnKeyPressed(KeyEvent event) {									
-		if (altT.match(event)) {changeTheme();}		
-		if (altj.match(event)) {clearChart();}
-		if (altk.match(event)) {clearFile();}
-		if (altl.match(event)) {clearDb();}		
-		if (ctrlb.match(event)) {
+		if (altT.match(event)) {changeTheme();event.consume();}		
+		else if (altj.match(event)) {clearChart();event.consume();}
+		else if (altk.match(event)) {clearFile();event.consume();}
+		else if (altl.match(event)) {clearDb();event.consume();}		
+		else if (ctrlb.match(event)) {
 			if(bulkEnable.isSelected()) {
 				bulkEnable.setSelected(false);
 				bulkNms.requestFocus();
 			}
 			else
 				bulkEnable.setSelected(true);
-			
+			event.consume();
 			buttonEnabler();
 		}
-		if (ctrlf.match(event)) {
+		else if (ctrlf.match(event)) {
 			if(fileEnable.isSelected())
 				fileEnable.setSelected(false);
 			else
 				fileEnable.setSelected(true);
-			
+			event.consume();
 			buttonEnabler();
 		}
-		if (ctrld.match(event)) {
+		else if (ctrld.match(event)) {
 			if(dbEnable.isSelected())
 				dbEnable.setSelected(false);
 			else
 				dbEnable.setSelected(true);
-			
+			event.consume();
 			buttonEnabler();
 		}		
-        if (ctrlPrintPDF.match(event)) {pdfExtract();}
-        if (ctrlPrintPNG.match(event)) {pngExtract();}
-        if (ctrlQ.match(event)) {exit();}
-        if (ctrlPrintTPDF.match(event)) {        	
+		else if (ctrlPrintPDF.match(event)) {pdfExtract();}
+		else if (ctrlPrintPNG.match(event)) {pngExtract();}
+		else if (ctrlQ.match(event)) {exit();}
+		else if (ctrlPrintTPDF.match(event)) {        	
         	try {
 				pdfTableExtract();
 			} catch (FileNotFoundException e) {
@@ -183,7 +185,9 @@ public class BarChartController {
 				error_label.setText("Error Occured!");
 				e.printStackTrace();
 			}
-        }           
+        }
+		else
+			event.consume();
 	}
 	private boolean theame=true;
 	final Stage primaryStage = null;
@@ -235,7 +239,7 @@ public class BarChartController {
 		}		
 	}
 	public void clearTable() {
-		table_error_label.setText("Table it cleared!\n To reload click on load button");
+		error_label.setText("Table it cleared! To reload click on load button");
 		table.getItems().clear();
 	}
 	public void clearDb() {
@@ -308,8 +312,8 @@ public class BarChartController {
 			Color c = Color.web("#d8d8d8");
 			error_label.setTextFill(Color.web("red"));
 			error_label.setStyle("-fx-border-color: red");
-			anchor1.setStyle("-fx-background-color:  #666666");
-			anchor2.setStyle("-fx-background-color:  #666666");
+			anchor.setStyle("-fx-background-color:  #666666");
+			//anchor2.setStyle("-fx-background-color:  #666666");
 			bChart.setStyle("-fx-border-color: #d8d8d8");
 		    bChart.setStyle("-fx-text-fill: black");
 			barValue.setStyle("-fx-border-color: #d8d8d8");
@@ -333,8 +337,8 @@ public class BarChartController {
 			Color c = Color.web("#666666");
 			error_label.setTextFill(Color.web("pink"));
 			error_label.setStyle("-fx-border-color:  pink");
-			anchor1.setStyle("-fx-background-color:  #d8d8d8");
-			anchor2.setStyle("-fx-background-color:  #d8d8d8");
+			anchor.setStyle("-fx-background-color:  #d8d8d8");
+			//anchor2.setStyle("-fx-background-color:  #d8d8d8");
 			bChart.setStyle("-fx-border-color: #666666");
 			bChart.setStyle("-fx-text-fill: white");
 			barValue.setStyle("-fx-border-color: #666666");
@@ -384,14 +388,15 @@ public class BarChartController {
 		}
 		else if(!inputValidator(X)) {
 			error_label.setText("");
-			error_label.setText("Entered pattern is not valid\nPlease try again!");
+			error_label.setText("Entered pattern is not valid. Please try again!");
 			System.out.println("Invalid Pattern");
 		} else {
 			if(dbEnable.isSelected()) {
 				try {if(!DbController.insertSeries(seriesLabel.getText(),1,X)) {error_label.setText("Error in Database");}} 
 				catch (SQLException e) {e.printStackTrace();}
 			}
-			decodeAndDraw(seriesLabel.getText(),X,true);					
+			decodeAndDraw(seriesLabel.getText(),X,true);
+			loadDataInTable();
 		}
 	}
 	//Draw & decoding Validations Functions-----------------------------------------------------------

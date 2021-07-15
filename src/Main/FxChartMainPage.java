@@ -47,7 +47,7 @@ public class FxChartMainPage extends Application{
         } else if(sel.equals("Line chart")) {
         	root =FXMLLoader.load(getClass().getResource("/LineChart/LineChart.fxml"));
         } else if(sel.equals("Bar chart")) {
-        	root =FXMLLoader.load(getClass().getResource("/BarChart/BarChart.fxml"));
+        	root =FXMLLoader.load(getClass().getResource("/BarChart/BarChartModel2.fxml"));
         }
         else if(sel.equals("Stacked chart")) {
         	//root =FXMLLoader.load(getClass().getResource("/LineChart/LineChart.fxml"));
