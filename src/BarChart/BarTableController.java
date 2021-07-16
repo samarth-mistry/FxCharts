@@ -14,6 +14,9 @@ public class BarTableController {
     public String getSeries() {    	
 		return series;
     }
+    public void setSeries(String series) {    	
+    	this.series = series;
+    }
     public String getSeriesX() {
         return seriesX;
     }

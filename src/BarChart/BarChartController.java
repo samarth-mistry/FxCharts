@@ -36,6 +36,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.BarChart;
@@ -50,10 +51,13 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
+import javafx.scene.control.TableColumn.CellEditEvent;
+import javafx.scene.control.TablePosition;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -90,7 +94,7 @@ public class BarChartController {
 	@FXML private CategoryAxis xxis;
 	@FXML private NumberAxis yxis;
 	@FXML private TableView<BarTableController> table;
-	@FXML private TableColumn<String, String> c1;
+	@FXML private TableColumn<BarTableController, String> c1;
 	@FXML private TableColumn<String, String> c2;
 	@FXML private TableColumn<String, String> c3;
 	@FXML private CheckBox dbEnable;
@@ -389,14 +393,23 @@ public class BarChartController {
 			}
 			decodeAndDraw(seriesLabel.getText(),X,true);
 			table.setEditable(true);
-			c1.setCellValueFactory(new PropertyValueFactory<>("series"));		
+			table.getSelectionModel().cellSelectionEnabledProperty().set(true);
+			 c1.setCellFactory(TextFieldTableCell.forTableColumn());			 	
+		        c1.setOnEditCommit(
+		            new EventHandler<CellEditEvent<BarTableController, String>>() {
+		                public void handle(CellEditEvent<BarTableController, String> t) {
+		                    	((BarTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setSeries(t.getNewValue().toString());		                    	
+		                }
+		            }
+		        );
+			c1.setCellValueFactory(new PropertyValueFactory<>("series"));			
 			c2.setCellValueFactory(new PropertyValueFactory<>("seriesX"));
 			c3.setCellValueFactory(new PropertyValueFactory<>("seriesY"));
 			c1.setSortable(false);
 			c2.setSortable(false);
 			c3.setSortable(false);
 		}
-	}
+	}	
 	//Draw & decoding Validations Functions-----------------------------------------------------------
 	private void drawSinChart(Boolean whoCalled) {
 		System.out.println("#drawSinChart");
@@ -474,7 +487,6 @@ public class BarChartController {
 			bulk.setDisable(false);				
 		}		
 	}
-
 	private boolean inputValidator(String X) {		
 		System.out.println("#PatternValidator#");										
 		for(int i=0;i< X.length();i++) {
@@ -613,7 +625,7 @@ public class BarChartController {
 		c1.setCellValueFactory(new PropertyValueFactory<>("series"));		
 		c2.setCellValueFactory(new PropertyValueFactory<>("seriesX"));
 		c3.setCellValueFactory(new PropertyValueFactory<>("seriesY"));
-		c1.setSortable(false);
+		c1.setSortable(false);	
 		c2.setSortable(false);
 		c3.setSortable(false);
 		
@@ -836,6 +848,43 @@ public class BarChartController {
             System.out.println("Export\n\tLine Table exported!");
 		}
     }
+	public void refresh() {
+		editFromTable();
+	}
+	public void editFromTable() {			//Allahu akber 
+		System.out.println("#editFromTable#");
+		ArrayList<String> barNmTab = new ArrayList<String>();
+		int i;
+		for(i=0;i<table.getItems().size();i++) {
+			String z = table.getItems().get(i).getSeries();
+			String x = table.getItems().get(i).getSeriesX();
+			String y = table.getItems().get(i).getSeriesY().toString();
+			
+			System.out.println(z+"\t"+x+"\t"+y);
+			if(!z.isEmpty())
+				barNmTab.add(z);
+		}
+		Number[][] yFin= new Number[barNmTab.size()][table.getItems().size()/barNmTab.size()];		
+		int finCounter = -1,interCount = 0;	
+		for(i=0;i<table.getItems().size();i++) {		
+			if(table.getItems().get(i).getSeries() != "") {
+				finCounter++;
+				System.out.println("finCount: "+finCounter);
+				interCount = 0;
+			}else {
+				interCount++;
+				System.out.println("InterCount: "+interCount);
+			}
+			yFin[finCounter][interCount]=table.getItems().get(i).getSeriesY();
+		}
+		System.out.println("YFIN : "+yFin);
+		clearFile();
+		clearTable();
+		for(int j=0;j< barNmTab.size();j++) {		
+			callWriter(barNmTab.get(j),bulkNames, yFin[j]);
+		}
+		loadDataFromFileConfirmed();
+	}
 	private PdfPCell getCell(String text, int alignment) {
         PdfPCell cell = new PdfPCell(new Phrase(text));
         cell.setPadding(0);
