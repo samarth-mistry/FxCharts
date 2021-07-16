@@ -56,14 +56,14 @@
          <font>
             <Font name="System Bold Italic" size="14.0" />
          </font></Label>
-      <Label fx:id="barValue" alignment="CENTER" layoutX="381.0" layoutY="486.0" prefHeight="25.0" prefWidth="486.0" style="-fx-border-color: black;">
+      <Label fx:id="barValue" alignment="CENTER" layoutX="381.0" layoutY="486.0" prefHeight="25.0" prefWidth="486.0">
          <font>
             <Font name="DejaVu Sans Bold" size="16.0" />
          </font></Label>
       <Label fx:id="l6" layoutX="189.0" layoutY="350.0" text="Data value" />
       <Label fx:id="l5" layoutX="189.0" layoutY="319.0" text="Data name" />
       <Line endX="979.0" layoutX="344.0" layoutY="521.0" startX="-334.0" />
-      <BarChart fx:id="bChart" layoutX="295.0" layoutY="44.0" onMouseClicked="#zoomNormal" onScroll="#zoomLineChart" prefHeight="428.0" prefWidth="658.0" title="BarChart title">
+      <BarChart fx:id="bChart" layoutX="295.0" layoutY="44.0" onMouseClicked="#zoomNormal" onScroll="#zoomLineChart" prefHeight="428.0" prefWidth="658.0" style="-fx-border-color: black;" title="BarChart title">
          <xAxis>
             <CategoryAxis side="BOTTOM" fx:id="xxis" />
          </xAxis>

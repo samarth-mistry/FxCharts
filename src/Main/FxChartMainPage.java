@@ -30,7 +30,7 @@ public class FxChartMainPage extends Application{
 		//chartSelector(primaryStage);
 		//URL url = new File("resources/views/LineChart.fxml").toURI().toURL();
 		//Parent root =FXMLLoader.load(url);
-		setStage(primaryStage,"Bar chart");
+		setStage(primaryStage,"Pie chart");
 	}
 	private void chartSelector(Stage primaryStage) throws IOException {
 		String chrt[] = {"Pie chart", "Line chart", "Stacked chart", "Bar chart"};
@@ -43,7 +43,7 @@ public class FxChartMainPage extends Application{
 	private void setStage(Stage primaryStage, String sel) throws IOException {
 		Parent root = null;
 		if(sel.equals("Pie chart")) {
-			root =FXMLLoader.load(getClass().getResource("/PieChart/PieChart.fxml"));
+			root =FXMLLoader.load(getClass().getResource("/PieChart/PieChartModel2.fxml"));
         } else if(sel.equals("Line chart")) {
         	root =FXMLLoader.load(getClass().getResource("/LineChart/LineChart.fxml"));
         } else if(sel.equals("Bar chart")) {

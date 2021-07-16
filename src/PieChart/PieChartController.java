@@ -69,7 +69,7 @@ public class PieChartController {
 	@FXML private TextField nm;
 	@FXML private TextField val;
 	@FXML private TextArea bulk;
-	@FXML private TableView table;
+	@FXML private TableView<PieTableController> table;
 	@FXML private TableColumn<String, String> c1;
 	@FXML private TableColumn<String, String> c2;
 	@FXML private CheckBox bulkEnable;
@@ -122,7 +122,7 @@ public class PieChartController {
 		}		
 	}
 	public void clearTable() {
-		table_error_label.setText("PieTable it cleared!\n To reload click on load button");
+		error_label.setText("PieTable it cleared!\n To reload click on load button");
 		table.getItems().clear();
 	}
 	public void clearDb() {
@@ -154,6 +154,9 @@ public class PieChartController {
 		valArr.remove(index);		
 		callWriter();
 		loadDataFromFile();
+	}
+	public void refresh() {
+		
 	}
 	//Configuration functions Functions-----------------------------------------------------------
 	public void axisRenamed() {	
@@ -191,30 +194,28 @@ public class PieChartController {
 		}
 	}
 	public void changeTheme() {
-		if(theame) {	//light
-			error_label.setTextFill(Color.web("red"));
+		if(theame) {	//light			
 			anchor.setStyle("-fx-background-color:  #666666");
-			pChart.setStyle("-fx-border-color:  #d8d8d8");
-			pieValue.setStyle("-fx-border-color:  #d8d8d8");
+			pChart.setStyle("-fx-border-color:  #d8d8d8");			
 			Color c = Color.web("#d8d8d8");
 			l1.setTextFill(c);
 			l2.setTextFill(c);
 			l3.setTextFill(c);
+			pieValue.setTextFill(c);
 			fileEnable.setTextFill(c);
 			dbEnable.setTextFill(c);
 			bulkEnable.setTextFill(c);			
 			theameCircle.setFill(c);
 			theame = false;
 		}
-		else {		//dark
-			error_label.setTextFill(Color.web("pink"));
+		else {			//dark			
 			anchor.setStyle("-fx-background-color:  #d8d8d8");
-			pChart.setStyle("-fx-border-color:  #666666");
-			pieValue.setStyle("-fx-border-color:  #666666");
+			pChart.setStyle("-fx-border-color:  #666666");			
 			Color c = Color.web("#666666");
 			l1.setTextFill(c);
 			l2.setTextFill(c);
 			l3.setTextFill(c);
+			pieValue.setTextFill(c);
 			fileEnable.setTextFill(c);
 			dbEnable.setTextFill(c);
 			bulkEnable.setTextFill(c);			

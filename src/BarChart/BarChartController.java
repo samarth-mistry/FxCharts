@@ -95,7 +95,7 @@ public class BarChartController {
 	@FXML private NumberAxis yxis;
 	@FXML private TableView<BarTableController> table;
 	@FXML private TableColumn<BarTableController, String> c1;
-	@FXML private TableColumn<String, String> c2;
+	@FXML private TableColumn<BarTableController, String> c2;
 	@FXML private TableColumn<String, String> c3;
 	@FXML private CheckBox dbEnable;
 	@FXML private CheckBox fileEnable;
@@ -394,14 +394,18 @@ public class BarChartController {
 			decodeAndDraw(seriesLabel.getText(),X,true);
 			table.setEditable(true);
 			table.getSelectionModel().cellSelectionEnabledProperty().set(true);
-			 c1.setCellFactory(TextFieldTableCell.forTableColumn());			 	
-		        c1.setOnEditCommit(
-		            new EventHandler<CellEditEvent<BarTableController, String>>() {
-		                public void handle(CellEditEvent<BarTableController, String> t) {
-		                    	((BarTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setSeries(t.getNewValue().toString());		                    	
-		                }
-		            }
-		        );
+			c1.setCellFactory(TextFieldTableCell.forTableColumn());
+			c2.setCellFactory(TextFieldTableCell.forTableColumn());
+		    c1.setOnEditCommit(new EventHandler<CellEditEvent<BarTableController, String>>() {
+		         public void handle(CellEditEvent<BarTableController, String> t) {
+		               ((BarTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setSeries(t.getNewValue().toString());		                    	
+		         }
+		    });
+		    c2.setOnEditCommit(new EventHandler<CellEditEvent<BarTableController, String>>() {
+		         public void handle(CellEditEvent<BarTableController, String> t) {
+		               ((BarTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setSeries(t.getNewValue().toString());		                    	
+		         }
+		    });
 			c1.setCellValueFactory(new PropertyValueFactory<>("series"));			
 			c2.setCellValueFactory(new PropertyValueFactory<>("seriesX"));
 			c3.setCellValueFactory(new PropertyValueFactory<>("seriesY"));
@@ -854,7 +858,7 @@ public class BarChartController {
 	public void editFromTable() {			//Allahu akber 
 		System.out.println("#editFromTable#");
 		ArrayList<String> barNmTab = new ArrayList<String>();
-		int i;
+		int i;			
 		for(i=0;i<table.getItems().size();i++) {
 			String z = table.getItems().get(i).getSeries();
 			String x = table.getItems().get(i).getSeriesX();
@@ -863,21 +867,20 @@ public class BarChartController {
 			System.out.println(z+"\t"+x+"\t"+y);
 			if(!z.isEmpty())
 				barNmTab.add(z);
-		}
+		}		
 		Number[][] yFin= new Number[barNmTab.size()][table.getItems().size()/barNmTab.size()];		
 		int finCounter = -1,interCount = 0;	
-		for(i=0;i<table.getItems().size();i++) {		
-			if(table.getItems().get(i).getSeries() != "") {
-				finCounter++;
-				System.out.println("finCount: "+finCounter);
+		for(i=0;i<table.getItems().size();i++) {			
+			if(!table.getItems().get(i).getSeries().isEmpty()) {
+				finCounter++;				
 				interCount = 0;
+				System.out.println("finCount: "+finCounter);				
 			}else {
 				interCount++;
 				System.out.println("InterCount: "+interCount);
-			}
+			}			
 			yFin[finCounter][interCount]=table.getItems().get(i).getSeriesY();
-		}
-		System.out.println("YFIN : "+yFin);
+		}		
 		clearFile();
 		clearTable();
 		for(int j=0;j< barNmTab.size();j++) {		
