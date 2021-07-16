@@ -685,7 +685,11 @@ public class BarChartController {
 			error_label.setText("DB is empty!\nPlease add data first");
 		}
 	}
-	//Exports--------------------------------------------
+	//Previewing-------------------------------------------
+	public void previewPDF() {
+		
+	}
+	//Exports-------------------------------------------
 	public void pdfExtract() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save");
