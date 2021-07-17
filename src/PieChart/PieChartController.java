@@ -7,6 +7,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -40,14 +41,21 @@ import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -58,9 +66,9 @@ import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 
 public class PieChartController {
+	@FXML private MenuBar menuBar;
 	@FXML private PieChart pChart;
-	@FXML private Label error_label;
-	@FXML private Label table_error_label; 
+	@FXML private Label error_label;	
 	@FXML private Label pieValue;
 	@FXML private Label l3;
 	@FXML private Label l2;
@@ -81,8 +89,8 @@ public class PieChartController {
 	@FXML private Button add_data;
 	@FXML private Button add_b_data;
 	@FXML private AnchorPane anchor;
-	@FXML private AnchorPane anchor1;
-	@FXML private AnchorPane anchor2;
+	@FXML private DatePicker setDate;
+	@FXML private ToggleButton themeToggle;
 	@FXML private Circle theameCircle;
 	final Stage primaryStage = null;
 	private boolean theame=true;
@@ -90,9 +98,87 @@ public class PieChartController {
 	private ArrayList<String> nmArr = new ArrayList<String>();
 	private ArrayList<Double> valArr = new ArrayList<Double>();
 	final double SCALE_DELTA = 1.1;
+	final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN);
+    final KeyCombination altj= new KeyCodeCombination(KeyCode.J, KeyCombination.ALT_DOWN);
+    final KeyCombination altk= new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN);
+    final KeyCombination altl= new KeyCodeCombination(KeyCode.L, KeyCombination.ALT_DOWN);
+    final KeyCombination ctrlb= new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrld= new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlPrintPDF = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlPrintPNG = new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
+    final KeyCombination altT= new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
+    @FXML
+    public void initialize() {
+        System.out.println("#initialized#");
+        table.setEditable(true);
+		c1.setCellValueFactory(new PropertyValueFactory<>("s"));		
+		c2.setCellValueFactory(new PropertyValueFactory<>("d"));		
+		c1.setSortable(false);
+		c2.setSortable(false);
+		setDate.setValue(LocalDate.now());
+    }
+    @FXML void bulkEntriesPressed(KeyEvent event) {
+    	if (altEnter.match(event)) {addBulkData();event.consume();}
+    	else {btnOnKeyPressed(event);event.consume();}
+    }
+    @FXML void nmValEntriesPressed(KeyEvent event) {
+    	if (altEnter.match(event)) {addData();event.consume();}
+    	else {btnOnKeyPressed(event);event.consume();}
+    }
+	@FXML void btnOnKeyPressed(KeyEvent event) {									
+		if (altT.match(event)) {changeTheme();event.consume();}		
+		else if (altj.match(event)) {clearChart();event.consume();}
+		else if (altk.match(event)) {clearFile();event.consume();}
+		else if (altl.match(event)) {clearDb();event.consume();}		
+		else if (ctrlb.match(event)) {
+			if(bulkEnable.isSelected()) {
+				bulkEnable.setSelected(false);
+				bulk.requestFocus();
+			}
+			else
+				bulkEnable.setSelected(true);
+			event.consume();
+			buttonEnabler();
+		}
+		else if (ctrlf.match(event)) {
+			if(fileEnable.isSelected())
+				fileEnable.setSelected(false);
+			else
+				fileEnable.setSelected(true);
+			event.consume();
+			buttonEnabler();
+		}
+		else if (ctrld.match(event)) {
+			if(dbEnable.isSelected())
+				dbEnable.setSelected(false);
+			else
+				dbEnable.setSelected(true);
+			event.consume();
+			buttonEnabler();
+		}		
+		else if (ctrlPrintPDF.match(event)) {pdfExtract();}
+		else if (ctrlPrintPNG.match(event)) {pngExtract();}
+		else if (ctrlQ.match(event)) {exit();}
+		else if (ctrlPrintTPDF.match(event)) {        	
+        	try {
+				pdfTableExtract();
+			} catch (FileNotFoundException e) {
+				error_label.setText("Error Occured!");
+				e.printStackTrace();
+			} catch (DocumentException e) {
+				error_label.setText("Error Occured!");
+				e.printStackTrace();
+			}
+        }
+		else
+			event.consume();
+	}
 	//Zooming-------------------------------------------------
 	public void zoomPieChart(ScrollEvent event) {
-		 double scaleFactor = (event.getDeltaY() > 0) ? SCALE_DELTA : 1 / SCALE_DELTA;
+		double scaleFactor = (event.getDeltaY() > 0) ? SCALE_DELTA : 1 / SCALE_DELTA;
         pChart.setScaleX(pChart.getScaleX() * scaleFactor);
         pChart.setScaleY(pChart.getScaleY() * scaleFactor);
 	}
@@ -107,9 +193,9 @@ public class PieChartController {
 		pChart.getData().clear();
 		nmArr.clear();
 		valArr.clear();
-		error_label.setText("Chart Data Cleared!\nClick load data to reload");				
+		error_label.setText("Chart Data Cleared! Click load data to reload");				
 	}
-	public void clearFile() {		
+	public void clearFile() {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
 		alert.setTitle("ALERT");
 		alert.setHeaderText("Clearing PieFile will permanently delete your data!");
@@ -118,11 +204,11 @@ public class PieChartController {
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
 			pieFileSysController.clearFile("pieFileData.txt");	
-			error_label.setText("File is Cleared\nData is permanently lost");
+			error_label.setText("File is Cleared");
 		}		
 	}
 	public void clearTable() {
-		error_label.setText("PieTable it cleared!\n To reload click on load button");
+		error_label.setText("PieTable it cleared! To reload click on load button");
 		table.getItems().clear();
 	}
 	public void clearDb() {
@@ -134,8 +220,13 @@ public class PieChartController {
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
 			//DbController.clearSeries();
-			error_label.setText("PieDB is Cleared\nData is permanently lost");
+			error_label.setText("Database entries are been Cleared");
 		}		
+	}
+	public void clearAll() {
+		clearChart();
+		clearTable();
+		clearFile();
 	}
 	public void exit() {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -206,6 +297,7 @@ public class PieChartController {
 			dbEnable.setTextFill(c);
 			bulkEnable.setTextFill(c);			
 			theameCircle.setFill(c);
+			themeToggle.setText("Light");
 			theame = false;
 		}
 		else {			//dark			
@@ -220,6 +312,7 @@ public class PieChartController {
 			dbEnable.setTextFill(c);
 			bulkEnable.setTextFill(c);			
 			theameCircle.setFill(c);
+			themeToggle.setText("Dark");
 			theame = true;
 		}
 	}	
@@ -232,7 +325,7 @@ public class PieChartController {
 			drawChart(true);
 			if(fileEnable.isSelected())
 				callWriter();
-		}        	
+		}		
 	}
 	public void addBulkData() {		
 		if(bulkValidator()) {					
@@ -254,21 +347,24 @@ public class PieChartController {
 					}
 					valArr.add(Double.parseDouble(tit_2));
 				}								
-			}
+			}			
 			drawChart(true);
 			if(fileEnable.isSelected())
 				callWriter();
 		}else {
-			error_label.setText("Invalid input in bulk data enter.\n Please check again");
+			error_label.setText("Invalid input in bulk data enter. Please check again");
 		}
 	}
 	//Draw & decoding Validations Functions-----------------------------------------------------------
-	private void drawChart(Boolean whoCalled) {		
+	private void drawChart(Boolean whoCalled) {
+		clearTable();
 		pie_data = FXCollections.observableArrayList();
 		System.out.println("Drawing\n\tString\tDouble\n\t-------------------");
 		for(int i=0; i<nmArr.size();i++) {
 			System.out.println("\t"+nmArr.get(i)+"\t"+valArr.get(i));
 			pie_data.add(new PieChart.Data(nmArr.get(i),valArr.get(i)));
+			PieTableController row = new PieTableController(nmArr.get(i),valArr.get(i));
+			table.getItems().add(row);
 		}
 		System.out.println("\t-------------------");
 		pChart.setData(pie_data);
@@ -387,12 +483,7 @@ public class PieChartController {
 		drawChart(false);	
 	}	
 	public void loadDataInTable() {
-		//loadDataFromFile();
-		table.setEditable(true);
-		c1.setCellValueFactory(new PropertyValueFactory<>("s"));		
-		c2.setCellValueFactory(new PropertyValueFactory<>("d"));		
-		c1.setSortable(false);
-		c2.setSortable(false);
+		//loadDataFromFile();	
 		for(int i=0;i<nmArr.size();i++) {
 			PieTableController row = new PieTableController(nmArr.get(i),valArr.get(i));
 			table.getItems().add(row);			
