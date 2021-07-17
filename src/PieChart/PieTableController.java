@@ -14,4 +14,12 @@ public class PieTableController {
     public Double getD() {
         return d;
     }
+    public void setS(String s) {
+    	System.out.println("Setting S");
+    	this.s = s;
+    }
+    public void setD(String d) {
+    	System.out.println("Setting D");
+    	this.d = Double.parseDouble(d);
+    }
 }

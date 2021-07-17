@@ -1,3 +1,2 @@
-[PieSlice,10.8]
-[PieSlice,10.8]
-[PieSlice,10.8]
+[File1,10.0]
+[File2,90.0]

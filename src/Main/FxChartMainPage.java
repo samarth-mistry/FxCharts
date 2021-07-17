@@ -55,11 +55,14 @@ public class FxChartMainPage extends Application{
         	root =FXMLLoader.load(getClass().getResource("/LineChart/LineChart.fxml"));
         }					
 		Scene scene = new Scene(root);
-		primaryStage.getIcons().add(new Image(new File("/resources/imgs/logo.ico").toURI().toString()));
+		
+		//primaryStage.getIcons().add(new Image(new File("/resources/imgs/logo.ico").toURI().toString()));
 		primaryStage.setScene(scene);
-		primaryStage.setTitle("LineChart-Cancer's");		
-		primaryStage.show();
-		primaryStage.setResizable(false);
+		primaryStage.setTitle("FxCharts-Cancer's");
+		primaryStage.setMaximized(true);
+		primaryStage.setFullScreen(false);
+		primaryStage.setResizable(true);
+		primaryStage.show();		
 	}
 	private void auth(Stage primaryStage) {
 		Platform.runLater(new Runnable(){						

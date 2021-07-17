@@ -186,6 +186,15 @@ public class BarChartController {
 	final Stage primaryStage = null;
 	final double SCALE_DELTA = 1.1;
 	private ArrayList<String> bulkNames = new ArrayList<String>();
+	@FXML public void initialize() {
+		table.setEditable(true);		
+		c1.setCellValueFactory(new PropertyValueFactory<>("series"));			
+		c2.setCellValueFactory(new PropertyValueFactory<>("seriesX"));
+		c3.setCellValueFactory(new PropertyValueFactory<>("seriesY"));
+		c1.setSortable(false);
+		c2.setSortable(false);
+		c3.setSortable(false);
+	}
 	//Zooming-------------------------------------------------
 	public void zoomLineChart(ScrollEvent event) {
 		 double scaleFactor = (event.getDeltaY() > 0) ? SCALE_DELTA : 1 / SCALE_DELTA;
@@ -368,6 +377,19 @@ public class BarChartController {
 					catch (SQLException e) {e.printStackTrace();}
 				}
 				drawSinChart(true);
+				table.getSelectionModel().cellSelectionEnabledProperty().set(true);
+				c1.setCellFactory(TextFieldTableCell.forTableColumn());
+				c2.setCellFactory(TextFieldTableCell.forTableColumn());
+			    c1.setOnEditCommit(new EventHandler<CellEditEvent<BarTableController, String>>() {
+			         public void handle(CellEditEvent<BarTableController, String> t) {
+			               ((BarTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setSeries(t.getNewValue().toString());		                    	
+			         }
+			    });
+			    c2.setOnEditCommit(new EventHandler<CellEditEvent<BarTableController, String>>() {
+			         public void handle(CellEditEvent<BarTableController, String> t) {
+			               ((BarTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setSeries(t.getNewValue().toString());		                    	
+			         }
+			    });
 			}else
 				error_label.setText("Value of val must be number");
 		}
@@ -388,27 +410,7 @@ public class BarChartController {
 				try {if(!DbController.insertSeries(seriesLabel.getText(),1,X)) {error_label.setText("Error in Database");}} 
 				catch (SQLException e) {e.printStackTrace();}
 			}
-			decodeAndDraw(seriesLabel.getText(),X,true);
-			table.setEditable(true);
-			table.getSelectionModel().cellSelectionEnabledProperty().set(true);
-			c1.setCellFactory(TextFieldTableCell.forTableColumn());
-			c2.setCellFactory(TextFieldTableCell.forTableColumn());
-		    c1.setOnEditCommit(new EventHandler<CellEditEvent<BarTableController, String>>() {
-		         public void handle(CellEditEvent<BarTableController, String> t) {
-		               ((BarTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setSeries(t.getNewValue().toString());		                    	
-		         }
-		    });
-		    c2.setOnEditCommit(new EventHandler<CellEditEvent<BarTableController, String>>() {
-		         public void handle(CellEditEvent<BarTableController, String> t) {
-		               ((BarTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setSeries(t.getNewValue().toString());		                    	
-		         }
-		    });
-			c1.setCellValueFactory(new PropertyValueFactory<>("series"));			
-			c2.setCellValueFactory(new PropertyValueFactory<>("seriesX"));
-			c3.setCellValueFactory(new PropertyValueFactory<>("seriesY"));
-			c1.setSortable(false);
-			c2.setSortable(false);
-			c3.setSortable(false);
+			decodeAndDraw(seriesLabel.getText(),X,true);			
 		}
 	}	
 	//Draw & decoding Validations Functions-----------------------------------------------------------
@@ -852,7 +854,7 @@ public class BarChartController {
 	public void refresh() {
 		editFromTable();
 	}
-	public void editFromTable() {			//Allahu akber 
+	public void editFromTable() {  
 		System.out.println("#editFromTable#");
 		ArrayList<String> barNmTab = new ArrayList<String>();
 		int i;			

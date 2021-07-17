@@ -8,6 +8,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -28,11 +29,13 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
+import BarChart.BarTableController;
 import FileSys.pieFileSysController;
 import LineChart.LineTableController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.LineChart;
@@ -50,7 +53,9 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -64,6 +69,8 @@ import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
+import javafx.util.StringConverter;
+import javafx.util.converter.DoubleStringConverter;
 
 public class PieChartController {
 	@FXML private MenuBar menuBar;
@@ -78,8 +85,8 @@ public class PieChartController {
 	@FXML private TextField val;
 	@FXML private TextArea bulk;
 	@FXML private TableView<PieTableController> table;
-	@FXML private TableColumn<String, String> c1;
-	@FXML private TableColumn<String, String> c2;
+	@FXML private TableColumn<PieTableController, String> c1;
+	@FXML private TableColumn<PieTableController, Double> c2;
 	@FXML private CheckBox bulkEnable;
 	@FXML private CheckBox dbEnable;
 	@FXML private CheckBox fileEnable;
@@ -93,7 +100,9 @@ public class PieChartController {
 	@FXML private ToggleButton themeToggle;
 	@FXML private Circle theameCircle;
 	final Stage primaryStage = null;
+	Stage stage = null;
 	private boolean theame=true;
+	private boolean isFullScr=false;
 	private ObservableList<PieChart.Data> pie_data;
 	private ArrayList<String> nmArr = new ArrayList<String>();
 	private ArrayList<Double> valArr = new ArrayList<Double>();
@@ -110,15 +119,48 @@ public class PieChartController {
     final KeyCombination ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
     final KeyCombination altT= new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
-    @FXML
-    public void initialize() {
+    final KeyCombination altF11= new KeyCodeCombination(KeyCode.F11, KeyCombination.ALT_DOWN);
+    
+    @FXML public void initialize() {
         System.out.println("#initialized#");
-        table.setEditable(true);
+        setDate.setConverter(new StringConverter<LocalDate>(){
+            private DateTimeFormatter classic=DateTimeFormatter.ofPattern("dd/MM/yyyy");
+            @Override
+            public String toString(LocalDate localDate){
+                if(localDate==null)
+                    return "";
+                return classic.format(localDate);
+            }
+            @Override
+            public LocalDate fromString(String dateString){
+                if(dateString==null || dateString.trim().isEmpty())
+                	return null;
+                return LocalDate.parse(dateString,classic);
+            }
+        });//set date to classic format DDMMYYYY
+        
+        table.setEditable(true);		
 		c1.setCellValueFactory(new PropertyValueFactory<>("s"));		
 		c2.setCellValueFactory(new PropertyValueFactory<>("d"));		
 		c1.setSortable(false);
 		c2.setSortable(false);
-		setDate.setValue(LocalDate.now());
+		table.getSelectionModel().cellSelectionEnabledProperty().set(true);
+		c1.setCellFactory(TextFieldTableCell.forTableColumn());
+		c2.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+	    c1.setOnEditCommit(new EventHandler<CellEditEvent<PieTableController, String>>() {
+	         public void handle(CellEditEvent<PieTableController, String> t) {
+	               ((PieTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setS(t.getNewValue().toString());		                    	
+	         }
+	    });
+	    c2.setOnEditCommit(new EventHandler<CellEditEvent<PieTableController, Double>>() {
+	         public void handle(CellEditEvent<PieTableController, Double> t) {
+	        	 if(dblChecker(t.getNewValue().toString()))
+	        		 ((PieTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setD(t.getNewValue().toString());
+	        	 else
+	        		 error_label.setText("Please enter numeric value here");
+	         }
+	    });
+		setDate.setValue(LocalDate.now());		
     }
     @FXML void bulkEntriesPressed(KeyEvent event) {
     	if (altEnter.match(event)) {addBulkData();event.consume();}
@@ -173,6 +215,8 @@ public class PieChartController {
 				e.printStackTrace();
 			}
         }
+		else if(altF11.match(event))
+			setFullscrn();
 		else
 			event.consume();
 	}
@@ -247,9 +291,21 @@ public class PieChartController {
 		loadDataFromFile();
 	}
 	public void refresh() {
-		
+		editFromTable();
 	}
 	//Configuration functions Functions-----------------------------------------------------------
+	public void setFullscrn() {
+		System.out.println("#FullScreen");
+		stage = (Stage) anchor.getScene().getWindow();
+		stage.setFullScreenExitHint("Press Alt + F11 to exit full-screen mode");
+		if(!isFullScr) {
+			stage.setFullScreen(true);
+			isFullScr=true;
+		}else {
+			stage.setFullScreen(false);
+			isFullScr=false;
+		}		
+	}
 	public void axisRenamed() {	
 		if(pieChartTitle.getText().isEmpty())
 			pChart.setTitle("PieChart title");
@@ -438,6 +494,13 @@ public class PieChartController {
 		}
 		return true;
 	}
+	private boolean dblChecker(String x) {
+		try {Double.parseDouble(x);}
+	    catch(NumberFormatException e) {	    	
+	    	return false;
+	    }
+		return true;
+	}
 	//loading functions------------------------------------------------------
 	private void callWriter() {		
 		pieFileSysController.writeDataInFile(nmArr,valArr);
@@ -489,9 +552,36 @@ public class PieChartController {
 			table.getItems().add(row);			
 		}
 	}	
-	public void loadDataFromDb() {
-		
-	}	
+	public void loadDataFromDb() {}
+	//Editing--------------------------------------
+	public void editFromTable() {
+		System.out.println("#editDataFromTable");
+		int i = 0;
+		Boolean isDvalid = true;
+		for(i=0;i<table.getItems().size();i++) {
+			String checkY = table.getItems().get(i).getD().toString();
+			if(!dblChecker(checkY)) {
+				isDvalid = false;
+				break;
+			}
+		}
+		if(isDvalid) {
+			nmArr.clear();
+			valArr.clear();
+			for(i=0;i<table.getItems().size();i++) {				
+				String x = table.getItems().get(i).getS();
+				Double y = table.getItems().get(i).getD();
+				
+				System.out.println("\t"+x+"\t"+y);
+				nmArr.add(x);
+				valArr.add(y);			
+			}
+			drawChart(true);
+			if(fileEnable.isSelected())
+				callWriter();
+		}else
+			error_label.setText("Value of "+table.getItems().get(i).getS()+" must be a number");
+	}
 	//Export functions------------------------------
 	public void pdfExtract() {
 		  FileChooser fileChooser = new FileChooser();

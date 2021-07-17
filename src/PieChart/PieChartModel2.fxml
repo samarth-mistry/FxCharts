@@ -34,8 +34,8 @@
             <Font name="DejaVu Sans Bold" size="16.0" />
          </font></Label>
       <Line endX="979.0" layoutX="344.0" layoutY="551.0" startX="-334.0" />
-      <DatePicker fx:id="setDate" layoutX="10.0" layoutY="290.0" promptText="Set date" />      
-      <TextField fx:id="pieChartTitle" layoutX="10.0" layoutY="320.0" onKeyReleased="#nmValEntriesPressed" onKeyTyped="#axisRenamed" promptText="Title for PieChart" />
+      <DatePicker fx:id="setDate" layoutX="10.0" layoutY="290.0" onKeyReleased="#btnOnKeyPressed" promptText="Set date [DD/MM/YYYY]" />      
+      <TextField fx:id="pieChartTitle" layoutX="10.0" layoutY="320.0" onKeyReleased="#nmValEntriesPressed" onKeyTyped="#axisRenamed" promptText="Change chart's title" />
       <TextField fx:id="nm" layoutX="10.0" layoutY="352.0" onKeyReleased="#nmValEntriesPressed" promptText="Name" text="PieSlice" />      
       <TextField fx:id="val" layoutX="10.0" layoutY="385.0" onKeyReleased="#nmValEntriesPressed" promptText="Value" text="10.8" />
       <TextArea fx:id="bulk" disable="true" layoutX="10.0" layoutY="419.0" onKeyReleased="#bulkEntriesPressed" prefHeight="118.0" prefWidth="289.0" promptText="Bulk entry here eg. [abc,23.4][efg,34.2]........" />
@@ -63,10 +63,10 @@
             <Font name="DejaVu Sans Bold" size="16.0" />
          </font>
       </Label>
-      <TableView fx:id="table" layoutX="988.0" layoutY="38.0" prefHeight="504.0" prefWidth="344.0">
+      <TableView fx:id="table" editable="true" layoutX="988.0" layoutY="38.0" prefHeight="504.0" prefWidth="344.0">
          <columns>
-            <TableColumn fx:id="c1" prefWidth="200.0" text="Name" />
-            <TableColumn fx:id="c2" prefWidth="143.0" text="Value" />
+            <TableColumn fx:id="c1" prefWidth="179.0" text="Name" />
+            <TableColumn fx:id="c2" prefWidth="164.0" text="Value" />
          </columns>
          <opaqueInsets>
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -115,6 +115,7 @@
                         <ToggleButton fx:id="themeToggle" mnemonicParsing="false" onAction="#changeTheme" text="Dark" />
                      </graphic>
                   </MenuItem>
+                  <MenuItem mnemonicParsing="false" onAction="#zoomNormal" text="Full Screen [alt+F11]" />
                   <MenuItem mnemonicParsing="false" text="Zoom chart  [ctrl++]" />
                   <MenuItem mnemonicParsing="false" onAction="#zoomNormal" text="Zoom to normal" />
               </items>
