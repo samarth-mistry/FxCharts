@@ -1,7 +1,6 @@
 package LineChart;
 
 import FileSys.lineFileSysController;
-import PieChart.PieTableController;
 import DbSys.DbController;
 
 import java.io.BufferedWriter;
@@ -23,13 +22,11 @@ import javax.imageio.ImageIO;
 import org.apache.pdfbox.pdmodel.PDDocument;
 import org.apache.pdfbox.pdmodel.PDPage;
 import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.common.PDRectangle;
 import org.apache.pdfbox.pdmodel.font.PDType1Font;
 import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
-import com.itextpdf.text.Element;
 import com.itextpdf.text.Phrase;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
@@ -46,6 +43,8 @@ import javafx.scene.chart.Axis;
 import javafx.scene.chart.LineChart;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Data;
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
@@ -53,28 +52,30 @@ import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
+import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
-import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.StringConverter;
 
 public class LineChartController {
+	@FXML private MenuBar menuBar;
 	@FXML private LineChart<Integer, Integer> lChart;
 	@FXML private Label error_label;
 	@FXML private Label table_error_label;
@@ -83,14 +84,14 @@ public class LineChartController {
 	@FXML private Label l3;
 	@FXML private Label l2;
 	@FXML private Label l1;
-	@FXML private TextField xVal;
+	@FXML private TextArea xVal;
 	@FXML private TextField lineChartTitle;
 	@FXML private TextField seriesLabel;
 	@FXML private TextField xxisLabel;
 	@FXML private TextField yxisLabel;
 	@FXML private NumberAxis xxis;
 	@FXML private NumberAxis yxis;
-	@FXML private TableView table;
+	@FXML private TableView<LineTableController> table;
 	@FXML private TableColumn<String, String> c1;
 	@FXML private TableColumn<String, String> c2;
 	@FXML private TableColumn<String, String> c3;
@@ -101,15 +102,15 @@ public class LineChartController {
 	@FXML private Button loadDataInTable;
 	@FXML private Button add_data;	
 	@FXML private AnchorPane anchor;
-	@FXML private AnchorPane anchor1;
-	@FXML private AnchorPane anchor2;
 	@FXML private Circle theameCircle;
 	@FXML private DatePicker setDate;
 	@FXML private ToggleButton themeToggle;
 	private DateTimeFormatter classic=DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	private boolean theame=true;
 	final Stage primaryStage = null;
-	final double SCALE_DELTA = 1.1;	
+	Stage stage = null;
+	final double SCALE_DELTA = 1.1;
+	private boolean isFullScr=false;
 	final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN);
     final KeyCombination altj= new KeyCodeCombination(KeyCode.J, KeyCombination.ALT_DOWN);
     final KeyCombination altk= new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN);
@@ -157,6 +158,50 @@ public class LineChartController {
 	        }
 		});
     }
+    @FXML void bulkEntriesPressed(KeyEvent event) {
+    	if (altEnter.match(event)) {addData();event.consume();}
+    	else {btnOnKeyPressed(event);event.consume();}
+    }
+	@FXML void btnOnKeyPressed(KeyEvent event) {									
+		if (altT.match(event)) {changeTheme();event.consume();}		
+		else if (altj.match(event)) {clearChart();event.consume();}
+		else if (altk.match(event)) {clearFile();event.consume();}
+		else if (altl.match(event)) {clearDb();event.consume();}				
+		else if (ctrlf.match(event)) {
+			if(fileEnable.isSelected())
+				fileEnable.setSelected(false);
+			else
+				fileEnable.setSelected(true);
+			event.consume();
+			buttonEnabler();
+		}
+		else if (ctrld.match(event)) {
+			if(dbEnable.isSelected())
+				dbEnable.setSelected(false);
+			else
+				dbEnable.setSelected(true);
+			event.consume();
+			buttonEnabler();
+		}		
+		else if (ctrlPrintPDF.match(event)) {pdfExtract();}
+		else if (ctrlPrintPNG.match(event)) {pngExtract();}
+		else if (ctrlQ.match(event)) {exit();}
+		else if (ctrlPrintTPDF.match(event)) {        	
+        	try {
+				pdfTableExtract();
+			} catch (FileNotFoundException e) {
+				error_label.setText("Error Occured!");
+				e.printStackTrace();
+			} catch (DocumentException e) {
+				error_label.setText("Error Occured!");
+				e.printStackTrace();
+			}
+        }
+		else if(altF11.match(event))
+			setFullscrn();
+		else
+			event.consume();		
+	}
 	//Zooming-------------------------------------------------
 	public void zoomLineChart(ScrollEvent event) {
 		 double scaleFactor = (event.getDeltaY() > 0) ? SCALE_DELTA : 1 / SCALE_DELTA;
@@ -213,7 +258,27 @@ public class LineChartController {
 			System.exit(0);
 		}		
 	}
+	public void refresh() {
+		
+	}
+	public void clearAll() {
+		clearChart();
+		clearTable();
+		clearFile();
+	}
 	//Config functions Functions-----------------------------------------------------------
+	public void setFullscrn() {
+		System.out.println("#FullScreen");
+		stage = (Stage) anchor.getScene().getWindow();
+		stage.setFullScreenExitHint("Press Alt + F11 to exit full-screen mode");
+		if(!isFullScr) {
+			stage.setFullScreen(true);
+			isFullScr=true;
+		}else {
+			stage.setFullScreen(false);
+			isFullScr=false;
+		}		
+	}
 	public void axisRenamed() {
 		lChart.setTitle(lineChartTitle.getText());				
 		xxis.setLabel(xxisLabel.getText());
@@ -241,17 +306,15 @@ public class LineChartController {
 		}			
 	}
 	public void changeTheme() {
-		if(theame) {	//light
-			Color c = Color.web("#d8d8d8");
-			error_label.setTextFill(Color.web("red"));
-			error_label.setStyle("-fx-border-color: red");
-			anchor1.setStyle("-fx-background-color:  #666666");
-			anchor2.setStyle("-fx-background-color:  #666666");
-			lChart.setStyle("-fx-border-color: #d8d8d8");
-		    lChart.setStyle("-fx-text-fill: black");
-			lineValue.setStyle("-fx-border-color: #d8d8d8");
+		if(theame) {				//light=Theme(true)#666666->white[light->dark]
+			Color c = Color.web("white");			
+			error_label.setStyle("-fx-border-color: white");
+			anchor.setStyle("-fx-background-color:  #666666");			
+			lChart.setStyle("-fx-border-color: white");
+		    lChart.setStyle("-fx-text-fill: white");			
 			lineValue.setTextFill(c);
-			xxis.setTickLabelFill(c);yxis.setTickLabelFill(c);			
+			xxis.setTickLabelFill(c);
+			yxis.setTickLabelFill(c);			
 			xxis.setStyle("-fx-text-fill: black");
 			yxis.setStyle("-fx-text-fill: black");			
 			l1.setTextFill(c);
@@ -260,18 +323,15 @@ public class LineChartController {
 			l4.setTextFill(c);
 			fileEnable.setTextFill(c);
 			dbEnable.setTextFill(c);					
-			theameCircle.setFill(c);
+			theameCircle.setFill(Color.web("#d8d8d8"));
 			theame = false;
 		}
-		else {		//dark
-			Color c = Color.web("#666666");
-			error_label.setTextFill(Color.web("pink"));
-			error_label.setStyle("-fx-border-color:  pink");
-			anchor1.setStyle("-fx-background-color:  #d8d8d8");
-			anchor2.setStyle("-fx-background-color:  #d8d8d8");
-			lChart.setStyle("-fx-border-color: #666666");
-			lChart.setStyle("-fx-text-fill: white");
-			lineValue.setStyle("-fx-border-color: #666666");
+		else {		//dark[if dark then set Light]
+			Color c = Color.web("black");			
+			error_label.setStyle("-fx-border-color: black");
+			anchor.setStyle("-fx-background-color:  #d8d8d8");			
+			lChart.setStyle("-fx-border-color: black");
+			lChart.setStyle("-fx-text-fill: black");			
 			lineValue.setTextFill(c);
 			xxis.setTickLabelFill(c);
 			yxis.setTickLabelFill(c);
@@ -336,15 +396,14 @@ public class LineChartController {
 	    });
 	 }
 	private void drawChart(String lineName,int xValues[],int yValues[],int filled,Boolean whoCalled) {
-		try {			
-			@SuppressWarnings("rawtypes")			
-			XYChart.Series series = new XYChart.Series();			
+		try {									
+			Series<Integer, Integer> series = new XYChart.Series<Integer, Integer>();			
 			int i=0;
 			for(i=0;i<filled;i++) {
 				if(!whoCalled) {
 					series.setName(lineName);
 				}
-				series.getData().add(new XYChart.Data(xValues[i],yValues[i]));
+				series.getData().add(new Data<Integer, Integer>(xValues[i],yValues[i]));
 			}
 			int[] xFin= new int[i];
 			int[] yFin= new int[i];
