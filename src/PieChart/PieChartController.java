@@ -50,6 +50,7 @@ import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.TableColumn.CellEditEvent;
@@ -120,9 +121,10 @@ public class PieChartController {
     final KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
     final KeyCombination altT= new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
     final KeyCombination altF11= new KeyCodeCombination(KeyCode.F11, KeyCombination.ALT_DOWN);
-    
+    //ShortCut functions----------------------------------------------------
     @FXML public void initialize() {
         System.out.println("#initialized#");
+        setDate.setValue(LocalDate.now());
         setDate.setConverter(new StringConverter<LocalDate>(){            
             @Override
             public String toString(LocalDate localDate){
@@ -162,8 +164,23 @@ public class PieChartController {
 	        		 error_label.setText("Please enter numeric value here");
 	         }
 	    });
-		setDate.setValue(LocalDate.now());		
-    }
+		
+		table.setOnKeyPressed(event -> {
+	        if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.TAB) {
+	            table.getSelectionModel().selectRightCell();
+	            event.consume();
+	        } else if (event.getCode() == KeyCode.LEFT) {
+	            table.getSelectionModel().selectLeftCell();
+	            event.consume();
+	        }else if (event.getCode() == KeyCode.UP) {
+	            table.getSelectionModel().selectAboveCell();
+	            event.consume();
+	        } else if (event.getCode() == KeyCode.DOWN) {
+	            table.getSelectionModel().selectBelowCell();
+	            event.consume();
+	        }
+		});
+    }       
     @FXML void bulkEntriesPressed(KeyEvent event) {
     	if (altEnter.match(event)) {addBulkData();event.consume();}
     	else {btnOnKeyPressed(event);event.consume();}
@@ -223,7 +240,7 @@ public class PieChartController {
 			event.consume();
 		nm.requestFocus();
 	}
-	//Zooming-------------------------------------------------
+	//Zooming---------------------------------------------------------------------
 	public void zoomPieChart(ScrollEvent event) {
 		double scaleFactor = (event.getDeltaY() > 0) ? SCALE_DELTA : 1 / SCALE_DELTA;
         pChart.setScaleX(pChart.getScaleX() * scaleFactor);
@@ -587,12 +604,12 @@ public class PieChartController {
 			error_label.setText("Value of "+table.getItems().get(i).getS()+" must be a number");
 	}
 	//Export functions------------------------------
-	public void pdfExtract() {
-		  FileChooser fileChooser = new FileChooser();
-	      fileChooser.setTitle("Save");
-	      fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));
-	      File pdffile = fileChooser.showSaveDialog(primaryStage);
-	      
+	public void pdfExtract() {		
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Save");
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));
+		File pdffile = fileChooser.showSaveDialog(primaryStage);
+      
 	      if (pdffile != null) {
 			WritableImage nodeshot = pChart.snapshot(new SnapshotParameters(), null);
 	        File file = new File("dat/imgs/chart.png");
@@ -609,13 +626,13 @@ public class PieChartController {
 	        try {
 	            pdimage = PDImageXObject.createFromFile("dat/imgs/chart.png",doc);
 	            content = new PDPageContentStream(doc, page);
-	            content.drawImage(pdimage,-17,340);
+	            content.drawImage(pdimage,-17,320);
 	        	content.beginText();                             
 	            content.setFont(PDType1Font.COURIER, 12);                          
 	            content.newLineAtOffset(410, 770);
 	            LocalDate localDate = setDate.getValue();
 	            String text = "PieChart by Cancer "+classic.format(localDate);;
-	            content.showText(text);        
+	            content.showText(text);
 	            content.endText();
 	            content.close();
 	            doc.addPage(page);

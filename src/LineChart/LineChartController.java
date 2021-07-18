@@ -12,6 +12,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.Writer;
 import java.sql.SQLException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
@@ -49,13 +51,18 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
+import javafx.scene.control.DatePicker;
 import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextField;
 import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.KeyCode;
+import javafx.scene.input.KeyCodeCombination;
+import javafx.scene.input.KeyCombination;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.input.ScrollEvent;
 import javafx.scene.layout.AnchorPane;
@@ -65,6 +72,7 @@ import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.StringConverter;
 
 public class LineChartController {
 	@FXML private LineChart<Integer, Integer> lChart;
@@ -96,10 +104,59 @@ public class LineChartController {
 	@FXML private AnchorPane anchor1;
 	@FXML private AnchorPane anchor2;
 	@FXML private Circle theameCircle;
+	@FXML private DatePicker setDate;
+	@FXML private ToggleButton themeToggle;
+	private DateTimeFormatter classic=DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	private boolean theame=true;
 	final Stage primaryStage = null;
-	final double SCALE_DELTA = 1.1;
-	
+	final double SCALE_DELTA = 1.1;	
+	final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN);
+    final KeyCombination altj= new KeyCodeCombination(KeyCode.J, KeyCombination.ALT_DOWN);
+    final KeyCombination altk= new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN);
+    final KeyCombination altl= new KeyCodeCombination(KeyCode.L, KeyCombination.ALT_DOWN);
+    final KeyCombination ctrlb= new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrld= new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlPrintPDF = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlPrintPNG = new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
+    final KeyCombination altT= new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
+    final KeyCombination altF11= new KeyCodeCombination(KeyCode.F11, KeyCombination.ALT_DOWN);
+	//ShortCut functions----------------------------------------------------
+    @FXML public void initialize() {
+        System.out.println("#initialized#");
+        setDate.setValue(LocalDate.now());
+        setDate.setConverter(new StringConverter<LocalDate>(){            
+            @Override
+            public String toString(LocalDate localDate){
+                if(localDate==null)
+                    return "";
+                return classic.format(localDate);
+            }
+            @Override
+            public LocalDate fromString(String dateString){
+                if(dateString==null || dateString.trim().isEmpty())
+                	return null;
+                return LocalDate.parse(dateString,classic);
+            }
+        });//set date to classic format DDMMYYYY
+        table.setOnKeyPressed(event -> {//Table navigation through buttons <^>
+	        if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.TAB) {
+	            table.getSelectionModel().selectRightCell();
+	            event.consume();
+	        } else if (event.getCode() == KeyCode.LEFT) {
+	            table.getSelectionModel().selectLeftCell();
+	            event.consume();
+	        }else if (event.getCode() == KeyCode.UP) {
+	            table.getSelectionModel().selectAboveCell();
+	            event.consume();
+	        } else if (event.getCode() == KeyCode.DOWN) {
+	            table.getSelectionModel().selectBelowCell();
+	            event.consume();
+	        }
+		});
+    }
 	//Zooming-------------------------------------------------
 	public void zoomLineChart(ScrollEvent event) {
 		 double scaleFactor = (event.getDeltaY() > 0) ? SCALE_DELTA : 1 / SCALE_DELTA;
