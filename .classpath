@@ -10,5 +10,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/XAMPP conn"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/PdfBox"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ITextPdf"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Jericho[htm-&gt;text]"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

@@ -23,8 +23,7 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane fx:id="anchor" prefHeight="622.0" prefWidth="1351.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PieChart.PieChartController">
-   <children>
-	  <PieChart fx:id="pChart" layoutX="308.0" layoutY="75.0" onMouseClicked="#zoomNormal" onScroll="#zoomPieChart" prefHeight="435.0" prefWidth="658.0" style="-fx-border-color: #666666;" title="PieChart title" />
+   <children>	  
       <Label fx:id="error_label" alignment="CENTER" layoutX="308.0" layoutY="40.0" prefHeight="25.0" prefWidth="658.0" style="-fx-border-color: black;" textFill="#e01f8d" wrapText="true">
          <font>
             <Font name="System Bold Italic" size="14.0" />
@@ -128,5 +127,6 @@
           </Menu>
         </menus>
       </MenuBar>
+      <PieChart fx:id="pChart" layoutX="308.0" layoutY="75.0" onMouseClicked="#zoomNormal" onScroll="#zoomPieChart" prefHeight="435.0" prefWidth="658.0" style="-fx-border-color: #666666;" title="PieChart title" />
    </children>
 </AnchorPane>

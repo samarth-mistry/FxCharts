@@ -29,12 +29,11 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import BarChart.BarTableController;
 import FileSys.pieFileSysController;
-import LineChart.LineTableController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
+import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.scene.SnapshotParameters;
@@ -74,7 +73,7 @@ import javafx.util.converter.DoubleStringConverter;
 
 public class PieChartController {
 	@FXML private MenuBar menuBar;
-	@FXML private PieChart pChart;
+	@FXML PieChart pChart;
 	@FXML private Label error_label;	
 	@FXML private Label pieValue;
 	@FXML private Label l3;
@@ -99,6 +98,7 @@ public class PieChartController {
 	@FXML private DatePicker setDate;
 	@FXML private ToggleButton themeToggle;
 	@FXML private Circle theameCircle;
+	private DateTimeFormatter classic=DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	final Stage primaryStage = null;
 	Stage stage = null;
 	private boolean theame=true;
@@ -123,8 +123,7 @@ public class PieChartController {
     
     @FXML public void initialize() {
         System.out.println("#initialized#");
-        setDate.setConverter(new StringConverter<LocalDate>(){
-            private DateTimeFormatter classic=DateTimeFormatter.ofPattern("dd/MM/yyyy");
+        setDate.setConverter(new StringConverter<LocalDate>(){            
             @Override
             public String toString(LocalDate localDate){
                 if(localDate==null)
@@ -149,13 +148,16 @@ public class PieChartController {
 		c2.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
 	    c1.setOnEditCommit(new EventHandler<CellEditEvent<PieTableController, String>>() {
 	         public void handle(CellEditEvent<PieTableController, String> t) {
-	               ((PieTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setS(t.getNewValue().toString());		                    	
+	               ((PieTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setS(t.getNewValue().toString());
+	               editFromTable();
 	         }
 	    });
 	    c2.setOnEditCommit(new EventHandler<CellEditEvent<PieTableController, Double>>() {
 	         public void handle(CellEditEvent<PieTableController, Double> t) {
-	        	 if(dblChecker(t.getNewValue().toString()))
+	        	 if(dblChecker(t.getNewValue().toString())) {
 	        		 ((PieTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setD(t.getNewValue().toString());
+	        	 	editFromTable();
+	         	 }
 	        	 else
 	        		 error_label.setText("Please enter numeric value here");
 	         }
@@ -219,6 +221,7 @@ public class PieChartController {
 			setFullscrn();
 		else
 			event.consume();
+		nm.requestFocus();
 	}
 	//Zooming-------------------------------------------------
 	public void zoomPieChart(ScrollEvent event) {
@@ -290,8 +293,9 @@ public class PieChartController {
 		callWriter();
 		loadDataFromFile();
 	}
-	public void refresh() {
-		editFromTable();
+	public void refresh(ActionEvent event) {
+		//editFromTable();
+		drawChart(true);
 	}
 	//Configuration functions Functions-----------------------------------------------------------
 	public void setFullscrn() {
@@ -605,11 +609,12 @@ public class PieChartController {
 	        try {
 	            pdimage = PDImageXObject.createFromFile("dat/imgs/chart.png",doc);
 	            content = new PDPageContentStream(doc, page);
-	            content.drawImage(pdimage,50, 50);
+	            content.drawImage(pdimage,-17,340);
 	        	content.beginText();                             
-	            content.setFont(PDType1Font.COURIER, 15);                          
-	            content.newLineAtOffset(10, 770);            
-	            String text = "PieChart by Cancer";             
+	            content.setFont(PDType1Font.COURIER, 12);                          
+	            content.newLineAtOffset(410, 770);
+	            LocalDate localDate = setDate.getValue();
+	            String text = "PieChart by Cancer "+classic.format(localDate);;
 	            content.showText(text);        
 	            content.endText();
 	            content.close();
@@ -694,4 +699,5 @@ public class PieChartController {
         cell.setHorizontalAlignment(alignment);        
         return cell;
     }
+	
 }
