@@ -1,8 +1,6 @@
 package Main;
 
-import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.util.Optional;
 
 import javafx.application.Application;
@@ -21,8 +19,6 @@ import javafx.scene.control.Dialog;
 import javafx.scene.control.Label;
 import javafx.scene.control.PasswordField;
 import javafx.scene.control.TextField;
-import javafx.scene.control.TextInputDialog;
-import javafx.scene.image.Image;
 import javafx.scene.layout.GridPane;
 public class FxChartMainPage extends Application{
 	public void start(Stage primaryStage) throws Exception {	
