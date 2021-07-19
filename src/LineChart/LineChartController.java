@@ -32,7 +32,6 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import BarChart.BarTableController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -48,6 +47,7 @@ import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
@@ -60,6 +60,7 @@ import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.WritableImage;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
@@ -74,34 +75,19 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.StringConverter;
+import javafx.util.converter.DoubleStringConverter;
 
 public class LineChartController {
 	@FXML private MenuBar menuBar;
 	@FXML private LineChart<Double, Double> lChart;
-	@FXML private Label error_label;
-	@FXML private Label table_error_label;
-	@FXML private Label lineValue;
-	@FXML private Label l4;
-	@FXML private Label l3;
-	@FXML private Label l2;
-	@FXML private Label l1;
+	@FXML private Label error_label;@FXML private Label table_error_label;@FXML private Label lineValue;@FXML private Label l4;@FXML private Label l3;@FXML private Label l2;@FXML private Label l1;
 	@FXML private TextArea xVal;
-	@FXML private TextField lineChartTitle;
-	@FXML private TextField seriesLabel;
-	@FXML private TextField xxisLabel;
-	@FXML private TextField yxisLabel;
-	@FXML private NumberAxis xxis;
+	@FXML private TextField lineChartTitle;@FXML private TextField seriesLabel;@FXML private TextField xxisLabel;@FXML private TextField yxisLabel;@FXML private NumberAxis xxis;
 	@FXML private NumberAxis yxis;
 	@FXML private TableView<LineTableController> table;
-	@FXML private TableColumn<Double, Double> c1;
-	@FXML private TableColumn<Double, Double> c2;
-	@FXML private TableColumn<Double, Double> c3;
-	@FXML private CheckBox dbEnable;
-	@FXML private CheckBox fileEnable;
-	@FXML private Button loadDataFromFile;
-	@FXML private Button loadDataFromDb;
-	@FXML private Button loadDataInTable;
-	@FXML private Button add_data;	
+	@FXML private TableColumn<LineTableController, String> c1;@FXML private TableColumn<LineTableController, Double> c2;@FXML private TableColumn<LineTableController, Double> c3;
+	@FXML private CheckBox dbEnable;@FXML private CheckBox fileEnable;
+	@FXML private Button loadDataFromFile;@FXML private Button loadDataFromDb;@FXML private Button loadDataInTable;@FXML private Button add_data;	
 	@FXML private AnchorPane anchor;
 	@FXML private Circle theameCircle;
 	@FXML private DatePicker setDate;
@@ -143,20 +129,43 @@ public class LineChartController {
                 return LocalDate.parse(dateString,classic);
             }
         });//set date to classic format DDMMYYYY
+        table.setEditable(true);		
+		c1.setCellValueFactory(new PropertyValueFactory<>("series"));			
+		c2.setCellValueFactory(new PropertyValueFactory<>("seriesX"));
+		c3.setCellValueFactory(new PropertyValueFactory<>("seriesY"));
+		c1.setSortable(false);
+		c2.setSortable(false);
+		c3.setSortable(false);
+		table.getSelectionModel().cellSelectionEnabledProperty().set(true);
+		c1.setCellFactory(TextFieldTableCell.forTableColumn());
+		c2.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+		c3.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+	    c1.setOnEditCommit(new EventHandler<CellEditEvent<LineTableController, String>>() {
+	         public void handle(CellEditEvent<LineTableController, String> t) {
+	               ((LineTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setSeries(t.getNewValue().toString());
+	               editFromTable();
+	         }
+	    });
+	    c2.setOnEditCommit(new EventHandler<CellEditEvent<LineTableController, Double>>() {
+	         public void handle(CellEditEvent<LineTableController, Double> t) {
+	               ((LineTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setSeriesX(t.getNewValue());
+	               editFromTable();
+	         }
+	    });
+	    c3.setOnEditCommit(new EventHandler<CellEditEvent<LineTableController, Double>>() {
+	         public void handle(CellEditEvent<LineTableController, Double> t) {
+	               ((LineTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setSeriesY(t.getNewValue());
+	               editFromTable();
+	         }
+	    });
         table.setOnKeyPressed(event -> {//Table navigation through buttons <^>
-	        if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.TAB) {
-	            table.getSelectionModel().selectRightCell();
-	            event.consume();
-	        } else if (event.getCode() == KeyCode.LEFT) {
-	            table.getSelectionModel().selectLeftCell();
-	            event.consume();
-	        }else if (event.getCode() == KeyCode.UP) {
-	            table.getSelectionModel().selectAboveCell();
-	            event.consume();
-	        } else if (event.getCode() == KeyCode.DOWN) {
-	            table.getSelectionModel().selectBelowCell();
-	            event.consume();
-	        }
+//	        if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.TAB) {
+//	            table.getSelectionModel().selectRightCell();
+//	            event.consume();
+//	        } else if (event.getCode() == KeyCode.LEFT) {
+//	            table.getSelectionModel().selectLeftCell();
+//	            event.consume();
+//	        }
 		});
     }
     @FXML void bulkEntriesPressed(KeyEvent event) {
@@ -233,7 +242,7 @@ public class LineChartController {
 		}		
 	}
 	public void clearTable() {
-		table_error_label.setText("Table it cleared!\n To reload click on load button");
+		error_label.setText("Table it cleared!\n To reload click on load button");
 		table.getItems().clear();
 	}
 	public void clearDb() {
@@ -267,7 +276,7 @@ public class LineChartController {
 		clearTable();
 		clearFile();
 	}
-	//Config functions Functions-----------------------------------------------------------
+	//Configuration functions Functions-----------------------------------------------------------
 	public void setFullscrn() {
 		System.out.println("#FullScreen");
 		stage = (Stage) anchor.getScene().getWindow();
@@ -283,7 +292,9 @@ public class LineChartController {
 	public void axisRenamed() {
 		lChart.setTitle(lineChartTitle.getText());				
 		xxis.setLabel(xxisLabel.getText());
-		yxis.setLabel(yxisLabel.getText());		
+		yxis.setLabel(yxisLabel.getText());
+		c2.setText(xxisLabel.getText());
+		c3.setText(yxisLabel.getText());
 		if(lineChartTitle.getText() == "")
 			lChart.setTitle("Line Chart");		
 		if(xxisLabel.getText() == "")
@@ -397,6 +408,7 @@ public class LineChartController {
 	    });
 	 }
 	private void drawChart(String lineName,Double xValues[],Double yValues[],int filled,Boolean whoCalled) {
+		System.out.println("#drawChart#");
 		try {									
 			Series<Double, Double> series = new XYChart.Series<Double, Double>();			
 			int i=0;
@@ -409,7 +421,7 @@ public class LineChartController {
 				if(i==0)
 					row = new LineTableController(lineName,xValues[i],yValues[i]);
 				else
-					row = new LineTableController("",xValues[i],yValues[i]);
+					row = new LineTableController("",xValues[i],yValues[i]);				
 				table.getItems().add(row);										
 			}
 			Double[] xFin= new Double[i];
@@ -428,34 +440,26 @@ public class LineChartController {
 	}
 	private boolean inputValidator(String X) {
 		System.out.println("#PatternValidator#");		
-		for(int i=0;i< X.length();i++) {
-			
+		for(int i=0;i< X.length();i++) {			
 			if(X.charAt(0) != '{' || X.charAt(X.length()-1) != ']') {
 				System.out.println("valid 1");
 				return false;
 			}			
-			if(X.charAt(i) == '[') {
-				int j=0,y=0;
-				if(!Character.isDigit(X.charAt(i+1))){					
+			if(X.charAt(i) == '[') {					
+				String xCo = new String();
+				for(int j=i;X.charAt(j+1)!=',' && X.charAt(j+1)!=']';j++) {					
+					xCo+=X.charAt(j+1);					
+				}				
+				if(!dblChecker(xCo))
+					return false;					
+			} else if(X.charAt(i)==',') {					
+				String xCo = new String();
+				for(int j=i;X.charAt(j+1)!=',' && X.charAt(j+1) != ']' ;j++) {					
+					xCo+=X.charAt(j+1);					
+				}						
+				if(!dblChecker(xCo))
 					return false;
-				}
-				if(X.charAt(i+1) != ','){
-					for(j=i;Character.isDigit(X.charAt(j+1));j++) {}
-					//System.out.println("valid 2.1: "+j);
-					if(X.charAt(j+1) !=',') {
-						return false;
-					}
-					if(X.charAt(j+2) != ']'){
-						for(y=j+2;Character.isDigit(X.charAt(y+1));y++) {}											
-					}
-				}
-				if(X.charAt(j+1) != ','){									
-					return false;
-				}else {j=0;}				
-				if(X.charAt(y+1) != ']'){
-					return false;
-				}
-			}			
+			} else {}			
 		}
 		return true;
 	}
@@ -623,6 +627,51 @@ public class LineChartController {
 		}else {
 			error_label.setText("DB is empty!\nPlease add data first");
 		}
+	}
+	//Editing------------------------------------------------------------
+	public void editFromTable() {
+		System.out.println("#editDataFromTable");		
+		Boolean isDvalid = true;
+		int i=0;
+		ArrayList<String> nmArr = new ArrayList<String>();
+		ArrayList<Double> bufx = new ArrayList<Double>();
+		ArrayList<Double> bufy = new ArrayList<Double>();
+		ArrayList<Integer> bkCnt = new ArrayList<Integer>();
+		int breakAfter=0;
+		for(i=0;i<table.getItems().size();i++) {					
+			bufx.add(table.getItems().get(i).getSeriesX());
+			bufy.add(table.getItems().get(i).getSeriesY());
+			if(!table.getItems().get(i).getSeries().isEmpty()) {
+				nmArr.add(table.getItems().get(i).getSeries());
+				if(i!=0)
+					bkCnt.add(breakAfter);
+				breakAfter = 0;
+			}	
+			breakAfter++;
+			if(i==table.getItems().size()-1) {
+				bkCnt.add(breakAfter);
+			}
+		}
+		System.out.println("\tnmArr"+nmArr+"\n\tBkCnt: "+bkCnt+"\n\txArr: "+bufx+"\n\tyArr: "+bufy);
+		
+		if(isDvalid) {
+			int selector = 0;
+			clearChart();
+			clearTable();
+			for(i=0;i<nmArr.size();i++) {
+				System.out.println("\tisDvalid\n\t\tnmArr: "+nmArr.get(i)+"\n\t\tSeletr: "+selector);
+				Double[] xArr = new Double[bkCnt.get(i)];
+				Double[] yArr = new Double[bkCnt.get(i)];
+				for(int j=0;j<bkCnt.get(i);j++) {
+					xArr[j] = bufx.get(selector+j);
+					yArr[j] = bufy.get(selector+j);
+					System.out.println("\t<"+xArr[j]+"><"+yArr[j]+">");
+				}
+				selector+=bkCnt.get(i);				
+				drawChart(nmArr.get(i),xArr,yArr,bkCnt.get(i),false);
+			}
+		}else
+			error_label.setText("Value of "+table.getItems().get(i).getSeries()+" must be a number");
 	}
 	//Exports--------------------------------------------
 	public void pdfExtract() {

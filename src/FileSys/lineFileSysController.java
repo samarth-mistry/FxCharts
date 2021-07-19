@@ -3,7 +3,6 @@ package FileSys;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -39,13 +38,10 @@ public class lineFileSysController {
 		ArrayList<String> seriesArr = new ArrayList<String>();
         try {
             scanner = new Scanner(new FileReader("dat/locations.txt"));
-            scanner.useDelimiter(",");
-            int seriesCounter = 0;
+            scanner.useDelimiter(",");            
             while(scanner.hasNextLine()) {                
                 String line = scanner.nextLine();                
-                seriesArr.add(line);
-                seriesCounter++;
-                //System.out.println(line);
+                seriesArr.add(line);                
             }
     		System.out.println("\tFile Reading");
         } catch(IOException e) {

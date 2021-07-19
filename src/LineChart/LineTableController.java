@@ -20,4 +20,13 @@ public class LineTableController {
     public Double getSeriesY() {
         return seriesY;
     }
+    public void setSeries(String series) {
+    	this.series = series;
+    }
+    public void setSeriesX(Double seriesX) {
+    	this.seriesX = seriesX;
+    }
+    public void setSeriesY(Double seriesY) {
+    	this.seriesY = seriesY;
+    }
 }
