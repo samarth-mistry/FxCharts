@@ -10,7 +10,7 @@ import java.util.Scanner;
 public class lineFileSysController {
 	static FileWriter locFile = null;
 	@SuppressWarnings("null")
-	public static void writeDataInFile(int[] xVal,int[] yVal, String lineName, int seriesId) {
+	public static void writeDataInFile(Double[] xVal,Double[] yVal, String lineName, int seriesId) {
 		System.out.println("File System Report:\n");
 	    try {	    
 	    	locFile = new FileWriter("dat/locations.txt",true);

@@ -32,6 +32,7 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
+import BarChart.BarTableController;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -76,7 +77,7 @@ import javafx.util.StringConverter;
 
 public class LineChartController {
 	@FXML private MenuBar menuBar;
-	@FXML private LineChart<Integer, Integer> lChart;
+	@FXML private LineChart<Double, Double> lChart;
 	@FXML private Label error_label;
 	@FXML private Label table_error_label;
 	@FXML private Label lineValue;
@@ -92,9 +93,9 @@ public class LineChartController {
 	@FXML private NumberAxis xxis;
 	@FXML private NumberAxis yxis;
 	@FXML private TableView<LineTableController> table;
-	@FXML private TableColumn<String, String> c1;
-	@FXML private TableColumn<String, String> c2;
-	@FXML private TableColumn<String, String> c3;
+	@FXML private TableColumn<Double, Double> c1;
+	@FXML private TableColumn<Double, Double> c2;
+	@FXML private TableColumn<Double, Double> c3;
 	@FXML private CheckBox dbEnable;
 	@FXML private CheckBox fileEnable;
 	@FXML private Button loadDataFromFile;
@@ -123,7 +124,7 @@ public class LineChartController {
     final KeyCombination ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
     final KeyCombination altT= new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
-    final KeyCombination altF11= new KeyCodeCombination(KeyCode.F11, KeyCombination.ALT_DOWN);
+    final KeyCombination altF11= new KeyCodeCombination(KeyCode.F11, KeyCombination.ALT_DOWN);	
 	//ShortCut functions----------------------------------------------------
     @FXML public void initialize() {
         System.out.println("#initialized#");
@@ -371,8 +372,8 @@ public class LineChartController {
 	}
 	//Draw & decoding Validations Functions-----------------------------------------------------------
 	private void cursorMoni() {
-	    final Axis<Integer> xAxis = lChart.getXAxis();
-	    final Axis<Integer> yAxis = lChart.getYAxis();	    
+	    final Axis<Double> xAxis = lChart.getXAxis();
+	    final Axis<Double> yAxis = lChart.getYAxis();	    
 
 	    final Node chartBackground = lChart.lookup(".chart-plot-background");
 	    for (Node n: chartBackground.getParent().getChildrenUnmodifiable()) {
@@ -395,18 +396,24 @@ public class LineChartController {
 	         }
 	    });
 	 }
-	private void drawChart(String lineName,int xValues[],int yValues[],int filled,Boolean whoCalled) {
+	private void drawChart(String lineName,Double xValues[],Double yValues[],int filled,Boolean whoCalled) {
 		try {									
-			Series<Integer, Integer> series = new XYChart.Series<Integer, Integer>();			
+			Series<Double, Double> series = new XYChart.Series<Double, Double>();			
 			int i=0;
 			for(i=0;i<filled;i++) {
 				if(!whoCalled) {
 					series.setName(lineName);
 				}
-				series.getData().add(new Data<Integer, Integer>(xValues[i],yValues[i]));
+				series.getData().add(new Data<Double,Double>(xValues[i],yValues[i]));
+				LineTableController row;
+				if(i==0)
+					row = new LineTableController(lineName,xValues[i],yValues[i]);
+				else
+					row = new LineTableController("",xValues[i],yValues[i]);
+				table.getItems().add(row);										
 			}
-			int[] xFin= new int[i];
-			int[] yFin= new int[i];
+			Double[] xFin= new Double[i];
+			Double[] yFin= new Double[i];
 			for(i=0;i<filled;i++) {
 				xFin[i] = xValues[i];
 				yFin[i] = yValues[i];
@@ -457,8 +464,8 @@ public class LineChartController {
 		xVal.setText("");
 		System.out.println("---------------\nxVal\tyVal\n---------------");
 		int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,xindexCounter=0,yindexCounter=0;
-		int[] xValues = new int[arraySize];
-		int[] yValues = new int[arraySize];									
+		Double[] xValues = new Double[arraySize];
+		Double[] yValues = new Double[arraySize];									
 		//Pattern reader
 		for(int i=0;i< X.length();i++) {						
 			if(X.charAt(i) == '[') {
@@ -469,7 +476,7 @@ public class LineChartController {
 					System.out.print(X.charAt(j+1));
 				}
 				System.out.print("\t");
-				xValues[xindexCounter]=Integer.parseInt(xCo);
+				xValues[xindexCounter]=Double.parseDouble(xCo);
 				xindexCounter++;
 			} else if(X.charAt(i)==',') {
 				int j=0;
@@ -479,7 +486,7 @@ public class LineChartController {
 					System.out.print(X.charAt(j+1));
 				}
 				System.out.println();
-				yValues[yindexCounter]=Integer.parseInt(yCo);
+				yValues[yindexCounter]=Double.parseDouble(yCo);
 				yindexCounter++;								
 			} else {}			
 		}		
@@ -488,8 +495,16 @@ public class LineChartController {
 		System.out.println("IndexCounters:\n\tX: "+xindexCounter+"\n\tY: "+yindexCounter);		
 		drawChart(line,xValues,yValues,xindexCounter,whoCalled);		
 	}
+	private boolean dblChecker(String x) {
+		try {Double.parseDouble(x);}
+	    catch(NumberFormatException e) {
+	    	error_label.setText("Value field must be a numeric");
+	    	return false;
+	    }
+		return true;
+	}
 	//loading functions------------------------------------------------------
-	private void callWriter(String lineNames,int[] xValues,int[] yValues) {		
+	private void callWriter(String lineNames,Double[] xValues,Double[] yValues) {		
 		lineFileSysController.writeDataInFile(yValues,xValues, lineNames,0);
 	}
 	public void loadDataFromFile() {
@@ -546,8 +561,8 @@ public class LineChartController {
 		for(int newSeri=0;newSeri<data.size();newSeri++) {
 			String X = data.get(newSeri);
 			int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,xindexCounter=0,yindexCounter=0;
-			int[] xValues = new int[arraySize];
-			int[] yValues = new int[arraySize];
+			Double[] xValues = new Double[arraySize];
+			Double[] yValues = new Double[arraySize];
 			
 			String[] lineNames =new String[arraySize];
 			//Pattern decoder
@@ -565,7 +580,7 @@ public class LineChartController {
 					for(j=i;X.charAt(j+1)!=',';j++) {					
 						xCo+=X.charAt(j+1);					
 					}
-					xValues[xindexCounter]=Integer.parseInt(xCo);
+					xValues[xindexCounter]=Double.parseDouble(xCo);
 					xindexCounter++;
 				} else if(X.charAt(i)==',') {
 					int j=0;
@@ -573,14 +588,14 @@ public class LineChartController {
 					for(j=i;X.charAt(j+1)!=']';j++) {					
 						yCo+=X.charAt(j+1);					
 					}					
-					yValues[yindexCounter]=Integer.parseInt(yCo);
+					yValues[yindexCounter]=Double.parseDouble(yCo);
 					yindexCounter++;								
 				} else {}
 			}
 			for(int i=0;i<xindexCounter;i++) {
-				String value1 = Integer.toString(xValues[i]);
-				String value2 = Integer.toString(yValues[i]);				
-				LineTableController row = new LineTableController(lineNames[i],value1,value2);
+				//String value1 = Double.parseDouble(xValues[i]);
+				//String value2 = Integer.toString(yValues[i]);				
+				LineTableController row = new LineTableController(lineNames[i],xValues[i],yValues[i]);
 				table.getItems().add(row);			
 			}
 		}			
@@ -677,8 +692,8 @@ public class LineChartController {
         for(int newSeri=0;newSeri<data.size();newSeri++) {
 			String X = data.get(newSeri);
 			int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,xindexCounter=0,yindexCounter=0;
-			int[] xValues = new int[arraySize];
-			int[] yValues = new int[arraySize];
+			Double[] xValues = new Double[arraySize];
+			Double[] yValues = new Double[arraySize];
 			
 			String[] lineNames =new String[arraySize];
 			//Pattern decoder
@@ -696,7 +711,7 @@ public class LineChartController {
 					for(j=i;X.charAt(j+1)!=',';j++) {					
 						xCo+=X.charAt(j+1);					
 					}
-					xValues[xindexCounter]=Integer.parseInt(xCo);
+					xValues[xindexCounter]=Double.parseDouble(xCo);
 					xindexCounter++;
 				} else if(X.charAt(i)==',') {
 					int j=0;
@@ -704,15 +719,14 @@ public class LineChartController {
 					for(j=i;X.charAt(j+1)!=']';j++) {					
 						yCo+=X.charAt(j+1);					
 					}					
-					yValues[yindexCounter]=Integer.parseInt(yCo);
+					yValues[yindexCounter]=Double.parseDouble(yCo);
 					yindexCounter++;								
 				} else {}
 			}								
 			for(int i=0;i<xindexCounter;i++) {
-				String value1 = Integer.toString(xValues[i]);
-				String value2 = Integer.toString(yValues[i]);
-									    	
-    			obdata.add(new LineTableController(lineNames[i],value1,value2));							
+				Double locX = xValues[i];
+				Double locY = yValues[i];
+				obdata.add(new LineTableController(lineNames[i],locX,locY));							
 			}					
 		}        
         Writer writer = null;
@@ -744,8 +758,8 @@ public class LineChartController {
 
             for(int i=0;i<table.getItems().size();i++) {
             	report_table.addCell(getCell(((LineTableController) table.getItems().get(i)).getSeries(),PdfPCell.ALIGN_CENTER ));
-            	report_table.addCell(getCell(((LineTableController) table.getItems().get(i)).getSeriesX(),PdfPCell.ALIGN_CENTER ));
-            	report_table.addCell(getCell(((LineTableController) table.getItems().get(i)).getSeriesY(),PdfPCell.ALIGN_CENTER ));
+            	report_table.addCell(getCell(((LineTableController) table.getItems().get(i)).getSeriesY().toString(),PdfPCell.ALIGN_CENTER ));            	
+            	report_table.addCell(getCell(((LineTableController) table.getItems().get(i)).getSeriesX().toString(),PdfPCell.ALIGN_CENTER ));
             }
             report.add(report_table);
             report.close();
