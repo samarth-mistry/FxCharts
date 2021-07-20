@@ -9,6 +9,8 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringReader;
 import java.io.Writer;
 import java.sql.SQLException;
 import java.time.LocalDate;
@@ -16,18 +18,13 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.Phrase;
+import com.itextpdf.text.html.simpleparser.HTMLWorker;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -37,7 +34,10 @@ import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
 import javafx.scene.Node;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.Axis;
 import javafx.scene.chart.LineChart;
@@ -74,6 +74,7 @@ import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Modality;
 import javafx.util.StringConverter;
 import javafx.util.converter.DoubleStringConverter;
 
@@ -100,6 +101,7 @@ public class LineChartController {
 	Stage stage = null;
 	final double SCALE_DELTA = 1.1;
 	private boolean isFullScr=false;
+	static String pdfTextApp = null;
 	final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN);
     final KeyCombination altj= new KeyCodeCombination(KeyCode.J, KeyCombination.ALT_DOWN);
     final KeyCombination altk= new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN);
@@ -651,7 +653,20 @@ public class LineChartController {
 			error_label.setText("DB is empty!\nPlease add data first");
 		}
 	}
-	//Editing------------------------------------------------------------
+	//Editing------------------------------------------------------------	
+    private void openPdfTextDialog(){
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/LineChart/PdfTextDialog.fxml"));
+        Parent parent;
+		try {
+			parent = fxmlLoader.load();
+	        Scene scene = new Scene(parent);
+	        Stage stage = new Stage();
+	        stage.initModality(Modality.APPLICATION_MODAL);
+	        stage.setScene(scene);
+	        stage.setResizable(false);
+	        stage.showAndWait();
+		} catch (IOException e) {e.printStackTrace();}
+    }   
 	public void editFromTable() {
 		System.out.println("#editDataFromTable");		
 		Boolean isDvalid = true;
@@ -697,46 +712,43 @@ public class LineChartController {
 			error_label.setText("Value of "+table.getItems().get(i).getSeries()+" must be a number");
 	}
 	//Exports--------------------------------------------
+	@SuppressWarnings("deprecation")
 	public void pdfExtract() {
+		openPdfTextDialog();
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save");
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));
 		File file = fileChooser.showSaveDialog(primaryStage);
 	      
         if (file != null) {
-				WritableImage nodeshot = lChart.snapshot(new SnapshotParameters(), null);
-		        File imgfile = new File("dat/imgs/chart.png");
-		
-				try {
-				ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
-				} catch (IOException e) {
-					System.out.println("Error in making image!");
-				}
-		        PDDocument doc = new PDDocument();
-		        PDPage page = new PDPage();
-		        PDImageXObject pdimage;
-		        PDPageContentStream content;
-		        try {
-		            pdimage = PDImageXObject.createFromFile("dat/imgs/chart.png",doc);
-		            content = new PDPageContentStream(doc, page);
-		            content.drawImage(pdimage,50, 50);
-		        	content.beginText();                             
-		            content.setFont(PDType1Font.COURIER, 15);                          
-		            content.newLineAtOffset(10, 770);            
-		            String text = "LineChart by Cancer";             
-		            content.showText(text);        
-		            content.endText();
-		            content.close();
-		            doc.addPage(page);
-		            doc.save(file.getAbsolutePath()+".pdf");
-		            doc.close();
-		            System.out.println("DOC\n\tPdf Exported!");
-		            imgfile.delete();
-		        } catch (IOException ex) {
-		            Logger.getLogger(LineChart.class.getName()).log(Level.SEVERE, null, ex);
-		        }
+			WritableImage nodeshot = lChart.snapshot(new SnapshotParameters(), null);
+	        File imgfile = new File("dat/imgs/chart.png");
+	
+			try {
+			ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", imgfile);
+			} catch (IOException e) {
+				System.out.println("Error in making image!");
+			}
+			try {
+			    String k = pdfTextApp;				    
+			    OutputStream popfile = new FileOutputStream(new File(file.getAbsolutePath()+".pdf"));
+			    Document document = new Document();
+			    PdfWriter.getInstance(document, popfile);
+			    document.open();
+			    Image img = Image.getInstance("dat/imgs/chart.png");			    
+			    img.scaleAbsolute(560, 300);
+		        document.add(img);			   
+				HTMLWorker htmlWorker = new HTMLWorker(document);
+			    htmlWorker.parse(new StringReader(k));
+			    document.close();
+			    popfile.close();
+			    System.out.println("DOC\n\tPdf Exported!");
+			    error_label.setText("PDF exported!");
+			} catch (Exception e) {
+			    e.printStackTrace();
+			}
 		}
-    }	
+    }
 	public void pngExtract() {
 		  FileChooser fileChooser = new FileChooser();
 	      fileChooser.setTitle("Save");
