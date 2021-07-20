@@ -81,19 +81,21 @@ public class LineChartController {
 	@FXML private MenuBar menuBar;
 	@FXML private LineChart<Double, Double> lChart;
 	@FXML private Label error_label;@FXML private Label table_error_label;@FXML private Label lineValue;@FXML private Label l4;@FXML private Label l3;@FXML private Label l2;@FXML private Label l1;
+	@FXML private Label app_log;
 	@FXML private TextArea xVal;
 	@FXML private TextField lineChartTitle;@FXML private TextField seriesLabel;@FXML private TextField xxisLabel;@FXML private TextField yxisLabel;@FXML private NumberAxis xxis;
 	@FXML private NumberAxis yxis;
 	@FXML private TableView<LineTableController> table;
 	@FXML private TableColumn<LineTableController, String> c1;@FXML private TableColumn<LineTableController, Double> c2;@FXML private TableColumn<LineTableController, Double> c3;
-	@FXML private CheckBox dbEnable;@FXML private CheckBox fileEnable;
-	@FXML private Button loadDataFromFile;@FXML private Button loadDataFromDb;@FXML private Button loadDataInTable;@FXML private Button add_data;	
+	@FXML private CheckBox dbEnable;@FXML private CheckBox fileEnable;@FXML private CheckBox clickDraw;
+	@FXML private Button loadDataFromFile;@FXML private Button loadDataFromDb;@FXML private Button loadDataInTable;@FXML private Button add_data;@FXML private Button add_click_data;	
 	@FXML private AnchorPane anchor;
 	@FXML private Circle theameCircle;
 	@FXML private DatePicker setDate;
 	@FXML private ToggleButton themeToggle;
 	private DateTimeFormatter classic=DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	private boolean theame=true;
+	private String clickDataStr = null;
 	final Stage primaryStage = null;
 	Stage stage = null;
 	final double SCALE_DELTA = 1.1;
@@ -167,6 +169,7 @@ public class LineChartController {
 //	            event.consume();
 //	        }
 		});
+        cursorMoni();
     }
     @FXML void bulkEntriesPressed(KeyEvent event) {
     	if (altEnter.match(event)) {addData();event.consume();}
@@ -315,12 +318,19 @@ public class LineChartController {
 		}
 		if(!dbEnable.isSelected()){
 			loadDataFromDb.setDisable(true);
-		}			
+		}
+		if(clickDraw.isSelected()) {
+			add_click_data.setDisable(false);			
+		}else {			
+			add_click_data.setDisable(true);
+		}
 	}
 	public void changeTheme() {
 		if(theame) {				//light=Theme(true)#666666->white[light->dark]
 			Color c = Color.web("white");			
 			error_label.setStyle("-fx-border-color: white");
+			app_log.setStyle("-fx-border-color: white");
+			app_log.setTextFill(c);
 			anchor.setStyle("-fx-background-color:  #666666");			
 			lChart.setStyle("-fx-border-color: white");
 		    lChart.setStyle("-fx-text-fill: white");			
@@ -341,6 +351,8 @@ public class LineChartController {
 		else {		//dark[if dark then set Light]
 			Color c = Color.web("black");			
 			error_label.setStyle("-fx-border-color: black");
+			app_log.setStyle("-fx-border-color: black");
+			app_log.setTextFill(c);
 			anchor.setStyle("-fx-background-color:  #d8d8d8");			
 			lChart.setStyle("-fx-border-color: black");
 			lChart.setStyle("-fx-text-fill: black");			
@@ -377,15 +389,17 @@ public class LineChartController {
 				try {if(!DbController.insertSeries(seriesLabel.getText(),1,X)) {error_label.setText("Error in Database");}} 
 				catch (SQLException e) {e.printStackTrace();}
 			}			
-			decodeAndDraw(seriesLabel.getText(),X,true);
-			cursorMoni();
+			decodeAndDraw(seriesLabel.getText(),X,true);			
 		}
+	}
+	public void addClickData() {
+		decodeAndDraw(seriesLabel.getText(),clickDataStr,true);
+		clickDataStr="";
 	}
 	//Draw & decoding Validations Functions-----------------------------------------------------------
 	private void cursorMoni() {
 	    final Axis<Double> xAxis = lChart.getXAxis();
-	    final Axis<Double> yAxis = lChart.getYAxis();	    
-
+	    final Axis<Double> yAxis = lChart.getYAxis();	    	    
 	    final Node chartBackground = lChart.lookup(".chart-plot-background");
 	    for (Node n: chartBackground.getParent().getChildrenUnmodifiable()) {
 	      if (n != chartBackground && n != xAxis && n != yAxis) {
@@ -405,6 +419,15 @@ public class LineChartController {
 	        public void handle(MouseEvent mouseEvent) {
 	     	  lineValue.setText("");	    	  
 	         }
+	    });
+	    chartBackground.setOnMouseClicked(new EventHandler<MouseEvent>() {
+	        public void handle(MouseEvent mouseEvent) {
+	        	if(clickDraw.isSelected()) {	        		
+	        		String ckPnt = String.format("[%.2f,%.2f]",xAxis.getValueForDisplay(mouseEvent.getX()),yAxis.getValueForDisplay(mouseEvent.getY()));	        			        	
+	        		clickDataStr+=ckPnt;
+	        		app_log.setText("Clicker Points :\n\t"+clickDataStr);
+	        	}
+	        }
 	    });
 	 }
 	private void drawChart(String lineName,Double xValues[],Double yValues[],int filled,Boolean whoCalled) {
