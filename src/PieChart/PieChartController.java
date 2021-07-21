@@ -6,25 +6,20 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringReader;
 import java.io.Writer;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.imageio.ImageIO;
-
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.Phrase;
+import com.itextpdf.text.html.simpleparser.HTMLWorker;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -36,8 +31,10 @@ import javafx.embed.swing.SwingFXUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
-import javafx.scene.chart.LineChart;
 import javafx.scene.chart.PieChart;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
@@ -66,11 +63,13 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
 import javafx.util.converter.DoubleStringConverter;
 
+@SuppressWarnings("deprecation")
 public class PieChartController {
 	@FXML private MenuBar menuBar;
 	@FXML PieChart pChart;
@@ -98,6 +97,7 @@ public class PieChartController {
 	@FXML private DatePicker setDate;
 	@FXML private ToggleButton themeToggle;
 	@FXML private Circle theameCircle;
+	static String pdfTextApp = null;
 	private DateTimeFormatter classic=DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	final Stage primaryStage = null;
 	Stage stage = null;
@@ -602,50 +602,59 @@ public class PieChartController {
 		}else
 			error_label.setText("Value of "+table.getItems().get(i).getS()+" must be a number");
 	}
+	private void openPdfTextDialog(){
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/PieChart/PdfTextDialog.fxml"));
+        Parent parent;
+		try {
+			parent = fxmlLoader.load();
+	        Scene scene = new Scene(parent);
+	        Stage stage = new Stage();
+	        stage.initModality(Modality.APPLICATION_MODAL);
+	        stage.setScene(scene);
+	        stage.setResizable(false);
+	        stage.showAndWait();
+		} catch (IOException e) {e.printStackTrace();}
+    }
 	//Export functions------------------------------
-	public void pdfExtract() {		
+	public void pdfExtract() {	
+		openPdfTextDialog();
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save");
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));
-		File pdffile = fileChooser.showSaveDialog(primaryStage);
+		File file = fileChooser.showSaveDialog(primaryStage);
       
-	      if (pdffile != null) {
+	     if (file != null) {
 			WritableImage nodeshot = pChart.snapshot(new SnapshotParameters(), null);
-	        File file = new File("dat/imgs/chart.png");
+	        File imgfile = new File("dat/imgs/chart.png");
 	
 			try {
-			ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
+			ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", imgfile);
 			} catch (IOException e) {
 				System.out.println("Error in making image!");
 			}
-	        PDDocument doc = new PDDocument();
-	        PDPage page = new PDPage();
-	        PDImageXObject pdimage;
-	        PDPageContentStream content;
-	        try {
-	            pdimage = PDImageXObject.createFromFile("dat/imgs/chart.png",doc);
-	            content = new PDPageContentStream(doc, page);
-	            content.drawImage(pdimage,-17,320);
-	        	content.beginText();                             
-	            content.setFont(PDType1Font.COURIER, 12);                          
-	            content.newLineAtOffset(410, 770);
-	            LocalDate localDate = setDate.getValue();
-	            String text = "PieChart by Cancer "+classic.format(localDate);;
-	            content.showText(text);
-	            content.endText();
-	            content.close();
-	            doc.addPage(page);
-	            doc.save(pdffile.getPath()+".pdf");
-	            doc.close();
-	            System.out.println("DOC\n\tPdf Exported!");
-	            error_label.setText("PDF exported");
-	            file.delete();
-	        } catch (IOException ex) {
-	            Logger.getLogger(LineChart.class.getName()).log(Level.SEVERE, null, ex);
-	        }
-	      }	      
+			try {
+			    String k = pdfTextApp;				    
+			    OutputStream popfile = new FileOutputStream(new File(file.getAbsolutePath()+".pdf"));
+			    Document document = new Document();
+			    PdfWriter.getInstance(document, popfile);
+			    document.open();
+			    Image img = Image.getInstance("dat/imgs/chart.png");			    
+			    img.scaleAbsolute(560, 300);
+		        document.add(img);			   
+				HTMLWorker htmlWorker = new HTMLWorker(document);
+			    htmlWorker.parse(new StringReader(k));
+			    document.close();
+			    popfile.close();
+			    System.out.println("DOC\n\tPdf Exported!");
+			    error_label.setText("PDF exported!");
+			} catch (Exception e) {
+			    e.printStackTrace();
+			} finally {
+				imgfile.delete();
+			}
+	     }	      
     }	
-	public void pngExtract() {
+	public void pngExtract() {		
 		  FileChooser fileChooser = new FileChooser();
 	      fileChooser.setTitle("Save");
 	      fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));

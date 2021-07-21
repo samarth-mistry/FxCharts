@@ -8,25 +8,20 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.OutputStream;
+import java.io.StringReader;
 import java.io.Writer;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import javax.imageio.ImageIO;
-
-import org.apache.pdfbox.pdmodel.PDDocument;
-import org.apache.pdfbox.pdmodel.PDPage;
-import org.apache.pdfbox.pdmodel.PDPageContentStream;
-import org.apache.pdfbox.pdmodel.font.PDType1Font;
-import org.apache.pdfbox.pdmodel.graphics.image.PDImageXObject;
 
 import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
+import com.itextpdf.text.Image;
 import com.itextpdf.text.Phrase;
+import com.itextpdf.text.html.simpleparser.HTMLWorker;
 import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
@@ -36,6 +31,9 @@ import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
@@ -66,9 +64,12 @@ import javafx.scene.layout.AnchorPane;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
+import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.util.converter.DoubleStringConverter;
 
+@SuppressWarnings("deprecation")
 public class BarChartController {
 	@FXML private BarChart<String, Number> bChart;
 	@FXML private Label error_label;
@@ -93,7 +94,7 @@ public class BarChartController {
 	@FXML private TableView<BarTableController> table;
 	@FXML private TableColumn<BarTableController, String> c1;
 	@FXML private TableColumn<BarTableController, String> c2;
-	@FXML private TableColumn<String, String> c3;
+	@FXML private TableColumn<BarTableController, Double> c3;
 	@FXML private CheckBox dbEnable;
 	@FXML private CheckBox fileEnable;
 	@FXML private CheckBox bulkEnable;
@@ -106,7 +107,8 @@ public class BarChartController {
 	@FXML private AnchorPane anchor;
 	@FXML private AnchorPane anchor1;
 	@FXML private AnchorPane anchor2;
-	@FXML private Circle theameCircle;	    
+	@FXML private Circle theameCircle;	
+	static String pdfTextApp = null;
     final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN);
     final KeyCombination altj= new KeyCodeCombination(KeyCode.J, KeyCombination.ALT_DOWN);
     final KeyCombination altk= new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN);
@@ -191,6 +193,28 @@ public class BarChartController {
 		c1.setSortable(false);
 		c2.setSortable(false);
 		c3.setSortable(false);
+		table.getSelectionModel().cellSelectionEnabledProperty().set(true);
+		c1.setCellFactory(TextFieldTableCell.forTableColumn());
+		c2.setCellFactory(TextFieldTableCell.forTableColumn());
+		c3.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
+	    c1.setOnEditCommit(new EventHandler<CellEditEvent<BarTableController, String>>() {
+	         public void handle(CellEditEvent<BarTableController, String> t) {
+	               ((BarTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setSeries(t.getNewValue().toString());
+	               editFromTable();
+	         }
+	    });
+	    c2.setOnEditCommit(new EventHandler<CellEditEvent<BarTableController, String>>() {
+	         public void handle(CellEditEvent<BarTableController, String> t) {
+	               ((BarTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setSeriesX(t.getNewValue().toString());
+	               editFromTable();
+	         }
+	    });
+	    c3.setOnEditCommit(new EventHandler<CellEditEvent<BarTableController, Double>>() {
+	         public void handle(CellEditEvent<BarTableController, Double> t) {
+	               ((BarTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setSeriesY(t.getNewValue());
+	               editFromTable();
+	         }
+	    });
 	}
 	//Zooming-------------------------------------------------
 	public void zoomLineChart(ScrollEvent event) {
@@ -373,20 +397,7 @@ public class BarChartController {
 					try {if(!DbController.insertSeries(seriesLabel.getText(),1,X)) {error_label.setText("Error in Database");}} 
 					catch (SQLException e) {e.printStackTrace();}
 				}
-				drawSinChart(true);
-				table.getSelectionModel().cellSelectionEnabledProperty().set(true);
-				c1.setCellFactory(TextFieldTableCell.forTableColumn());
-				c2.setCellFactory(TextFieldTableCell.forTableColumn());
-			    c1.setOnEditCommit(new EventHandler<CellEditEvent<BarTableController, String>>() {
-			         public void handle(CellEditEvent<BarTableController, String> t) {
-			               ((BarTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setSeries(t.getNewValue().toString());		                    	
-			         }
-			    });
-			    c2.setOnEditCommit(new EventHandler<CellEditEvent<BarTableController, String>>() {
-			         public void handle(CellEditEvent<BarTableController, String> t) {
-			               ((BarTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setSeries(t.getNewValue().toString());		                    	
-			         }
-			    });
+				drawSinChart(true);				
 			}else
 				error_label.setText("Value of val must be number");
 		}
@@ -698,49 +709,103 @@ public class BarChartController {
 		}
 	}
 	//Previewing-------------------------------------------
-	public void previewPDF() {
+	public void previewPDF() {}
+	//Editing-----------------------------------------------
+	public void editFromTable() {
+		System.out.println("#editDataFromTable");		
+		Boolean isDvalid = true;
+		int i=0;
+		ArrayList<String> nmArr = new ArrayList<String>();
+		ArrayList<String> bufx = new ArrayList<String>();
+		ArrayList<Number> bufy = new ArrayList<Number>();
+		ArrayList<Integer> bkCnt = new ArrayList<Integer>();
+		int breakAfter=0;
+		for(i=0;i<table.getItems().size();i++) {					
+			bufx.add(table.getItems().get(i).getSeriesX());
+			bufy.add(table.getItems().get(i).getSeriesY());
+			if(!table.getItems().get(i).getSeries().isEmpty()) {
+				nmArr.add(table.getItems().get(i).getSeries());
+				if(i!=0)
+					bkCnt.add(breakAfter);
+				breakAfter = 0;
+			}	
+			breakAfter++;
+			if(i==table.getItems().size()-1) {
+				bkCnt.add(breakAfter);
+			}
+		}
+		System.out.println("\tnmArr"+nmArr+"\n\tBkCnt: "+bkCnt+"\n\txArr: "+bufx+"\n\tyArr: "+bufy);
 		
+		if(isDvalid) {
+			int selector = 0;
+			clearChart();
+			clearTable();
+			bulkNames.clear();
+			for(i=0;i<nmArr.size();i++) {
+				System.out.println("\tisDvalid\n\t\tnmArr: "+nmArr.get(i)+"\n\t\tSeletr: "+selector);
+				String[] xArr = new String[bkCnt.get(i)];
+				Number[] yArr = new Number[bkCnt.get(i)];
+				for(int j=0;j<bkCnt.get(i);j++) {
+					xArr[j] = bufx.get(selector+j);
+					bulkNames.add(xArr[j]);
+					yArr[j] = bufy.get(selector+j);
+					System.out.println("\t<"+xArr[j]+"><"+yArr[j]+">");
+				}
+				selector+=bkCnt.get(i);				
+				drawBulkChart(nmArr.get(i),yArr,bkCnt.get(i),false);
+			}
+		}else
+			error_label.setText("Value of "+table.getItems().get(i).getSeries()+" must be a number");
 	}
+	private void openPdfTextDialog(){
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/BarChart/PdfTextDialog.fxml"));
+        Parent parent;
+		try {
+			parent = fxmlLoader.load();
+	        Scene scene = new Scene(parent);
+	        Stage stage = new Stage();
+	        stage.initModality(Modality.APPLICATION_MODAL);
+	        stage.setScene(scene);
+	        stage.setResizable(false);
+	        stage.showAndWait();
+		} catch (IOException e) {e.printStackTrace();}
+    }
 	//Exports-------------------------------------------
 	public void pdfExtract() {
+		openPdfTextDialog();
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save");
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));
 		File file = fileChooser.showSaveDialog(primaryStage);
 	      
         if (file != null) {
-				WritableImage nodeshot = bChart.snapshot(new SnapshotParameters(), null);
-		        File imgfile = new File("dat/imgs/bchart.png");		        
-				try {
-					ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", imgfile);
-				} catch (IOException e) {
-					System.out.println("Error in making image!");
-				}
-		        PDDocument doc = new PDDocument();
-		        PDPage page = new PDPage();
-		        PDImageXObject pdimage;
-		        PDPageContentStream content;	            		        
-		        try {		        	
-		            pdimage = PDImageXObject.createFromFile("dat/imgs/bchart.png",doc);		            		           
-		            content = new PDPageContentStream(doc, page);
-		            content.drawImage(pdimage,-17,350);
-		        	content.beginText();                             
-		            content.setFont(PDType1Font.COURIER, 15);                          
-		            content.newLineAtOffset(420, 770);            
-		            String text = "BarChart by Cancer";             
-		            content.showText(text);        
-		            content.endText();
-		            content.close();
-		            doc.addPage(page);
-		            doc.save(file.getAbsolutePath()+".pdf");
-		            doc.close();
-		            System.out.println("DOC\n\tPdf Exported!");
-		            imgfile.delete();
-		            error_label.setText("PDF exported successfully");
-		        } catch (IOException ex) {
-		        	error_label.setText("Error occured in exporting PDF");		    
-		            Logger.getLogger(BarChart.class.getName()).log(Level.SEVERE, null, ex);
-		        } 
+			WritableImage nodeshot = bChart.snapshot(new SnapshotParameters(), null);
+	        File imgfile = new File("dat/imgs/bchart.png");		        
+			try {
+				ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", imgfile);
+			} catch (IOException e) {
+				System.out.println("Error in making image!");
+			}			
+			try {
+			    String k = pdfTextApp;				    
+			    OutputStream popfile = new FileOutputStream(new File(file.getAbsolutePath()+".pdf"));
+			    Document document = new Document();
+			    PdfWriter.getInstance(document, popfile);
+			    document.open();
+			    Image img = Image.getInstance("dat/imgs/bchart.png");			    
+			    img.scaleAbsolute(560, 300);
+		        document.add(img);
+				HTMLWorker htmlWorker = new HTMLWorker(document);				
+			    htmlWorker.parse(new StringReader(k));
+			    document.close();
+			    popfile.close();
+			    System.out.println("DOC\n\tPdf Exported!");
+			    error_label.setText("PDF exported!");
+			} catch (Exception e) {
+			    e.printStackTrace();
+			} finally {
+				imgfile.delete();
+			}
 		}
     }	
 	public void pngExtract() {
@@ -848,42 +913,7 @@ public class BarChartController {
             System.out.println("Export\n\tLine Table exported!");
 		}
     }
-	public void refresh() {
-		editFromTable();
-	}
-	public void editFromTable() {  
-		System.out.println("#editFromTable#");
-		ArrayList<String> barNmTab = new ArrayList<String>();
-		int i;			
-		for(i=0;i<table.getItems().size();i++) {
-			String z = table.getItems().get(i).getSeries();
-			String x = table.getItems().get(i).getSeriesX();
-			String y = table.getItems().get(i).getSeriesY().toString();
-			
-			System.out.println(z+"\t"+x+"\t"+y);
-			if(!z.isEmpty())
-				barNmTab.add(z);
-		}		
-		Number[][] yFin= new Number[barNmTab.size()][table.getItems().size()/barNmTab.size()];		
-		int finCounter = -1,interCount = 0;	
-		for(i=0;i<table.getItems().size();i++) {			
-			if(!table.getItems().get(i).getSeries().isEmpty()) {
-				finCounter++;				
-				interCount = 0;
-				System.out.println("finCount: "+finCounter);				
-			}else {
-				interCount++;
-				System.out.println("InterCount: "+interCount);
-			}			
-			yFin[finCounter][interCount]=table.getItems().get(i).getSeriesY();
-		}		
-		clearFile();
-		clearTable();
-		for(int j=0;j< barNmTab.size();j++) {		
-			callWriter(barNmTab.get(j),bulkNames, yFin[j]);
-		}
-		loadDataFromFileConfirmed();
-	}
+	public void refresh() {}
 	private PdfPCell getCell(String text, int alignment) {
         PdfPCell cell = new PdfPCell(new Phrase(text));
         cell.setPadding(0);

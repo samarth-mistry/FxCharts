@@ -78,6 +78,7 @@ import javafx.stage.Modality;
 import javafx.util.StringConverter;
 import javafx.util.converter.DoubleStringConverter;
 
+@SuppressWarnings("deprecation")
 public class LineChartController {
 	@FXML private MenuBar menuBar;
 	@FXML private LineChart<Double, Double> lChart;
@@ -162,15 +163,7 @@ public class LineChartController {
 	               editFromTable();
 	         }
 	    });
-        table.setOnKeyPressed(event -> {//Table navigation through buttons <^>
-//	        if (event.getCode() == KeyCode.RIGHT || event.getCode() == KeyCode.TAB) {
-//	            table.getSelectionModel().selectRightCell();
-//	            event.consume();
-//	        } else if (event.getCode() == KeyCode.LEFT) {
-//	            table.getSelectionModel().selectLeftCell();
-//	            event.consume();
-//	        }
-		});
+        
         cursorMoni();
     }
     @FXML void bulkEntriesPressed(KeyEvent event) {
@@ -712,7 +705,6 @@ public class LineChartController {
 			error_label.setText("Value of "+table.getItems().get(i).getSeries()+" must be a number");
 	}
 	//Exports--------------------------------------------
-	@SuppressWarnings("deprecation")
 	public void pdfExtract() {
 		openPdfTextDialog();
 		FileChooser fileChooser = new FileChooser();

@@ -1,4 +1,4 @@
-package LineChart;
+package PieChart;
 
 import javafx.fxml.FXML;
 import javafx.scene.web.HTMLEditor;
@@ -8,8 +8,7 @@ public class pdfTextDialogController {
 	@FXML private HTMLEditor pdfTextAppend;
 	public void getPdfText() {
 		System.out.println("PdfText: "+pdfTextAppend.getHtmlText());
-		LineChartController.pdfTextApp = pdfTextAppend.getHtmlText();
-		System.out.println(LineChartController.pdfTextApp);
+		PieChartController.pdfTextApp = pdfTextAppend.getHtmlText();
 		cancelDialog();
 	}
 	public void cancelDialog() {

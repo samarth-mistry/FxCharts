@@ -13,14 +13,20 @@ public class BarTableController {
 
     public String getSeries() {    	
 		return series;
-    }
-    public void setSeries(String series) {    	
-    	this.series = series;
-    }
+    }    
     public String getSeriesX() {
         return seriesX;
     }
     public Number getSeriesY() {
         return seriesY;
+    }
+    public void setSeries(String series) {    	
+    	this.series = series;
+    }
+    public void setSeriesX(String seriesX) {    	
+    	this.seriesX = seriesX;
+    }
+    public void setSeriesY(Double seriesY) {    	
+    	this.seriesY = seriesY;
     }
 }
