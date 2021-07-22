@@ -7,72 +7,105 @@
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.Tooltip?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.shape.Circle?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane fx:id="anchor" prefHeight="600.0" prefWidth="1339.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="BarChart.BarChartController">
+<AnchorPane fx:id="anchor" prefHeight="667.0" prefWidth="1338.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="BarChart.BarChartController">
    <children>
-      <TextField fx:id="barChartTitle" layoutX="9.0" layoutY="185.0" onKeyReleased="#btnOnKeyPressed" onKeyTyped="#axisRenamed" promptText="Title" />
-      <TextField layoutX="9.0" layoutY="217.0" onKeyReleased="#btnOnKeyPressed" onKeyTyped="#axisRenamed" promptText="Label of X-axis" text="X" fx:id="xxisLabel" />
-      <TextField fx:id="yxisLabel" layoutX="9.0" layoutY="250.0" onKeyReleased="#btnOnKeyPressed" onKeyTyped="#axisRenamed" promptText="Label of Y-axis" text="Y" />
-      <TextField fx:id="seriesLabel" layoutX="9.0" layoutY="283.0" promptText="Label for line" text="Line" />
-      <TextField fx:id="nm" layoutX="9.0" layoutY="315.0" onKeyReleased="#nmValEntriesPressed" promptText="Name" text="Name" />
-      <TextField fx:id="val" layoutX="9.0" layoutY="346.0" onKeyReleased="#nmValEntriesPressed" promptText="Value" text="10.8" />
-      <TextArea fx:id="bulkNms" disable="true" layoutX="9.0" layoutY="377.0" onKeyReleased="#bulkNamesPressed" prefHeight="41.0" prefWidth="281.0" promptText="Enter Bulk Names          eg. [Name1][Name2][.....]..." />
-      <TextArea fx:id="bulk" disable="true" layoutX="9.0" layoutY="427.0" onKeyReleased="#bulkEntriesPressed" prefHeight="84.0" prefWidth="281.0" promptText="Bulk entry here eg. [abc,23.4][efg,34.2]........">
+      <MenuBar fx:id="menuBar" prefHeight="27.0" prefWidth="1338.0">
+         <menus>
+            <Menu mnemonicParsing="false" text="File">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="New File [ctrl+o]" />
+                  <MenuItem mnemonicParsing="false" onAction="#openBarKit" text="New BarChart" />
+                  <MenuItem mnemonicParsing="false" onAction="#openPieKit" text="New PieChart" />
+                  <MenuItem mnemonicParsing="false" onAction="#openLineKit" text="New LineChart" />
+                  <MenuItem mnemonicParsing="false" onAction="#openStackKit" text="New StackedAreaChart" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" text="Save       [ctrl+s]" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" onAction="#pdfExtract" text="Export chart to PDF  [ctrl+p]" />
+                  <MenuItem mnemonicParsing="false" onAction="#pngExtract" text="Export chart to PNG [ctrl+i]" />
+                  <MenuItem mnemonicParsing="false" onAction="#pdfTableExtract" text="Export table to PDF  [ctrl+t]" />
+                  <MenuItem mnemonicParsing="false" onAction="#csvExtract" text="Export table to CSV [ctrl+r]" />
+                  <MenuItem mnemonicParsing="false" onAction="#exit" text="Exit         [ctrl+q]" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Edit">
+               <items>
+                  <MenuItem mnemonicParsing="false" onAction="#clearChart" text="Clear Chart" />
+                  <MenuItem mnemonicParsing="false" onAction="#clearFile" text="Clear File" />
+                  <MenuItem mnemonicParsing="false" onAction="#clearDb" text="Clear Database" />
+                  <MenuItem mnemonicParsing="false" onAction="#clearTable" text="Clear table" />
+                  <MenuItem mnemonicParsing="false" onAction="#clearAll" text="Clear chart, table and file [ctrl+c]" />
+                  <MenuItem mnemonicParsing="false" text="Enable bulk entries" />
+                  <MenuItem mnemonicParsing="false" text="Enable file" />
+                  <MenuItem mnemonicParsing="false" text="Enable database recording" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="View">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Change UI theme  [alt+t]">
+                     <graphic>
+                        <ToggleButton fx:id="themeToggle" mnemonicParsing="false" onAction="#changeTheme" text="Dark" />
+                     </graphic>
+                  </MenuItem>
+                  <MenuItem mnemonicParsing="false" onAction="#zoomNormal" text="Full Screen [alt+F11]" />
+                  <MenuItem mnemonicParsing="false" text="Zoom chart  [ctrl++]" />
+                  <MenuItem mnemonicParsing="false" onAction="#zoomNormal" text="Zoom to normal" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Help">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="About" />
+                  <MenuItem mnemonicParsing="false" text="Key shortcuts" />
+               </items>
+            </Menu>
+         </menus>
+      </MenuBar>
+      <TextField fx:id="barChartTitle" layoutX="9.0" layoutY="205.0" onKeyReleased="#btnOnKeyPressed" onKeyTyped="#axisRenamed" promptText="Title" />
+      <TextField layoutX="9.0" layoutY="237.0" onKeyReleased="#btnOnKeyPressed" onKeyTyped="#axisRenamed" promptText="Label of X-axis" text="X" fx:id="xxisLabel" />
+      <TextField fx:id="yxisLabel" layoutX="9.0" layoutY="270.0" onKeyReleased="#btnOnKeyPressed" onKeyTyped="#axisRenamed" promptText="Label of Y-axis" text="Y" />
+      <TextField fx:id="seriesLabel" layoutX="9.0" layoutY="303.0" promptText="Label for line" text="Line" />
+      <TextField fx:id="nm" layoutX="9.0" layoutY="335.0" onKeyReleased="#nmValEntriesPressed" promptText="Name" text="Name" />
+      <TextField fx:id="val" layoutX="9.0" layoutY="366.0" onKeyReleased="#nmValEntriesPressed" promptText="Value" text="10.8" />
+      <TextArea fx:id="bulkNms" disable="true" layoutX="9.0" layoutY="397.0" onKeyReleased="#bulkNamesPressed" prefHeight="41.0" prefWidth="281.0" promptText="Enter Bulk Names          eg. [Name1][Name2][.....]..." />
+      <TextArea fx:id="bulk" disable="true" layoutX="9.0" layoutY="447.0" onKeyReleased="#bulkEntriesPressed" prefHeight="84.0" prefWidth="281.0" promptText="Bulk entry here eg. [abc,23.4][efg,34.2]........">
          <tooltip>
             <Tooltip text="Empty Tooltip" />
          </tooltip></TextArea>
-      <CheckBox fx:id="bulkEnable" layoutX="619.0" layoutY="524.0" mnemonicParsing="false" onAction="#buttonEnabler" onKeyReleased="#btnOnKeyPressed" text="Enable Bulk" />
-      <CheckBox fx:id="fileEnable" layoutX="619.0" layoutY="546.0" mnemonicParsing="false" onAction="#buttonEnabler" onKeyReleased="#btnOnKeyPressed" prefHeight="18.0" prefWidth="101.0" text="Enable File" />
-      <CheckBox fx:id="dbEnable" layoutX="619.0" layoutY="568.0" mnemonicParsing="false" onAction="#buttonEnabler" onKeyReleased="#btnOnKeyPressed" prefHeight="18.0" prefWidth="96.0" text="Enable DB" />
-      <Button fx:id="add_data" layoutX="221.0" layoutY="529.0" mnemonicParsing="false" onAction="#addData" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #60c0da;" text="Add Line">
+      <CheckBox fx:id="bulkEnable" layoutX="619.0" layoutY="544.0" mnemonicParsing="false" onAction="#buttonEnabler" onKeyReleased="#btnOnKeyPressed" text="Enable Bulk" />
+      <CheckBox fx:id="fileEnable" layoutX="619.0" layoutY="566.0" mnemonicParsing="false" onAction="#buttonEnabler" onKeyReleased="#btnOnKeyPressed" prefHeight="18.0" prefWidth="101.0" text="Enable File" />
+      <CheckBox fx:id="dbEnable" layoutX="619.0" layoutY="588.0" mnemonicParsing="false" onAction="#buttonEnabler" onKeyReleased="#btnOnKeyPressed" prefHeight="18.0" prefWidth="96.0" text="Enable DB" />
+      <Button fx:id="add_data" layoutX="221.0" layoutY="549.0" mnemonicParsing="false" onAction="#addData" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #60c0da;" text="Add Line">
          <tooltip>
             <Tooltip text="Add single line" />
          </tooltip></Button>
-      <Button layoutX="758.0" layoutY="565.0" mnemonicParsing="false" onAction="#exit" style="-fx-background-color: #ff2225;" text="Exit" textFill="WHITE" />
-      <Button fx:id="loadDataFromFile" disable="true" layoutX="465.0" layoutY="560.0" mnemonicParsing="false" onAction="#loadDataFromFile" style="-fx-background-color: #60c0da;" text="Load data from file" />
-      <Button layoutX="220.0" layoutY="560.0" mnemonicParsing="false" onAction="#clearChart" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #ffaa00;" text="Clear chart" />
-      <Button layoutX="136.0" layoutY="529.0" mnemonicParsing="false" onAction="#clearDb" style="-fx-background-color: #ffaa00;" text="Clear DB" />
-      <Button fx:id="loadDataFromDb" disable="true" layoutX="465.0" layoutY="529.0" mnemonicParsing="false" onAction="#loadDataFromDb" style="-fx-background-color: #60c0da;" text="Load data from DB" />
-      <Button layoutX="137.0" layoutY="560.0" mnemonicParsing="false" onAction="#clearFile" style="-fx-background-color: #ffaa00;" text="Clear file" />
-      <Button layoutX="16.0" layoutY="560.0" mnemonicParsing="false" onAction="#pdfExtract" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #81af6a;" text="Export PDF" textFill="WHITE" />
-      <Button layoutX="16.0" layoutY="529.0" mnemonicParsing="false" onAction="#pngExtract" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #81af6a;" text="Export image" textFill="WHITE" />
-      <Button fx:id="add_b_data" disable="true" layoutX="330.0" layoutY="529.0" mnemonicParsing="false" onAction="#addBulkData" prefHeight="24.0" prefWidth="126.0" style="-fx-background-color: #60c0da;" text="Add Bulk values" />
-      <Button fx:id="add_b_nms" disable="true" layoutX="330.0" layoutY="560.0" mnemonicParsing="false" onAction="#setBulkNames" style="-fx-background-color: #60c0da;" text="Add Bulk Names" />
-      <Circle fx:id="theameCircle" fill="#666666" layoutX="779.0" layoutY="546.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
-      <Label fx:id="l4" layoutX="189.0" layoutY="287.0" text="Line name" />
-      <Label fx:id="l3" layoutX="188.0" layoutY="254.0" text="Y-axis name" />
-      <Label fx:id="l2" layoutX="187.0" layoutY="221.0" text="X-axis name" />
-      <Label fx:id="l1" layoutX="188.0" layoutY="189.0" text="BarChart title" />
-      <Label fx:id="error_label" alignment="CENTER" layoutX="296.0" layoutY="14.0" prefHeight="25.0" prefWidth="681.0" style="-fx-border-color: black;" textFill="#e01f8d" wrapText="true">
-         <font>
-            <Font name="System Bold Italic" size="14.0" />
-         </font></Label>
-      <Label fx:id="barValue" alignment="CENTER" layoutX="381.0" layoutY="486.0" prefHeight="25.0" prefWidth="486.0">
-         <font>
-            <Font name="DejaVu Sans Bold" size="16.0" />
-         </font></Label>
-      <Label fx:id="l6" layoutX="189.0" layoutY="350.0" text="Data value" />
-      <Label fx:id="l5" layoutX="189.0" layoutY="319.0" text="Data name" />
-      <Line endX="979.0" layoutX="344.0" layoutY="521.0" startX="-334.0" />
-      <BarChart fx:id="bChart" layoutX="295.0" layoutY="44.0" onMouseClicked="#zoomNormal" onScroll="#zoomLineChart" prefHeight="428.0" prefWidth="658.0" style="-fx-border-color: black;" title="BarChart title">
-         <xAxis>
-            <CategoryAxis side="BOTTOM" fx:id="xxis" />
-         </xAxis>
-         <yAxis>
-            <NumberAxis fx:id="yxis" side="LEFT" />
-         </yAxis>
-      </BarChart>
-      <Button fx:id="loadDataInTable" disable="true" layoutX="1080.0" layoutY="533.0" mnemonicParsing="false" onAction="#loadDataInTable" style="-fx-background-color: #60c0da;" text="Load Table" />
-      <TableView fx:id="table" editable="true" layoutX="983.0" layoutY="8.0" prefHeight="504.0" prefWidth="344.0">
+      <Button layoutX="758.0" layoutY="585.0" mnemonicParsing="false" onAction="#exit" style="-fx-background-color: #ff2225;" text="Exit" textFill="WHITE" />
+      <Button fx:id="loadDataFromFile" disable="true" layoutX="465.0" layoutY="580.0" mnemonicParsing="false" onAction="#loadDataFromFile" style="-fx-background-color: #60c0da;" text="Load data from file" />
+      <Button layoutX="220.0" layoutY="580.0" mnemonicParsing="false" onAction="#clearChart" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #ffaa00;" text="Clear chart" />
+      <Button layoutX="136.0" layoutY="549.0" mnemonicParsing="false" onAction="#clearDb" style="-fx-background-color: #ffaa00;" text="Clear DB" />
+      <Button fx:id="loadDataFromDb" disable="true" layoutX="465.0" layoutY="549.0" mnemonicParsing="false" onAction="#loadDataFromDb" style="-fx-background-color: #60c0da;" text="Load data from DB" />
+      <Button layoutX="137.0" layoutY="580.0" mnemonicParsing="false" onAction="#clearFile" style="-fx-background-color: #ffaa00;" text="Clear file" />
+      <Button layoutX="16.0" layoutY="580.0" mnemonicParsing="false" onAction="#pdfExtract" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #81af6a;" text="Export PDF" textFill="WHITE" />
+      <Button layoutX="16.0" layoutY="549.0" mnemonicParsing="false" onAction="#pngExtract" prefHeight="24.0" prefWidth="112.0" style="-fx-background-color: #81af6a;" text="Export image" textFill="WHITE" />
+      <Button fx:id="add_b_data" disable="true" layoutX="330.0" layoutY="549.0" mnemonicParsing="false" onAction="#addBulkData" prefHeight="24.0" prefWidth="126.0" style="-fx-background-color: #60c0da;" text="Add Bulk values" />
+      <Button fx:id="add_b_nms" disable="true" layoutX="330.0" layoutY="580.0" mnemonicParsing="false" onAction="#setBulkNames" style="-fx-background-color: #60c0da;" text="Add Bulk Names" />
+      <Circle fx:id="theameCircle" fill="#666666" layoutX="779.0" layoutY="566.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
+      <Button fx:id="loadDataInTable" disable="true" layoutX="1080.0" layoutY="553.0" mnemonicParsing="false" onAction="#loadDataInTable" style="-fx-background-color: #60c0da;" text="Load Table" />
+      <TableView fx:id="table" editable="true" layoutX="983.0" layoutY="33.0" prefHeight="499.0" prefWidth="348.0">
          <columns>
             <TableColumn fx:id="c1" prefWidth="132.0" sortable="false" text="BarName" />
             <TableColumn fx:id="c2" prefWidth="110.0" text="[X]" />
@@ -82,9 +115,32 @@
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </opaqueInsets>
       </TableView>
-      <Button layoutX="1080.0" layoutY="563.0" mnemonicParsing="false" onAction="#clearTable" style="-fx-background-color: #ffaa00;" text="Clear table" />
-      <Button layoutX="1179.0" layoutY="532.0" mnemonicParsing="false" onAction="#csvExtract" prefHeight="24.0" prefWidth="142.0" style="-fx-background-color: #81af6a;" text="Export to CSV" textFill="WHITE" />
-      <Button layoutX="1179.0" layoutY="564.0" mnemonicParsing="false" onAction="#pdfTableExtract" style="-fx-background-color: #81af6a;" text="Export table to PDF" textFill="WHITE" />
-      <Button layoutX="813.0" layoutY="565.0" mnemonicParsing="false" onAction="#refresh" text="Refresh" />
+      <Button layoutX="1080.0" layoutY="583.0" mnemonicParsing="false" onAction="#clearTable" style="-fx-background-color: #ffaa00;" text="Clear table" />
+      <Button layoutX="1179.0" layoutY="552.0" mnemonicParsing="false" onAction="#csvExtract" prefHeight="24.0" prefWidth="142.0" style="-fx-background-color: #81af6a;" text="Export to CSV" textFill="WHITE" />
+      <Button layoutX="1179.0" layoutY="584.0" mnemonicParsing="false" onAction="#pdfTableExtract" style="-fx-background-color: #81af6a;" text="Export table to PDF" textFill="WHITE" />
+      <Button layoutX="813.0" layoutY="585.0" mnemonicParsing="false" onAction="#refresh" text="Refresh" />
+      <Label fx:id="l4" layoutX="189.0" layoutY="307.0" text="Line name" />
+      <Label fx:id="l3" layoutX="188.0" layoutY="274.0" text="Y-axis name" />
+      <Label fx:id="l2" layoutX="187.0" layoutY="241.0" text="X-axis name" />
+      <Label fx:id="l1" layoutX="188.0" layoutY="209.0" text="BarChart title" />
+      <Label fx:id="error_label" alignment="CENTER" layoutX="295.0" layoutY="34.0" prefHeight="25.0" prefWidth="681.0" style="-fx-border-color: black;" textFill="#e01f8d" wrapText="true">
+         <font>
+            <Font name="System Bold Italic" size="14.0" />
+         </font></Label>
+      <Label fx:id="barValue" alignment="CENTER" layoutX="381.0" layoutY="506.0" prefHeight="25.0" prefWidth="486.0">
+         <font>
+            <Font name="DejaVu Sans Bold" size="16.0" />
+         </font></Label>
+      <Label fx:id="l6" layoutX="189.0" layoutY="370.0" text="Data value" />
+      <Label fx:id="l5" layoutX="189.0" layoutY="339.0" text="Data name" />
+      <Line endX="979.0" layoutX="344.0" layoutY="541.0" startX="-334.0" />
+      <BarChart fx:id="bChart" layoutX="295.0" layoutY="64.0" onMouseClicked="#zoomNormal" onScroll="#zoomLineChart" prefHeight="428.0" prefWidth="681.0" style="-fx-border-color: black;" title="BarChart title">
+         <xAxis>
+            <CategoryAxis side="BOTTOM" fx:id="xxis" />
+         </xAxis>
+         <yAxis>
+            <NumberAxis fx:id="yxis" side="LEFT" />
+         </yAxis>
+      </BarChart>
    </children>
 </AnchorPane>

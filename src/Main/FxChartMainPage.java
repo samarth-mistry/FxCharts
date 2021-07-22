@@ -35,8 +35,8 @@ public class FxChartMainPage extends Application{
         d.showAndWait();
         String sel = d.getSelectedItem();
         setStage(primaryStage, sel);        
-	}
-	private void setStage(Stage primaryStage, String sel) throws IOException {
+	}	
+	public void setStage(Stage primaryStage, String sel) throws IOException {
 		Parent root = null;
 		if(sel.equals("Pie chart")) {
 			root =FXMLLoader.load(getClass().getResource("/PieChart/PieChartModel2.fxml"));

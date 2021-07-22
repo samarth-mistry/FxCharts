@@ -25,6 +25,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import FileSys.pieFileSysController;
+import Main.FxChartMainPage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -724,5 +725,37 @@ public class PieChartController {
         cell.setHorizontalAlignment(alignment);        
         return cell;
     }
-	
+	//Open new chart--------------------------------------------------------------------
+	public void openPieKit() {	
+		FxChartMainPage openNew = new FxChartMainPage();
+		try {
+			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			openNew.setStage(thisstage,"Pie chart");
+			System.out.println("Opening Pie Chart closed bar chart");
+		} catch (IOException e) {e.printStackTrace();}
+	}
+	public void openBarKit() {
+		FxChartMainPage openNew = new FxChartMainPage();
+		try {
+			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			openNew.setStage(thisstage,"Bar chart");
+			System.out.println("Opening Pie Chart closed bar chart");
+		} catch (IOException e) {e.printStackTrace();}
+	}
+	public void openLineKit() {
+		FxChartMainPage openNew = new FxChartMainPage();
+		try {
+			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			openNew.setStage(thisstage,"Line chart");
+			System.out.println("Opening Pie Chart closed bar chart");
+		} catch (IOException e) {e.printStackTrace();}
+	}
+	public void openStackKit() {
+		FxChartMainPage openNew = new FxChartMainPage();
+		try {
+			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			openNew.setStage(thisstage,"Stacked chart");
+			System.out.println("Opening Pie Chart closed bar chart");
+		} catch (IOException e) {e.printStackTrace();}
+	}
 }

@@ -1,7 +1,10 @@
 package BarChart;
 
 import FileSys.barFileSysController;
+import Main.FxChartMainPage;
 import DbSys.DbController;
+
+import java.awt.Toolkit;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -46,11 +49,13 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.CheckBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.TableView;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.WritableImage;
@@ -71,9 +76,10 @@ import javafx.util.converter.DoubleStringConverter;
 
 @SuppressWarnings("deprecation")
 public class BarChartController {
+	@FXML private MenuBar menuBar;
 	@FXML private BarChart<String, Number> bChart;
 	@FXML private Label error_label;
-	@FXML private Label table_error_label;
+	@FXML private Label app_log;
 	@FXML private Label barValue;
 	@FXML private Label l6;
 	@FXML private Label l5;
@@ -104,10 +110,9 @@ public class BarChartController {
 	@FXML private Button add_data;
 	@FXML private Button add_b_data;
 	@FXML private Button add_b_nms;
-	@FXML private AnchorPane anchor;
-	@FXML private AnchorPane anchor1;
-	@FXML private AnchorPane anchor2;
+	@FXML private AnchorPane anchor;	
 	@FXML private Circle theameCircle;	
+	@FXML private ToggleButton themeToggle;
 	static String pdfTextApp = null;
     final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN);
     final KeyCombination altj= new KeyCodeCombination(KeyCode.J, KeyCombination.ALT_DOWN);
@@ -186,6 +191,8 @@ public class BarChartController {
 	final double SCALE_DELTA = 1.1;
 	private ArrayList<String> bulkNames = new ArrayList<String>();
 	@FXML public void initialize() {
+		//AudioPlayer.ALERT_AUDIOCLIP.play();
+		Toolkit.getDefaultToolkit().beep();		
 		table.setEditable(true);		
 		c1.setCellValueFactory(new PropertyValueFactory<>("series"));			
 		c2.setCellValueFactory(new PropertyValueFactory<>("seriesX"));
@@ -276,6 +283,11 @@ public class BarChartController {
 			DbController.clearSeries();
 			error_label.setText("DB is Cleared. Data is permanently lost");
 		}		
+	}
+	public void clearAll() {
+		clearChart();
+		clearTable();
+		clearFile();
 	}
 	public void exit() {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -920,4 +932,37 @@ public class BarChartController {
         cell.setHorizontalAlignment(alignment);        
         return cell;
     }
+	//New charts opening-----------------------------------------------------------
+	public void openPieKit() {	
+		FxChartMainPage openNew = new FxChartMainPage();
+		try {
+			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			openNew.setStage(thisstage,"Pie chart");
+			System.out.println("Opening Pie Chart closed bar chart");
+		} catch (IOException e) {e.printStackTrace();}
+	}
+	public void openBarKit() {
+		FxChartMainPage openNew = new FxChartMainPage();
+		try {
+			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			openNew.setStage(thisstage,"Bar chart");
+			System.out.println("Opening bar Chart closed bar chart");
+		} catch (IOException e) {e.printStackTrace();}
+	}
+	public void openLineKit() {
+		FxChartMainPage openNew = new FxChartMainPage();
+		try {
+			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			openNew.setStage(thisstage,"Line chart");
+			System.out.println("Opening Line Chart closed bar chart");
+		} catch (IOException e) {e.printStackTrace();}
+	}
+	public void openStackKit() {
+		FxChartMainPage openNew = new FxChartMainPage();
+		try {
+			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			openNew.setStage(thisstage,"Stacked chart");
+			System.out.println("Opening stack Chart closed bar chart");
+		} catch (IOException e) {e.printStackTrace();}
+	}
 }

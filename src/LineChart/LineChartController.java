@@ -1,6 +1,7 @@
 package LineChart;
 
 import FileSys.lineFileSysController;
+import Main.FxChartMainPage;
 import DbSys.DbController;
 
 import java.io.BufferedWriter;
@@ -848,4 +849,37 @@ public class LineChartController {
         cell.setHorizontalAlignment(alignment);        
         return cell;
     }
+	//Open new chart--------------------------------------------------------------------
+	public void openPieKit() {	
+		FxChartMainPage openNew = new FxChartMainPage();
+		try {
+			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			openNew.setStage(thisstage,"Pie chart");
+			System.out.println("Opening Pie Chart closed bar chart");
+		} catch (IOException e) {e.printStackTrace();}
+	}
+	public void openBarKit() {
+		FxChartMainPage openNew = new FxChartMainPage();
+		try {
+			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			openNew.setStage(thisstage,"Bar chart");
+			System.out.println("Opening Pie Chart closed bar chart");
+		} catch (IOException e) {e.printStackTrace();}
+	}
+	public void openLineKit() {
+		FxChartMainPage openNew = new FxChartMainPage();
+		try {
+			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			openNew.setStage(thisstage,"Line chart");
+			System.out.println("Opening Pie Chart closed bar chart");
+		} catch (IOException e) {e.printStackTrace();}
+	}
+	public void openStackKit() {
+		FxChartMainPage openNew = new FxChartMainPage();
+		try {
+			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			openNew.setStage(thisstage,"Stacked chart");
+			System.out.println("Opening Pie Chart closed bar chart");
+		} catch (IOException e) {e.printStackTrace();}
+	}
 }

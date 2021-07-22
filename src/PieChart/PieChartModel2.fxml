@@ -23,7 +23,59 @@
 <?import javafx.scene.text.Font?>
 
 <AnchorPane fx:id="anchor" prefHeight="622.0" prefWidth="1351.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="PieChart.PieChartController">
-   <children>	  
+   <children>
+	<MenuBar fx:id="menuBar" prefHeight="27.0" prefWidth="1351.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+                  <MenuItem mnemonicParsing="false" text="New File [ctrl+o]" />
+                  <MenuItem mnemonicParsing="false" onAction="#openBarKit" text="New BarChart" />
+                  <MenuItem mnemonicParsing="false" onAction="#openPieKit" text="New PieChart" />
+                  <MenuItem mnemonicParsing="false" onAction="#openLineKit" text="New LineChart" />
+                  <MenuItem mnemonicParsing="false" onAction="#openStackKit" text="New StackedAreaChart" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" text="Save       [ctrl+s]" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" onAction="#pdfExtract" text="Export chart to PDF  [ctrl+p]" />
+                  <MenuItem mnemonicParsing="false" onAction="#pngExtract" text="Export chart to PNG [ctrl+i]" />
+                  <MenuItem mnemonicParsing="false" onAction="#pdfTableExtract" text="Export table to PDF  [ctrl+t]" />
+                  <MenuItem mnemonicParsing="false" onAction="#csvExtract" text="Export table to CSV [ctrl+r]" />
+              <MenuItem mnemonicParsing="false" onAction="#exit" text="Exit         [ctrl+q]" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" onAction="#removeLast" text="Remove Last  [ctrl+z]" />
+                  <MenuItem mnemonicParsing="false" onAction="#clearChart" text="Clear Chart" />
+                  <MenuItem mnemonicParsing="false" onAction="#clearFile" text="Clear File" />
+                  <MenuItem mnemonicParsing="false" onAction="#clearDb" text="Clear Database" />
+                  <MenuItem mnemonicParsing="false" onAction="#clearTable" text="Clear table" />
+                  <MenuItem mnemonicParsing="false" onAction="#clearAll" text="Clear chart, table and file [ctrl+c]" />
+                  <MenuItem mnemonicParsing="false" text="Enable bulk entries" />
+                  <MenuItem mnemonicParsing="false" text="Enable file" />
+                  <MenuItem mnemonicParsing="false" text="Enable database recording" />
+            </items>
+          </Menu>
+            <Menu mnemonicParsing="false" text="View">
+              <items>
+                <MenuItem mnemonicParsing="false" text="Change UI theme  [alt+t]">
+                     <graphic>
+                        <ToggleButton fx:id="themeToggle" mnemonicParsing="false" onAction="#changeTheme" text="Dark" />
+                     </graphic>
+                  </MenuItem>
+                  <MenuItem mnemonicParsing="false" onAction="#zoomNormal" text="Full Screen [alt+F11]" />
+                  <MenuItem mnemonicParsing="false" text="Zoom chart  [ctrl++]" />
+                  <MenuItem mnemonicParsing="false" onAction="#zoomNormal" text="Zoom to normal" />
+              </items>
+            </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+                  <MenuItem mnemonicParsing="false" text="Key shortcuts" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
       <Label fx:id="error_label" alignment="CENTER" layoutX="308.0" layoutY="40.0" prefHeight="25.0" prefWidth="658.0" style="-fx-border-color: black;" textFill="#e01f8d" wrapText="true">
          <font>
             <Font name="System Bold Italic" size="14.0" />
@@ -79,54 +131,7 @@
          <image>
             <Image url="@../../resources/imgs/logo.jpg" />
          </image>
-      </ImageView>
-      <MenuBar fx:id="menuBar" prefHeight="27.0" prefWidth="1351.0">
-        <menus>
-          <Menu mnemonicParsing="false" text="File">
-            <items>
-                  <MenuItem mnemonicParsing="false" text="New File [ctrl+o]" />
-                  <MenuItem mnemonicParsing="false" text="Save       [ctrl+s]" />
-                  <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" onAction="#pdfExtract" text="Export chart to PDF  [ctrl+p]" />
-                  <MenuItem mnemonicParsing="false" onAction="#pngExtract" text="Export chart to PNG [ctrl+i]" />
-                  <MenuItem mnemonicParsing="false" onAction="#pdfTableExtract" text="Export table to PDF  [ctrl+t]" />
-                  <MenuItem mnemonicParsing="false" onAction="#csvExtract" text="Export table to CSV [ctrl+r]" />
-              <MenuItem mnemonicParsing="false" onAction="#exit" text="Exit         [ctrl+q]" />
-            </items>
-          </Menu>
-          <Menu mnemonicParsing="false" text="Edit">
-            <items>
-              <MenuItem mnemonicParsing="false" onAction="#removeLast" text="Remove Last  [ctrl+z]" />
-                  <MenuItem mnemonicParsing="false" onAction="#clearChart" text="Clear Chart" />
-                  <MenuItem mnemonicParsing="false" onAction="#clearFile" text="Clear File" />
-                  <MenuItem mnemonicParsing="false" onAction="#clearDb" text="Clear Database" />
-                  <MenuItem mnemonicParsing="false" onAction="#clearTable" text="Clear table" />
-                  <MenuItem mnemonicParsing="false" onAction="#clearAll" text="Clear chart, table and file [ctrl+c]" />
-                  <MenuItem mnemonicParsing="false" text="Enable bulk entries" />
-                  <MenuItem mnemonicParsing="false" text="Enable file" />
-                  <MenuItem mnemonicParsing="false" text="Enable database recording" />
-            </items>
-          </Menu>
-            <Menu mnemonicParsing="false" text="View">
-              <items>
-                <MenuItem mnemonicParsing="false" text="Change UI theme  [alt+t]">
-                     <graphic>
-                        <ToggleButton fx:id="themeToggle" mnemonicParsing="false" onAction="#changeTheme" text="Dark" />
-                     </graphic>
-                  </MenuItem>
-                  <MenuItem mnemonicParsing="false" onAction="#zoomNormal" text="Full Screen [alt+F11]" />
-                  <MenuItem mnemonicParsing="false" text="Zoom chart  [ctrl++]" />
-                  <MenuItem mnemonicParsing="false" onAction="#zoomNormal" text="Zoom to normal" />
-              </items>
-            </Menu>
-          <Menu mnemonicParsing="false" text="Help">
-            <items>
-              <MenuItem mnemonicParsing="false" text="About" />
-                  <MenuItem mnemonicParsing="false" text="Key shortcuts" />
-            </items>
-          </Menu>
-        </menus>
-      </MenuBar>
+      </ImageView>      
       <PieChart fx:id="pChart" layoutX="308.0" layoutY="75.0" onMouseClicked="#zoomNormal" onScroll="#zoomPieChart" prefHeight="435.0" prefWidth="658.0" style="-fx-border-color: #666666;" title="PieChart title" />
    </children>
 </AnchorPane>
