@@ -1,10 +1,10 @@
 
-package paint.controller;
+package FxPaint.controller;
 
 import java.util.HashMap;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
-import paint.model.*;
+import FxPaint.model.*;
 
 
 //Factory DP

@@ -1,5 +1,5 @@
 
-package paint.model;
+package FxPaint.model;
 
 import java.util.HashMap;
 import java.util.Map;

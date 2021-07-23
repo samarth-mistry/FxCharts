@@ -1,5 +1,5 @@
 
-package paint.controller;
+package FxPaint.controller;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -7,7 +7,7 @@ import java.util.HashMap;
 import javax.xml.parsers.*;
 import org.xml.sax.*;
 import org.w3c.dom.*;
-import paint.model.Shape;
+import FxPaint.model.Shape;
 
 public class LoadFromXML {
     private String path;

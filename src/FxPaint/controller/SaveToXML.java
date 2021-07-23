@@ -1,5 +1,5 @@
 
-package paint.controller;
+package FxPaint.controller;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,7 +13,7 @@ import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
 import org.xml.sax.*;
 import org.w3c.dom.*;
-import paint.model.Shape;
+import FxPaint.model.Shape;
 
 public class SaveToXML {
     private String path;

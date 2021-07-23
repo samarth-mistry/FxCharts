@@ -1,5 +1,5 @@
 
-package paint.model;
+package FxPaint.model;
 
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;

@@ -1,5 +1,5 @@
 
-package paint.controller;
+package FxPaint.controller;
 
 
 import java.io.IOException;
@@ -29,7 +29,7 @@ import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.*;
 import javax.xml.parsers.ParserConfigurationException;
 import org.xml.sax.SAXException;
-import paint.model.*;
+import FxPaint.model.*;
 
 
 public class FXMLDocumentController implements Initializable, DrawingEngine {

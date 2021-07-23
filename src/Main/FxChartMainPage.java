@@ -26,7 +26,7 @@ public class FxChartMainPage extends Application{
 		//chartSelector(primaryStage);
 		//URL url = new File("resources/views/LineChart.fxml").toURI().toURL();
 		//Parent root =FXMLLoader.load(url);
-		setStage(primaryStage,"Bar chart");
+		setStage(primaryStage,"Paint");
 	}
 	private void chartSelector(Stage primaryStage) throws IOException {
 		String chrt[] = {"Pie chart", "Line chart", "Stacked chart", "Bar chart"};
@@ -38,20 +38,23 @@ public class FxChartMainPage extends Application{
 	}	
 	public void setStage(Stage primaryStage, String sel) throws IOException {
 		Parent root = null;
+		
 		if(sel.equals("Pie chart")) {
 			root =FXMLLoader.load(getClass().getResource("/PieChart/PieChartModel2.fxml"));
         } else if(sel.equals("Line chart")) {
         	root =FXMLLoader.load(getClass().getResource("/LineChart/LineChartModel2.fxml"));
         } else if(sel.equals("Bar chart")) {
         	root =FXMLLoader.load(getClass().getResource("/BarChart/BarChartModel2.fxml"));
+        } else if(sel.equals("Paint")) {
+        	root = FXMLLoader.load(getClass().getResource("/FxPaint/view/FxPaint.fxml"));
+        	//scene.getStylesheets().add(getClass().getResource("view/styles.css").toExternalForm());
         }
         else if(sel.equals("Stacked chart")) {
         	//root =FXMLLoader.load(getClass().getResource("/LineChart/LineChart.fxml"));
         } else {
         	root =FXMLLoader.load(getClass().getResource("/LineChart/LineChart.fxml"));
-        }					
+        }							
 		Scene scene = new Scene(root);
-		
 		//primaryStage.getIcons().add(new Image(new File("/resources/imgs/logo.ico").toURI().toString()));
 		primaryStage.setScene(scene);
 		primaryStage.setTitle("FxCharts-Cancer's");

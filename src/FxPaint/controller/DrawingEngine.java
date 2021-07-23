@@ -1,6 +1,6 @@
-package paint.controller;
+package FxPaint.controller;
 
-import paint.model.Shape;
+import FxPaint.model.Shape;
 
 
 public interface DrawingEngine {

@@ -1,4 +1,4 @@
-package paint.model;
+package FxPaint.model;
 
 public interface iShape{
 
