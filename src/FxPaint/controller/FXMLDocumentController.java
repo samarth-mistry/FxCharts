@@ -32,75 +32,28 @@ import org.xml.sax.SAXException;
 import FxPaint.model.*;
 
 
-public class FXMLDocumentController implements Initializable, DrawingEngine {
-  
-    /***FXML VARIABLES***/
-    @FXML
-    private Button DeleteBtn;
-
-    @FXML
-    private ComboBox<String> ShapeBox;
-
-    @FXML
-    private Button UndoBtn;
-
-    @FXML
-    private Button RedoBtn;
-
-    @FXML
-    private ColorPicker ColorBox;
-
-    @FXML
-    private Button SaveBtn;
-    
-    @FXML
-    private Button MoveBtn;
-    
-    @FXML
-    private Button RecolorBtn;
-    
-    @FXML
-    private Button LoadBtn;
-    
-    @FXML
-    private GridPane After;
-    
-    @FXML
-    private Pane Before;
-    
-    @FXML
-    private Pane PathPane;
-    
-    @FXML
-    private TextField PathText;
-
-    @FXML
-    private Button StartBtn;
-    
-    @FXML
-    private Button ResizeBtn;
-    
-    @FXML
-    private Button ImportBtn;
-    
-    @FXML
-    private Button PathBtn;
-    
-    @FXML
-    private Canvas CanvasBox;
-    
-    @FXML
-    private Button CopyBtn;
-    
-    @FXML
-    private Label Message;
-    
-    @FXML
-    private ListView ShapeList;
-    
-    
-    
-    /***CLASS VARIABLES***/
+public class FXMLDocumentController implements Initializable, DrawingEngine {     
+    @FXML private Button DeleteBtn;
+    @FXML private ComboBox<String> ShapeBox;
+    @FXML private Button UndoBtn;
+    @FXML private Button RedoBtn;
+    @FXML private ColorPicker ColorBox;
+    @FXML private Button SaveBtn;    
+    @FXML private Button MoveBtn;    
+    @FXML private Button RecolorBtn;    
+    @FXML private Button LoadBtn;
+    @FXML private GridPane After;
+    @FXML private Pane Before;
+    @FXML private Pane PathPane;
+    @FXML private TextField PathText;
+    @FXML private Button StartBtn;    
+    @FXML private Button ResizeBtn;    
+    @FXML private Button ImportBtn;    
+    @FXML private Button PathBtn;    
+    @FXML private Canvas CanvasBox;    
+    @FXML private Button CopyBtn;    
+    @FXML private Label Message;    
+    @FXML private ListView<String> ShapeList;    
     private Point2D start;
     private Point2D end;
     
@@ -117,26 +70,18 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
     //MEMENTO DP
     private Stack primary = new Stack<ArrayList<Shape>>();
     private Stack secondary = new Stack<ArrayList<Shape>>();
-
-
     
     @FXML
     private void handleButtonAction(ActionEvent event) {
-        if(event.getSource() == StartBtn){
-            Before.setVisible(false);
-            After.setVisible(true);
-        }
-        
         Message.setText("");
         if(event.getSource()==DeleteBtn){
             if(!ShapeList.getSelectionModel().isEmpty()){
-            int index = ShapeList.getSelectionModel().getSelectedIndex();
-            removeShape(shapeList.get(index));
+            	int index = ShapeList.getSelectionModel().getSelectedIndex();
+            	removeShape(shapeList.get(index));
             }else{
                 Message.setText("You need to pick a shape first to delete it.");
             }
-        }
-        
+        }        
         if(event.getSource()==RecolorBtn){
             if(!ShapeList.getSelectionModel().isEmpty()){
                 int index = ShapeList.getSelectionModel().getSelectedIndex();
@@ -145,8 +90,7 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
             }else{
                 Message.setText("You need to pick a shape first to recolor it.");
             }
-        }
-        
+        }        
         if(event.getSource()==MoveBtn){
             if(!ShapeList.getSelectionModel().isEmpty()){
                 move=true;
@@ -154,8 +98,7 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
             }else{
                 Message.setText("You need to pick a shape first to move it.");
             }
-        }
-        
+        }        
         if(event.getSource()==CopyBtn){
             if(!ShapeList.getSelectionModel().isEmpty()){
                 copy=true;
@@ -163,8 +106,7 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
             }else{
                 Message.setText("You need to pick a shape first to copy it.");
             }
-        }
-        
+        }        
         if(event.getSource()==ResizeBtn){
             if(!ShapeList.getSelectionModel().isEmpty()){
                 resize=true;
@@ -172,33 +114,27 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
             }else{
                 Message.setText("You need to pick a shape first to copy it.");
             }
-        }
-        
+        }       
         if(event.getSource()==UndoBtn){
             if(primary.empty()){Message.setText("We are back to zero point! .. Can Undo nothing more!");return;}
             undo();
-        }
-        
+        }        
         if(event.getSource()==RedoBtn){
             if(secondary.empty()){Message.setText("There is no more history for me to get .. Go search history books.");return;}
             redo();
-        }
-        
+        }        
         if(event.getSource()==SaveBtn){
             showPathPane();
             save=true;
-        }
-        
+        }        
         if(event.getSource()==LoadBtn){
             showPathPane();
             load=true;
-        }
-        
+        }        
         if(event.getSource()==ImportBtn){
             showPathPane();
             importt=true;
-        }
-        
+        }        
         if(event.getSource()==PathBtn){
             if(PathText.getText().isEmpty()){PathText.setText("You need to set the path of the file.");return;}
             if(save){save=false;save(PathText.getText());}
@@ -206,18 +142,9 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
             else if(importt){importt=false;installPluginShape(PathText.getText());}
             hidePathPane();
         }
-    }
-    
-    public void showPathPane(){
-        Message.setVisible(false);
-        PathPane.setVisible(true);
-    }
-    
-    public void hidePathPane(){
-        PathPane.setVisible(false);
-        Message.setVisible(true);
-    }
-    
+    }    
+    public void showPathPane(){Message.setVisible(false);PathPane.setVisible(true);}  
+    public void hidePathPane(){PathPane.setVisible(false);Message.setVisible(true);}    
     public void startDrag(MouseEvent event){
         start = new Point2D(event.getX(),event.getY());
         Message.setText("");
@@ -225,20 +152,17 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
     public void endDrag(MouseEvent event) throws CloneNotSupportedException{
         end = new Point2D(event.getX(), event.getY());
         if(end.equals(start)){clickFunction();}else{dragFunction();}
-    }
-    
+    }    
     public void clickFunction() throws CloneNotSupportedException{
         if(move){move=false;moveFunction();}
         else if(copy){copy=false;copyFunction();}
         else if(resize){resize=false;resizeFunction();}
-    }
-    
+    }    
     public void moveFunction(){
         int index = ShapeList.getSelectionModel().getSelectedIndex();
         shapeList.get(index).setTopLeft(start);
         refresh(CanvasBox);
-    }
-    
+    }    
     public void copyFunction() throws CloneNotSupportedException{
         int index = ShapeList.getSelectionModel().getSelectedIndex();
         Shape temp = shapeList.get(index).cloneShape();
@@ -248,8 +172,7 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
             shapeList.get(shapeList.size()-1).setTopLeft(start);
             refresh(CanvasBox);
         }
-    }
-    
+    }    
     public void resizeFunction(){
         int index = ShapeList.getSelectionModel().getSelectedIndex();
         Color c = shapeList.get(index).getFillColor();
@@ -262,8 +185,7 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
         shapeList.add(index, temp);
         refresh(CanvasBox);
         
-    }
-    
+    }    
     public void dragFunction(){
         String type = ShapeBox.getValue();
         Shape sh;
@@ -274,8 +196,6 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
         sh.draw(CanvasBox);
         
     }
-    
-    
     //Observer DP
     public ObservableList getStringList(){
         ObservableList l = FXCollections.observableArrayList(new ArrayList());
@@ -286,8 +206,7 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
         }
         }catch(Exception e){}
         return l;
-    }
-    
+    }    
     public ArrayList<Shape> cloneList(ArrayList<Shape> l) throws CloneNotSupportedException{
         ArrayList<Shape> temp = new ArrayList<Shape>();
         for(int i=0;i<l.size();i++){
@@ -295,8 +214,6 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
         }
         return temp;
     }
-    
-    
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         ObservableList shapeList = FXCollections.observableArrayList();
@@ -305,7 +222,6 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
         
         ColorBox.setValue(Color.BLACK);
     }
-
     @Override
     public void refresh(Object canvas) {
         try {
@@ -316,7 +232,6 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
         redraw((Canvas) canvas);
        ShapeList.setItems((getStringList()));
     }
-    
     public void redraw(Canvas canvas){
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0, 0, 850, 370);
@@ -326,31 +241,26 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
         }
         }catch(Exception e){}
     }
-
     @Override
     public void addShape(Shape shape) {
         shapeList.add(shape);
         refresh(CanvasBox);
     }
-
     @Override
     public void removeShape(Shape shape) {
         shapeList.remove(shape);
         refresh(CanvasBox);
     }
-
     @Override
     public void updateShape(Shape oldShape, Shape newShape) {
         shapeList.remove(oldShape);
         shapeList.add(newShape);
         refresh(CanvasBox);
     }
-
     @Override
     public Shape[] getShapes() {
      return (Shape[]) shapeList.toArray();
     }
-
     @Override
     public void undo() {
         if(secondary.size()<21){
@@ -364,7 +274,6 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
         ShapeList.setItems((getStringList()));
         }else{Message.setText("Sorry, Cannot do more than 20 Undo's :'(");}
     }
-
     @Override
     public void redo() {
         ArrayList temp = (ArrayList) secondary.pop();
@@ -390,7 +299,6 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
         else{Message.setText("Wrong file format .. save to either .xml or .json");}
   
     }
-
     @Override
     public void load(String path) {
         if(path.substring(path.length()-4).equals(".xml")){
@@ -416,17 +324,12 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
         }
         else{Message.setText("Wrong file format .. load from either .xml or .json");}
     }
-
     @Override
     public List<Class<? extends Shape>> getSupportedShapes() {
         return null;
     }
-
     @Override
     public void installPluginShape(String jarPath) {
         Message.setText("Not supported yet.");
     }
-
-    
-    
 }

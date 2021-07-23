@@ -46,7 +46,7 @@ public class FxChartMainPage extends Application{
         } else if(sel.equals("Bar chart")) {
         	root =FXMLLoader.load(getClass().getResource("/BarChart/BarChartModel2.fxml"));
         } else if(sel.equals("Paint")) {
-        	root = FXMLLoader.load(getClass().getResource("/FxPaint/view/FxPaint.fxml"));
+        	root = FXMLLoader.load(getClass().getResource("/FxPaint/view/FxShapes.fxml"));
         	//scene.getStylesheets().add(getClass().getResource("view/styles.css").toExternalForm());
         }
         else if(sel.equals("Stacked chart")) {
