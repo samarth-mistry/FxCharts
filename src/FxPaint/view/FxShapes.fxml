@@ -4,67 +4,182 @@
 <?import javafx.scene.canvas.Canvas?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ColorPicker?>
-<?import javafx.scene.control.ComboBox?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.ListView?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.Tooltip?>
+<?import javafx.scene.image.Image?>
+<?import javafx.scene.image.ImageView?>
 <?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.paint.Color?>
 <?import javafx.scene.shape.Line?>
 <?import javafx.scene.text.Font?>
 
 <AnchorPane prefHeight="667.0" prefWidth="1338.0" xmlns="http://javafx.com/javafx/16" xmlns:fx="http://javafx.com/fxml/1" fx:controller="FxPaint.controller.FXMLDocumentController">
    <children>
-      <Canvas fx:id="CanvasBox" height="575.0" layoutX="143.0" layoutY="85.0" onMousePressed="#startDrag" onMouseReleased="#endDrag" width="875.0">
+      <Canvas fx:id="CanvasBox" height="584.0" layoutX="143.0" layoutY="85.0" onMousePressed="#startDrag" onMouseReleased="#endDrag" width="875.0">
          <cursor>
             <Cursor fx:constant="CROSSHAIR" />
          </cursor>
       </Canvas>
-      <Label fx:id="Message" alignment="CENTER" layoutX="142.0" layoutY="46.0" prefHeight="25.0" prefWidth="875.0" style="-fx-border-color: black;" textFill="#e01f8d" wrapText="true">
+      <Label fx:id="Message" alignment="CENTER" layoutX="454.0" layoutY="33.0" prefHeight="25.0" prefWidth="875.0" style="-fx-border-color: black;" textFill="#e01f8d" wrapText="true">
          <font>
             <Font name="System Bold Italic" size="14.0" />
          </font>
       </Label>
       <Line endX="15.0" endY="589.0" layoutX="128.0" layoutY="71.0" startX="15.0" startY="14.0" />
       <Line endX="15.0" endY="589.0" layoutX="1002.0" layoutY="71.0" startX="15.0" startY="14.0" />
-      <Button fx:id="LoadBtn" layoutX="20.0" layoutY="464.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #60c0da;" text="Load">
+      <Button fx:id="LoadBtn" layoutX="21.0" layoutY="278.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #60c0da;" text="Load">
          <tooltip>
             <Tooltip text="Add single line" />
          </tooltip>
       </Button>
-      <Button fx:id="SaveBtn" layoutX="20.0" layoutY="498.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #60c0da;" text="Save">
+      <Button fx:id="SaveBtn" layoutX="14.0" layoutY="538.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="115.0" style="-fx-background-color: #86b56e;" text="Save">
          <tooltip>
             <Tooltip text="Add single line" />
          </tooltip>
       </Button>
-      <Button fx:id="DeleteBtn" layoutX="20.0" layoutY="530.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #60c0da;" text="Delete" textFill="WHITE">
+      <Button fx:id="DeleteBtn" layoutX="21.0" layoutY="311.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #ff2225;" text="Delete" textFill="WHITE">
          <tooltip>
             <Tooltip text="Add single line" />
          </tooltip>
       </Button>
-      <Button fx:id="UndoBtn" layoutX="21.0" layoutY="563.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #60c0da;" text="Undo">
+      <Button fx:id="UndoBtn" layoutX="19.0" layoutY="345.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #ffaa00;" text="Undo">
          <tooltip>
             <Tooltip text="Add single line" />
          </tooltip>
       </Button>
-      <Button fx:id="RedoBtn" layoutX="21.0" layoutY="596.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #60c0da;" text="Redo">
+      <Button fx:id="RedoBtn" layoutX="21.0" layoutY="378.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #ffaa00;" text="Redo">
          <tooltip>
             <Tooltip text="Add single line" />
          </tooltip>
       </Button>
-      <ComboBox fx:id="ShapeBox" layoutX="7.0" layoutY="47.0" prefHeight="24.0" prefWidth="127.0" promptText="Shapes" />
-      <ColorPicker fx:id="ColorBox" layoutX="7.0" layoutY="85.0" prefHeight="24.0" prefWidth="127.0" />
-      <Button fx:id="CopyBtn" layoutX="20.0" layoutY="203.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="101.0" text="Copy" />
-      <Button fx:id="RecolorBtn" layoutX="20.0" layoutY="123.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="101.0" text="ReColor" />
-      <Button fx:id="MoveBtn" layoutX="21.0" layoutY="163.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="101.0" text="Move" />
-      <Button fx:id="ResizeBtn" layoutX="21.0" layoutY="243.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="101.0" text="Resize" />
-      <Button layoutX="12.0" layoutY="322.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="115.0" text="Export as PNG" />
-      <Button fx:id="ImportBtn" layoutX="21.0" layoutY="283.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="101.0" text="Import" />
-      <ListView fx:id="ShapeList" layoutX="1029.0" layoutY="83.0" maxHeight="576.0" maxWidth="301.0" minHeight="400.0" minWidth="166.67" prefHeight="576.0" prefWidth="301.0" style="-fx-border-color: black;">
+      <ColorPicker fx:id="ColorBox" layoutX="7.0" layoutY="35.0" prefHeight="24.0" prefWidth="127.0">
+         <value>
+            <Color />
+         </value></ColorPicker>
+      <Button fx:id="CopyBtn" layoutX="20.0" layoutY="212.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="101.0" text="Copy" />
+      <Button fx:id="RecolorBtn" layoutX="20.0" layoutY="147.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="101.0" text="ReColor" />
+      <Button fx:id="MoveBtn" layoutX="21.0" layoutY="179.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="101.0" text="Move" />
+      <Button fx:id="ResizeBtn" layoutX="21.0" layoutY="245.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="101.0" text="Resize" />
+      <Button layoutX="12.0" layoutY="600.0" mnemonicParsing="false" prefHeight="24.0" prefWidth="115.0" style="-fx-background-color: #86b56e;" text="Export as PNG" />
+      <Button fx:id="ImportBtn" layoutX="13.0" layoutY="569.0" mnemonicParsing="false" onAction="#handleButtonAction" prefHeight="24.0" prefWidth="115.0" style="-fx-background-color: #86b56e;" text="Import" />
+      <Button layoutX="50.0" layoutY="630.0" mnemonicParsing="false" onAction="#exit" style="-fx-background-color: #ff2225;" text="Exit" textFill="WHITE" />
+      <ListView fx:id="ShapeList" layoutX="1029.0" layoutY="64.0" maxHeight="595.0" maxWidth="301.0" minHeight="400.0" minWidth="166.67" prefHeight="595.0" prefWidth="301.0" style="-fx-border-color: black;">
          <cursor>
             <Cursor fx:constant="HAND" />
          </cursor>
       </ListView>
       <Line endX="878.5" endY="3.5" layoutX="138.0" layoutY="81.0" startX="4.5" startY="3.5" />
       <Line endX="878.5" endY="3.5" layoutX="139.0" layoutY="657.0" startX="4.5" startY="3.5" />
+      <MenuBar fx:id="menuBar" prefHeight="27.0" prefWidth="1338.0">
+         <menus>
+            <Menu mnemonicParsing="false" text="File">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="New File [ctrl+o]" />
+                  <MenuItem mnemonicParsing="false" text="New BarChart" />
+                  <MenuItem mnemonicParsing="false" text="New PieChart" />
+                  <MenuItem mnemonicParsing="false" text="New LineChart" />
+                  <MenuItem mnemonicParsing="false" text="New StackedAreaChart" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" text="Save       [ctrl+s]" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" text="Export chart to PDF  [ctrl+p]" />
+                  <MenuItem mnemonicParsing="false" text="Export chart to PNG [ctrl+i]" />
+                  <MenuItem mnemonicParsing="false" text="Export table to PDF  [ctrl+t]" />
+                  <MenuItem mnemonicParsing="false" text="Export table to CSV [ctrl+r]" />
+                  <MenuItem mnemonicParsing="false" onAction="#exit" text="Exit         [ctrl+q]" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Edit">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Clear Chart" />
+                  <MenuItem mnemonicParsing="false" text="Clear File" />
+                  <MenuItem mnemonicParsing="false" text="Clear Database" />
+                  <MenuItem mnemonicParsing="false" text="Clear table" />
+                  <MenuItem mnemonicParsing="false" text="Clear chart, table and file [ctrl+c]" />
+                  <MenuItem mnemonicParsing="false" text="Enable bulk entries" />
+                  <MenuItem mnemonicParsing="false" text="Enable file" />
+                  <MenuItem mnemonicParsing="false" text="Enable database recording" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="View">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="Change UI theme  [alt+t]">
+                     <graphic>
+                        <ToggleButton fx:id="themeToggle" mnemonicParsing="false" text="Dark" />
+                     </graphic>
+                  </MenuItem>
+                  <MenuItem mnemonicParsing="false" text="Full Screen [alt+F11]" />
+                  <MenuItem mnemonicParsing="false" text="Zoom chart  [ctrl++]" />
+                  <MenuItem mnemonicParsing="false" text="Zoom to normal" />
+               </items>
+            </Menu>
+            <Menu mnemonicParsing="false" text="Help">
+               <items>
+                  <MenuItem mnemonicParsing="false" text="About" />
+                  <MenuItem mnemonicParsing="false" text="Key shortcuts" />
+               </items>
+            </Menu>
+         </menus>
+      </MenuBar>
+      <ToggleButton fx:id="cir" layoutX="142.0" layoutY="33.0" mnemonicParsing="false" onMouseClicked="#toggleManager" selected="true">
+         <graphic>
+            <ImageView fitHeight="18.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../resources/imgs/circle.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </ToggleButton>
+      <ToggleButton fx:id="rec" layoutX="182.0" layoutY="33.0" mnemonicParsing="false" onMouseClicked="#toggleManager">
+         <graphic>
+            <ImageView fitHeight="18.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../resources/imgs/rectangle.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </ToggleButton>
+      <ToggleButton fx:id="lin" layoutX="223.0" layoutY="33.0" mnemonicParsing="false" onMouseClicked="#toggleManager">
+         <graphic>
+            <ImageView fitHeight="18.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../resources/imgs/line.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </ToggleButton>
+      <ToggleButton fx:id="tri" layoutX="264.0" layoutY="33.0" mnemonicParsing="false" onMouseClicked="#toggleManager">
+         <graphic>
+            <ImageView fitHeight="18.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../resources/imgs/triangle.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </ToggleButton>
+      <ToggleButton fx:id="ell" layoutX="305.0" layoutY="33.0" mnemonicParsing="false" onMouseClicked="#toggleManager">
+         <graphic>
+            <ImageView fitHeight="18.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../resources/imgs/ellipse.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </ToggleButton>
+      <ToggleButton fx:id="sq" layoutX="347.0" layoutY="33.0" mnemonicParsing="false" onMouseClicked="#toggleManager">
+         <graphic>
+            <ImageView fitHeight="18.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../resources/imgs/square.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </ToggleButton>
    </children>
 </AnchorPane>

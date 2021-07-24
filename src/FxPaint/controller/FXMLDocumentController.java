@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.ResourceBundle;
 import java.util.Stack;
 import java.util.logging.Level;
@@ -16,7 +17,9 @@ import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.Initializable;
 import javafx.geometry.Point2D;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ColorPicker;
 import javafx.scene.control.ComboBox;
 import javafx.scene.layout.GridPane;
@@ -24,7 +27,10 @@ import javafx.scene.layout.Pane;
 import javafx.scene.canvas.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
+import javafx.scene.control.MenuBar;
 import javafx.scene.control.TextField;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.*;
 import javax.xml.parsers.ParserConfigurationException;
@@ -34,7 +40,7 @@ import FxPaint.model.*;
 
 public class FXMLDocumentController implements Initializable, DrawingEngine {     
     @FXML private Button DeleteBtn;
-    @FXML private ComboBox<String> ShapeBox;
+    @FXML private MenuBar menuBar;    
     @FXML private Button UndoBtn;
     @FXML private Button RedoBtn;
     @FXML private ColorPicker ColorBox;
@@ -52,14 +58,31 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
     @FXML private Button PathBtn;    
     @FXML private Canvas CanvasBox;    
     @FXML private Button CopyBtn;    
-    @FXML private Label Message;    
+    @FXML private Label Message;
+    @FXML private ToggleButton themeToggle;
+    @FXML private ToggleButton cir;
+    @FXML private ToggleButton lin;
+    @FXML private ToggleButton tri;
+    @FXML private ToggleButton rec;
+    @FXML private ToggleButton sq;
+    @FXML private ToggleButton ell;
     @FXML private ListView<String> ShapeList;    
     private Point2D start;
     private Point2D end;
-    
+    public void exit() {
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("ALERT");
+		alert.setHeaderText("Your data is been saved!");
+		alert.setContentText("Are you sure you want to exit?");
+
+		Optional<ButtonType> result = alert.showAndWait();
+		if (result.get() == ButtonType.OK){
+			System.exit(0);
+		}		
+	}
     //SINGLETON DP
     private static ArrayList<Shape> shapeList = new ArrayList<Shape>();
-    
+    private int selectedShape = 1;	//1-cir//2-tri//3-lin//4-rec//5-ell//6-sq
     private boolean move=false;
     private boolean copy=false;
     private boolean resize=false;
@@ -71,6 +94,58 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
     private Stack primary = new Stack<ArrayList<Shape>>();
     private Stack secondary = new Stack<ArrayList<Shape>>();
     
+    public void toggleManager(MouseEvent event) {
+    	System.out.println(event.getSource());
+    	if(event.getSource() == cir) {
+    		selectedShape = 1;
+    		cir.setSelected(true);
+    		tri.setSelected(false);
+    		lin.setSelected(false);
+    		rec.setSelected(false);
+    		ell.setSelected(false);
+    		sq.setSelected(false);
+    	}else if(event.getSource() == tri) {    		
+    		selectedShape = 2;
+    		tri.setSelected(true);
+    		cir.setSelected(false);
+    		lin.setSelected(false);
+    		rec.setSelected(false);
+    		ell.setSelected(false);
+    		sq.setSelected(false);    		
+    	} else if(event.getSource() == lin) {
+    		selectedShape = 3;
+    		lin.setSelected(true);
+    		tri.setSelected(false);
+    		cir.setSelected(false);
+    		rec.setSelected(false);
+    		ell.setSelected(false);
+    		sq.setSelected(false);    		
+    	} else if(event.getSource() == rec) {
+    		selectedShape = 4;
+    		rec.setSelected(true);
+    		tri.setSelected(false);
+    		lin.setSelected(false);
+    		cir.setSelected(false);
+    		ell.setSelected(false);
+    		sq.setSelected(false);    		
+    	} else if(event.getSource() == 	ell) {
+    		selectedShape = 5;
+    		ell.setSelected(true);
+    		tri.setSelected(false);
+    		lin.setSelected(false);
+    		rec.setSelected(false);
+    		cir.setSelected(false);
+    		sq.setSelected(false);    		
+    	} else {
+    		selectedShape = 6;
+    		sq.setSelected(true);
+    		tri.setSelected(false);
+    		lin.setSelected(false);
+    		rec.setSelected(false);
+    		ell.setSelected(false);
+    		cir.setSelected(false); 
+    	}    	
+    }
     @FXML
     private void handleButtonAction(ActionEvent event) {
         Message.setText("");
@@ -187,11 +262,25 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
         
     }    
     public void dragFunction(){
-        String type = ShapeBox.getValue();
+    	String type = "";//1-cir//2-tri//3-lin//4-rec//5-ell//6-sq
+    	if(selectedShape == 1) {
+    		type = "Circle";
+    	}else if(selectedShape == 2) {
+    		type = "Triangle";
+    	}else if(selectedShape == 3) {
+    		type = "Line";
+    	}else if(selectedShape == 4) {
+    		type = "Rectangle";
+    	}else if(selectedShape == 5) {
+    		type = "Ellipse";
+    	}else {
+    		type = "Square";
+    	}
         Shape sh;
         //Factory DP
-        try{sh = new ShapeFactory().createShape(type,start,end,ColorBox.getValue());}catch(Exception e)
-        {Message.setText("Don't be in a hurry! Choose a shape first :'D");return;}
+        try{
+        	sh = new ShapeFactory().createShape(type,start,end,ColorBox.getValue());
+        }catch(Exception e){Message.setText("Don't be in a hurry! Choose a shape first :'D");return;}
         addShape(sh);
         sh.draw(CanvasBox);
         
@@ -217,8 +306,12 @@ public class FXMLDocumentController implements Initializable, DrawingEngine {
     @Override
     public void initialize(URL url, ResourceBundle rb) {
         ObservableList shapeList = FXCollections.observableArrayList();
-        shapeList.add("Circle");shapeList.add("Ellipse");shapeList.add("Rectangle");shapeList.add("Square");shapeList.add("Triangle");shapeList.add("Line");
-        ShapeBox.setItems(shapeList);
+        shapeList.add("Circle");
+        shapeList.add("Ellipse");
+        shapeList.add("Rectangle");
+        shapeList.add("Square");
+        shapeList.add("Triangle");
+        shapeList.add("Line");
         
         ColorBox.setValue(Color.BLACK);
     }
