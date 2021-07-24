@@ -831,9 +831,9 @@ public class BarChartController {
 			file = new File(file.getAbsolutePath()+".png");
 			try {
 				ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
-				System.out.println("PNG\n\tImage exported");
+				error_label.setText("PNG\n\tImage exported");
 			} catch (IOException e) {
-				System.out.println("Error in making image!");
+				error_label.setText("Error in making image!");
 			}
 		}
 	}
@@ -963,6 +963,14 @@ public class BarChartController {
 			Stage thisstage = (Stage) anchor.getScene().getWindow();
 			openNew.setStage(thisstage,"Stacked chart");
 			System.out.println("Opening stack Chart closed bar chart");
+		} catch (IOException e) {e.printStackTrace();}
+	}
+	public void openFxPaintKit() {
+		FxChartMainPage openNew = new FxChartMainPage();
+		try {
+			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			openNew.setStage(thisstage,"Paint");
+			System.out.println("Opening Paint closed bar chart");
 		} catch (IOException e) {e.printStackTrace();}
 	}
 }

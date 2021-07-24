@@ -24,8 +24,8 @@ public interface DrawingEngine {
     
     /* use the file extension to determine the type,
     * or throw runtime exception when unexpected extension */
-    public void save(String path);
-    public void load(String path);
+    public void save();
+    public void load();
     
 // *************** bonus functions ****************
     /* return the classes (types) of supported shapes already exist and the
@@ -33,5 +33,5 @@ public interface DrawingEngine {
     public java.util.List<Class<? extends Shape>> getSupportedShapes();
     
     /* add to the supported shapes the new shape class (see Part 4) */
-    public void installPluginShape(String jarPath);
+    public void installPluginShape(String jarPath);	
 }
