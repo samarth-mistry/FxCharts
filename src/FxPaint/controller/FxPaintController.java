@@ -62,7 +62,6 @@ import com.itextpdf.text.pdf.PdfWriter;
 import FxPaint.model.*;
 import Main.FxChartMainPage;
 
-
 @SuppressWarnings("deprecation")
 public class FxPaintController implements Initializable, DrawingEngine {
 	@FXML private AnchorPane anchor;
@@ -94,11 +93,13 @@ public class FxPaintController implements Initializable, DrawingEngine {
     @FXML private ToggleButton sq;
     @FXML private ToggleButton ell;
     @FXML private ToggleButton txt;
+    @FXML private ToggleButton pen;
     @FXML private TextField tevo;
     @FXML private ListView<String> ShapeList;    
     private Point2D start;
     private Point2D end;
     String tovoVal = "";
+    GraphicsContext graphicsContext = null;
     final KeyCombination alt1= new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.ALT_DOWN);
     final KeyCombination alt2= new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.ALT_DOWN);
     final KeyCombination alt3= new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.ALT_DOWN);
@@ -106,6 +107,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     final KeyCombination alt5= new KeyCodeCombination(KeyCode.DIGIT5, KeyCombination.ALT_DOWN);
     final KeyCombination alt6= new KeyCodeCombination(KeyCode.DIGIT6, KeyCombination.ALT_DOWN);
     final KeyCombination alt7= new KeyCodeCombination(KeyCode.DIGIT7, KeyCombination.ALT_DOWN);
+    final KeyCombination alt8= new KeyCodeCombination(KeyCode.DIGIT8, KeyCombination.ALT_DOWN);
     final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN);
     final KeyCombination ctrll= new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrle= new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN);
@@ -132,7 +134,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
 	}
     //SINGLETON DP
     private static ArrayList<Shape> shapeList = new ArrayList<Shape>();
-    private int selectedShape = 1;	//1-cir//2-tri//3-lin//4-rec//5-ell//6-sq
+    private int selectedShape = 8;	//1-cir//2-tri//3-lin//4-rec//5-ell//6-sq
     private boolean move=false;
     private boolean copy=false;
     private boolean resize=false;
@@ -163,7 +165,25 @@ public class FxPaintController implements Initializable, DrawingEngine {
 			isFullScr=false;
 		}		
 	}
-    public void initialize(URL url, ResourceBundle rb) {cursorMoni();}
+    public void initialize(URL url, ResourceBundle rb) {
+    	//cursorMoni();
+    	graphicsContext = CanvasBox.getGraphicsContext2D();    	
+    	CanvasBox.addEventHandler(MouseEvent.MOUSE_PRESSED,new EventHandler<MouseEvent>(){
+    		@Override public void handle(MouseEvent event) {
+                graphicsContext.beginPath();
+                graphicsContext.moveTo(event.getX(), event.getY());
+                graphicsContext.stroke();
+            }
+        });
+    	CanvasBox.addEventHandler(MouseEvent.MOUSE_DRAGGED,new EventHandler<MouseEvent>(){
+            @Override public void handle(MouseEvent event) {
+            	if(selectedShape == 8) {
+            		graphicsContext.lineTo(event.getX(), event.getY());
+                	graphicsContext.stroke();
+            	}
+            }
+        });
+    }
     public void keyEventHand(KeyEvent e) {
     	if(e.getCode() == KeyCode.F11) {setFullscrn();e.consume();}    	
     	else if(ctrlp.match(e)) {pdfExtract();e.consume();}
@@ -183,6 +203,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		ell.setSelected(false);
     		sq.setSelected(false);
     		txt.setSelected(false);
+    		pen.setSelected(false);
     		e.consume();
     	}else if(alt2.match(e)) {
     		selectedShape = 5;
@@ -193,6 +214,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		cir.setSelected(false);
     		sq.setSelected(false);
     		txt.setSelected(false);
+    		pen.setSelected(false);
     		e.consume();    		
     	}else if(alt3.match(e)) {
     		selectedShape = 4;
@@ -203,6 +225,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		ell.setSelected(false);
     		sq.setSelected(false);
     		txt.setSelected(false);
+    		pen.setSelected(false);
     		e.consume();    		
     	}else if(alt4.match(e)) {
     		selectedShape = 6;
@@ -213,6 +236,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		ell.setSelected(false);
     		cir.setSelected(false);
     		txt.setSelected(false);
+    		pen.setSelected(false);
     		e.consume();
     	}else if(alt5.match(e)) {
     		selectedShape = 2;
@@ -223,6 +247,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		ell.setSelected(false);
     		sq.setSelected(false);
     		txt.setSelected(false);
+    		pen.setSelected(false);
     		e.consume();
     	}else if(alt6.match(e)) {
     		selectedShape = 3;//1-cir//2-tri//3-lin//4-rec//5-ell//6-sq
@@ -233,6 +258,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		ell.setSelected(false);
     		sq.setSelected(false);
     		txt.setSelected(false);
+    		pen.setSelected(false);
     		e.consume();    		
     	}else if(alt7.match(e)) {
     		selectedShape = 7;
@@ -243,8 +269,21 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		rec.setSelected(false);
     		ell.setSelected(false);
     		sq.setSelected(false);
+    		pen.setSelected(false);
+    		e.consume();    		
+    	}else if(alt8.match(e)) {
+    		selectedShape = 8;
+    		pen.setSelected(true);
+    		txt.setSelected(false);
+    		lin.setSelected(false);
+    		tri.setSelected(false);
+    		cir.setSelected(false);
+    		rec.setSelected(false);
+    		ell.setSelected(false);
+    		sq.setSelected(false);
     		e.consume();    		
     	}
+    	
     }
     public void toggleManager(MouseEvent event) {    	
     	if(event.getSource() == cir) {
@@ -256,6 +295,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		ell.setSelected(false);
     		sq.setSelected(false);
     		txt.setSelected(false);
+    		pen.setSelected(false);
     	}else if(event.getSource() == tri) {    		
     		selectedShape = 2;
     		tri.setSelected(true);
@@ -265,6 +305,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		ell.setSelected(false);
     		sq.setSelected(false);
     		txt.setSelected(false);
+    		pen.setSelected(false);
     	} else if(event.getSource() == lin) {
     		selectedShape = 3;
     		lin.setSelected(true);
@@ -274,6 +315,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		ell.setSelected(false);
     		sq.setSelected(false);
     		txt.setSelected(false);
+    		pen.setSelected(false);
     	} else if(event.getSource() == rec) {
     		selectedShape = 4;
     		rec.setSelected(true);
@@ -283,6 +325,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		ell.setSelected(false);
     		sq.setSelected(false);
     		txt.setSelected(false);
+    		pen.setSelected(false);
     	} else if(event.getSource() == 	ell) {
     		selectedShape = 5;
     		ell.setSelected(true);
@@ -292,6 +335,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		cir.setSelected(false);
     		sq.setSelected(false);
     		txt.setSelected(false);
+    		pen.setSelected(false);
     	} else if(event.getSource() == sq){
     		selectedShape = 6;
     		sq.setSelected(true);
@@ -301,6 +345,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		ell.setSelected(false);
     		cir.setSelected(false);
     		txt.setSelected(false);
+    		pen.setSelected(false);
     	} else if(event.getSource() == txt){
     		selectedShape = 7;
     		txt.setSelected(true);
@@ -309,7 +354,18 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		lin.setSelected(false);
     		rec.setSelected(false);
     		ell.setSelected(false);
-    		cir.setSelected(false); 
+    		cir.setSelected(false);
+    		pen.setSelected(false);
+    	} else if(event.getSource() == pen){
+    		selectedShape = 8;
+    		pen.setSelected(true);
+    		sq.setSelected(false);
+    		tri.setSelected(false);
+    		lin.setSelected(false);
+    		rec.setSelected(false);
+    		ell.setSelected(false);
+    		cir.setSelected(false);
+    		txt.setSelected(false);
     	}    	
     }
     @FXML
@@ -360,9 +416,9 @@ public class FxPaintController implements Initializable, DrawingEngine {
         if(event.getSource()==LoadBtn){load();}        
         if(event.getSource()==ImportBtn){installPluginShape(null);}                
     }           
-    public void startDrag(MouseEvent event){
+    public void startDrag(MouseEvent event){    	
         start = new Point2D(event.getX(),event.getY());
-        Message.setText("");
+        Message.setText("");        	
     }
     public void endDrag(MouseEvent event) throws CloneNotSupportedException{
         end = new Point2D(event.getX(), event.getY());
@@ -434,7 +490,8 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	else if(selectedShape == 4) {type = "Rectangle";}
     	else if(selectedShape == 5) {type = "Ellipse";}
     	else if(selectedShape == 6){type = "Square";}
-    	if(type != null) {
+    	System.out.println(type);
+    	if(type != "") {
 			Shape sh;        
 	        try{
 	        	sh = new ShapeFactory().createShape(type,start,end,ColorBox.getValue());

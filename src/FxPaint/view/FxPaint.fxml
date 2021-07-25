@@ -326,5 +326,17 @@
             <Tooltip text="Line" />
          </tooltip>
       </ToggleButton>
+      <ToggleButton fx:id="pen" layoutX="50.0" layoutY="137.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
+         <graphic>
+            <ImageView fitHeight="18.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../resources/imgs/pencil.png" />
+               </image>
+            </ImageView>
+         </graphic>
+         <tooltip>
+            <Tooltip text="Line" />
+         </tooltip>
+      </ToggleButton>
    </children>
 </AnchorPane>
