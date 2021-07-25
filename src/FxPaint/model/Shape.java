@@ -3,14 +3,12 @@ package FxPaint.model;
 
 import java.util.HashMap;
 import java.util.Map;
-import javafx.animation.Interpolatable;
 import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.paint.*;
 
 
-public abstract class Shape implements iShape, java.lang.Cloneable{
-    
+public abstract class Shape implements iShape, java.lang.Cloneable{    
     private Point2D startPosition;
     private Point2D endPosition;
     private Point2D topLeft;
@@ -18,17 +16,14 @@ public abstract class Shape implements iShape, java.lang.Cloneable{
     private Color fillColor;
     private Map<String, Double> properties = new HashMap<String,Double>();
     
-    public Shape(){
-        //Variables will be set by the Properties map.
-    }
+    public Shape(){}
     public Shape(Point2D startPos, Point2D endPos , Color strockColor){
         this.color = strockColor;
         this.startPosition = startPos;
         this.endPosition = endPos;
         this.fillColor = Color.TRANSPARENT;
         this.topLeft = calculateTopLeft();
-    }
-    
+    }   
     /*public Shape(Point2D startPos, Point2D endPos, Color strockColor, Color fillColor){
         this.color = strockColor;
         this.startPosition = startPos;
@@ -49,11 +44,9 @@ public abstract class Shape implements iShape, java.lang.Cloneable{
     protected void setPropertiesToVariables(){
         double startX,startY,endX,endY,topLeftX,topLeftY;
         startX = (double) properties.get("startPositionX");
-        startY = (double) properties.get("startPositionY");
-        
+        startY = (double) properties.get("startPositionY");        
         endX = (double) properties.get("endPositionX");
-        endY = (double) properties.get("endPositionY");
-        
+        endY = (double) properties.get("endPositionY");        
         topLeftX = (double) properties.get("topLeftX");
         topLeftY = (double) properties.get("topLeftY");
         
@@ -64,16 +57,13 @@ public abstract class Shape implements iShape, java.lang.Cloneable{
         Double strockR,strockG,strockB,fillR,fillG,fillB;
         strockR = (Double) properties.get("strockR");
         strockG = (Double) properties.get("strockG");
-        strockB = (Double) properties.get("strockB");
-        
+        strockB = (Double) properties.get("strockB");        
         fillR = (Double) properties.get("fillR");
         fillG = (Double) properties.get("fillG");
         fillB = (Double) properties.get("fillB");
         
-        color = Color.color(strockR,strockG,strockB);
-        
-        fillColor = Color.color(fillR, fillG, fillB);
-        
+        color = Color.color(strockR,strockG,strockB);        
+        fillColor = Color.color(fillR, fillG, fillB);        
     }    
     protected double getFromMap(String s){
         try{return (double)properties.get(s);}catch(Exception e){
@@ -88,18 +78,14 @@ public abstract class Shape implements iShape, java.lang.Cloneable{
     }   
     protected void getPropertiesToMap(){
         properties.put("startPositionX", startPosition.getX());
-        properties.put("startPositionY", startPosition.getY());
-        
+        properties.put("startPositionY", startPosition.getY());        
         properties.put("endPositionX", endPosition.getX());
-        properties.put("endPositionY", endPosition.getY());
-        
+        properties.put("endPositionY", endPosition.getY());        
         properties.put("topLeftX", topLeft.getX());
-        properties.put("topLeftY", topLeft.getY());
-        
+        properties.put("topLeftY", topLeft.getY());        
         properties.put("strockR", color.getRed());
         properties.put("strockG", color.getGreen());
-        properties.put("strockB", color.getBlue());
-        
+        properties.put("strockB", color.getBlue());        
         properties.put("fillR", fillColor.getRed());
         properties.put("fillG", fillColor.getGreen());
         properties.put("fillB", fillColor.getBlue());

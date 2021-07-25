@@ -29,10 +29,8 @@ import javafx.scene.control.ColorPicker;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
-import javafx.scene.Node;
 import javafx.scene.SnapshotParameters;
 import javafx.scene.canvas.*;
-import javafx.scene.chart.Axis;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
@@ -121,58 +119,28 @@ public class FxPaintController implements Initializable, DrawingEngine {
     final KeyCombination ctrls= new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrli= new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrla= new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlback= new KeyCodeCombination(KeyCode.BACK_SPACE, KeyCombination.CONTROL_DOWN);
-    public void exit() {
-		Alert alert = new Alert(AlertType.CONFIRMATION);
-		alert.setTitle("ALERT");		
-		alert.setContentText("Close without saving or Exporting?");
-
-		Optional<ButtonType> result = alert.showAndWait();
-		if (result.get() == ButtonType.OK){
-			System.exit(0);
-		}		
-	}
+    final KeyCombination ctrlback= new KeyCodeCombination(KeyCode.BACK_SPACE, KeyCombination.CONTROL_DOWN);    
     //SINGLETON DP
     private static ArrayList<Shape> shapeList = new ArrayList<Shape>();
-    private int selectedShape = 8;	//1-cir//2-tri//3-lin//4-rec//5-ell//6-sq
+    private ArrayList<String> freeHandList = new ArrayList<String>();
+    private int selectedShape = 1;	//1-cir//2-tri//3-lin//4-rec//5-ell//6-sq
     private boolean move=false;
     private boolean copy=false;
     private boolean resize=false;
     private boolean isFullScr=false;
     private Stack<ArrayList<Shape>> primary = new Stack<ArrayList<Shape>>();
     private Stack<ArrayList<Shape>> secondary = new Stack<ArrayList<Shape>>();
-    private void cursorMoni() {	    
-	    CanvasBox.setOnMouseMoved(new EventHandler<MouseEvent>() {
-	        @Override public void handle(MouseEvent mouseEvent) {	        	
-	            cords.setText(String.format("(%.2f, %.2f)",mouseEvent.getX(),mouseEvent.getY()));
-	        }
-	    });
-	    CanvasBox.setOnMouseExited(new EventHandler<MouseEvent>() {
-	         public void handle(MouseEvent mouseEvent) {
-	        	 cords.setText("");    	  
-	         }
-	    });
-	}
-    public void setFullscrn() {
-		System.out.println("#FullScreen");
-		Stage stage = (Stage) CanvasBox.getScene().getWindow(); 
-		stage.setFullScreenExitHint("Press F11 to exit full-screen mode");
-		if(!isFullScr) {
-			stage.setFullScreen(true);
-			isFullScr=true;
-		}else {
-			stage.setFullScreen(false);
-			isFullScr=false;
-		}		
-	}
     public void initialize(URL url, ResourceBundle rb) {
     	//cursorMoni();
     	graphicsContext = CanvasBox.getGraphicsContext2D();    	
     	CanvasBox.addEventHandler(MouseEvent.MOUSE_PRESSED,new EventHandler<MouseEvent>(){
     		@Override public void handle(MouseEvent event) {
-                graphicsContext.beginPath();
-                graphicsContext.moveTo(event.getX(), event.getY());
-                graphicsContext.stroke();
+        		if(selectedShape == 8) {
+        			freeHandList.add("/");
+	                graphicsContext.beginPath();
+	                graphicsContext.moveTo(event.getX(), event.getY());
+	                graphicsContext.stroke();
+        		}
             }
         });
     	CanvasBox.addEventHandler(MouseEvent.MOUSE_DRAGGED,new EventHandler<MouseEvent>(){
@@ -180,12 +148,50 @@ public class FxPaintController implements Initializable, DrawingEngine {
             	if(selectedShape == 8) {
             		graphicsContext.lineTo(event.getX(), event.getY());
                 	graphicsContext.stroke();
+                	//System.out.println(graphicsContext.getStroke());                	
+                	freeHandList.add("("+event.getX()+","+event.getY()+")");
+            	}
+            }
+        });
+    	CanvasBox.addEventHandler(MouseEvent.MOUSE_RELEASED,new EventHandler<MouseEvent>(){
+            @Override public void handle(MouseEvent event) {
+            	if(selectedShape == 8) {            		
+                	freeHandList.add("/");
             	}
             }
         });
     }
+    //Experi-----------------
+    public void printFromFreeHand() {
+    	System.out.println("#printFromFreehand"+freeHandList);
+    	for(int i=0;i<freeHandList.size();i++) {
+    		String X = freeHandList.get(i);
+    		if(!X.equals("/")) {
+	    		String xval = "";
+				String yval = "";
+	    		for(int j=0;j<X.length();j++) {    			
+	    			if(X.charAt(j)=='(') {    				
+	    				for(int k=0;X.charAt(k+1)!=',';k++) {
+	    					xval+=X.charAt(k+1);
+	    				}
+	    			}
+	    			if(X.charAt(j)==',') {
+	    				for(int k=j;X.charAt(k+1)!=')';k++) {
+	    					yval+=X.charAt(k+1);
+	    				}
+	    			}
+	    		}
+	    		graphicsContext.lineTo(Double.parseDouble(xval), Double.parseDouble(yval));
+	    		graphicsContext.stroke();
+    		}else {
+    			graphicsContext.beginPath();
+    			graphicsContext.stroke();
+    		}
+    	}
+    }
+    //Events handles---------------------------------    
     public void keyEventHand(KeyEvent e) {
-    	if(e.getCode() == KeyCode.F11) {setFullscrn();e.consume();}    	
+    	if(e.getCode() == KeyCode.F11) {printFromFreeHand();/*setFullscrn();*/e.consume();}    	
     	else if(ctrlp.match(e)) {pdfExtract();e.consume();}
     	else if(ctrlpn.match(e)) {pngExtract();e.consume();}
     	else if(ctrls.match(e)) {save();e.consume();}
@@ -285,7 +291,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	}
     	
     }
-    public void toggleManager(MouseEvent event) {    	
+    public void toggleManager(MouseEvent event) {
     	if(event.getSource() == cir) {
     		selectedShape = 1;
     		cir.setSelected(true);
@@ -375,40 +381,32 @@ public class FxPaintController implements Initializable, DrawingEngine {
             if(!ShapeList.getSelectionModel().isEmpty()){
             	int index = ShapeList.getSelectionModel().getSelectedIndex();
             	removeShape(shapeList.get(index));
-            }else{
-                Message.setText("You need to pick a shape first to delete it.");
-            }
+            }else{Message.setText("You need to pick a shape first to delete it.");}
         }        
         if(event.getSource()==RecolorBtn){
             if(!ShapeList.getSelectionModel().isEmpty()){
                 int index = ShapeList.getSelectionModel().getSelectedIndex();
                 shapeList.get(index).setFillColor(ColorBox.getValue());
                 refresh(CanvasBox);
-            }else{
-                Message.setText("You need to pick a shape first to recolor it.");
-            }
+            }else{Message.setText("You need to pick a shape first to recolor it.");}
         }        
         if(event.getSource()==MoveBtn){
             if(!ShapeList.getSelectionModel().isEmpty()){
                 move=true;
                 Message.setText("Click on the new top-left position below to move the selected shape.");
-            }else{
-                Message.setText("You need to pick a shape first to move it.");
-            }
+            }else{Message.setText("You need to pick a shape first to move it.");}
         }        
         if(event.getSource()==CopyBtn){
             if(!ShapeList.getSelectionModel().isEmpty()){
                 copy=true;
                 Message.setText("Click on the new top-left position below to copy the selected shape.");
-            }else{
-                Message.setText("You need to pick a shape first to copy it.");
-            }
+            }else{Message.setText("You need to pick a shape first to copy it.");}
         }        
         if(event.getSource()==ResizeBtn){
             if(!ShapeList.getSelectionModel().isEmpty()){
                 resize=true;
                 Message.setText("Click on the new right-button position below to resize the selected shape.");
-            }else{Message.setText("Select the shape from List view first to copy it.");}
+            }else{Message.setText("Select the shape from List view first to resize it.");}
         }       
         if(event.getSource()==UndoBtn){if(primary.empty()){jbp();return;}undo();}
         if(event.getSource()==RedoBtn){if(secondary.empty()){jbp();return;}redo();}
@@ -441,7 +439,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
 		        		tevo.setDisable(true);
 		        		ColorBox.requestFocus();
 		        		Shape sh;
-		                try{
+		                try{		                	
 		                	sh = new ShapeFactory().createShape("Text",cc.getX(),cc.getY(),tovoVal,ColorBox.getValue());
 		                	tevo.setText("");
 		                }catch(Exception e) {return;}
@@ -500,7 +498,48 @@ public class FxPaintController implements Initializable, DrawingEngine {
 	        sh.draw(CanvasBox);
     	}
     }
-    //Observer DP
+    //Clear, configuration & remove functions	-----------------------------------
+    private void cursorMoni() {	    
+	    CanvasBox.setOnMouseMoved(new EventHandler<MouseEvent>() {
+	        @Override public void handle(MouseEvent mouseEvent) {	        	
+	            cords.setText(String.format("(%.2f, %.2f)",mouseEvent.getX(),mouseEvent.getY()));
+	        }
+	    });
+	    CanvasBox.setOnMouseExited(new EventHandler<MouseEvent>() {
+	         public void handle(MouseEvent mouseEvent) {
+	        	 cords.setText("");    	  
+	         }
+	    });
+	}
+    public void setFullscrn() {
+		System.out.println("#FullScreen");
+		Stage stage = (Stage) CanvasBox.getScene().getWindow(); 
+		stage.setFullScreenExitHint("Press F11 to exit full-screen mode");
+		if(!isFullScr) {
+			stage.setFullScreen(true);
+			isFullScr=true;
+		}else {
+			stage.setFullScreen(false);
+			isFullScr=false;
+		}		
+	}
+    public void clearCanvas() {
+    	GraphicsContext gc = CanvasBox.getGraphicsContext2D();    	
+    	gc.clearRect(0, 0, CanvasBox.getWidth(), CanvasBox.getHeight());
+    	shapeList.clear();
+    	ShapeList.getItems().clear();
+    }
+    public void exit() {
+		Alert alert = new Alert(AlertType.CONFIRMATION);
+		alert.setTitle("ALERT");		
+		alert.setContentText("Close without saving or Exporting?");
+
+		Optional<ButtonType> result = alert.showAndWait();
+		if (result.get() == ButtonType.OK){
+			System.exit(0);
+		}		
+	}
+    //Undo - redo and else imp functionalities-------------------------------------
     public ObservableList<String> getStringList(){
         ObservableList<String> l = FXCollections.observableArrayList(new ArrayList<String>());
         try{
@@ -527,12 +566,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
         }
         redraw((Canvas) canvas);
        ShapeList.setItems((getStringList()));
-    }
-    public void clearCanvas() {
-    	GraphicsContext gc = CanvasBox.getGraphicsContext2D();    	
-    	gc.clearRect(0, 0, CanvasBox.getWidth(), CanvasBox.getHeight());
-    	shapeList.clear();
-    }
+    }   
     public void redraw(Canvas canvas){
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0, 0, 850, 370);

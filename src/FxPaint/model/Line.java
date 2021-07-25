@@ -1,4 +1,3 @@
-
 package FxPaint.model;
 
 import javafx.geometry.Point2D;
@@ -6,9 +5,7 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-
-public class Line extends Shape{
-    
+public class Line extends Shape{    
     private double length;
     
     public Line(Point2D start, Point2D end, Color color){

@@ -12,9 +12,9 @@ public class ShapeFactory {
     
     public ShapeFactory(){}
     public Shape createShape(String type, double lx, double ly,String tevo, Color color){
-    	Shape temp=null;
+    	Shape temp=null;		//currently used for test only
     	Point2D start = new Point2D(lx,ly);
-    	Point2D end = new Point2D(lx*tevo.length()*10,ly*tevo.length()*10);
+    	Point2D end = new Point2D(lx*tevo.length()*10,ly*tevo.length()*10);    	
     	temp = new Text(start,end,tevo,color);
 		return temp;    	
     }
