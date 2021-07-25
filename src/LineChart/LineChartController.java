@@ -425,7 +425,7 @@ public class LineChartController {
 	        	}
 	        }
 	    });
-	 }
+	}
 	private void drawChart(String lineName,Double xValues[],Double yValues[],int filled,Boolean whoCalled) {
 		System.out.println("#drawChart#");
 		try {									
@@ -753,9 +753,9 @@ public class LineChartController {
 			file = new File(file.getAbsolutePath()+".png");
 			try {
 				ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
-				System.out.println("PNG\n\tImage exported");
+				error_label.setText("PNG\n\tImage exported");
 			} catch (IOException e) {
-				System.out.println("Error in making image!");
+				error_label.setText("Error in making image!");
 			}
 		}
 	}

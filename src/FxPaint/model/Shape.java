@@ -16,12 +16,11 @@ public abstract class Shape implements iShape, java.lang.Cloneable{
     private Point2D topLeft;
     private Color color;
     private Color fillColor;
-    private Map properties = new HashMap<String,Double>();
+    private Map<String, Double> properties = new HashMap<String,Double>();
     
     public Shape(){
         //Variables will be set by the Properties map.
     }
-    
     public Shape(Point2D startPos, Point2D endPos , Color strockColor){
         this.color = strockColor;
         this.startPosition = startPos;
@@ -36,31 +35,17 @@ public abstract class Shape implements iShape, java.lang.Cloneable{
         this.endPosition = endPos;
         this.fillColor = fillColor;
     }*/
-    
     @Override
-    public void setPosition(Point2D position) {
-        this.startPosition = position;
-    }
-    
-    public void setEndPosition(Point2D position) {
-        this.endPosition = position;
-    }
-
+    public void setPosition(Point2D position) {this.startPosition = position;}    
+    public void setEndPosition(Point2D position) {this.endPosition = position;}
     @Override
-    public Point2D getPosition() {
-        return this.startPosition;
-    }
-    
-    public Point2D getEndPosition() {
-        return this.endPosition;
-    }
-
+    public Point2D getPosition() {return this.startPosition;}    
+    public Point2D getEndPosition() {return this.endPosition;}
     @Override
     public void setProperties(Map<String, Double> properties) {
         this.properties = properties;
         setPropertiesToVariables();
-    }
-    
+    }    
     protected void setPropertiesToVariables(){
         double startX,startY,endX,endY,topLeftX,topLeftY;
         startX = (double) properties.get("startPositionX");
@@ -89,21 +74,18 @@ public abstract class Shape implements iShape, java.lang.Cloneable{
         
         fillColor = Color.color(fillR, fillG, fillB);
         
-    }
-    
+    }    
     protected double getFromMap(String s){
         try{return (double)properties.get(s);}catch(Exception e){
             System.out.println("Error, can't find this property.");
         }
         return Double.POSITIVE_INFINITY;
-    }
-    
+    }    
     @Override
     public Map<String, Double> getProperties() {
         getPropertiesToMap();
         return this.properties;
-    }
-    
+    }   
     protected void getPropertiesToMap(){
         properties.put("startPositionX", startPosition.getX());
         properties.put("startPositionY", startPosition.getY());
@@ -122,62 +104,31 @@ public abstract class Shape implements iShape, java.lang.Cloneable{
         properties.put("fillG", fillColor.getGreen());
         properties.put("fillB", fillColor.getBlue());
     }
-
-    public void addToProperties(String s, Double x){
-        properties.put(s, x);
-    }
+    public void addToProperties(String s, Double x){properties.put(s, x);}
     @Override
-    public void setColor(Color color) {
-        this.color = color;
-    }
-
+    public void setColor(Color color) {this.color = color;}
     @Override
-    public Color getColor() {
-        return this.color;
-    }
-
+    public Color getColor() {return this.color;}
     @Override
-    public void setFillColor(Color color) {
-        this.fillColor = color;
-    }
-
+    public void setFillColor(Color color) {this.fillColor = color;}
     @Override
-    public Color getFillColor() {
-        return this.fillColor;
-    }
-
+    public Color getFillColor() {return this.fillColor;}
     @Override
-    public void draw(Canvas canvas) {
-        
-    }
-    
-    
-
+    public void draw(Canvas canvas) {}
     @Override
-    public Shape clone() throws CloneNotSupportedException{
-        return cloneShape();
-    }
-    
+    public Shape clone() throws CloneNotSupportedException{return cloneShape();}    
     public Shape cloneShape() throws CloneNotSupportedException {
         Shape temp = null;
         temp = (Shape) super.clone();
         return temp;
-    }
-    
+    }    
     public Point2D calculateTopLeft(){
         double x = Math.min(this.getPosition().getX(), this.getEndPosition().getX());
         double y = Math.min(this.getPosition().getY(), this.getEndPosition().getY());
         return new Point2D(x,y);
-    }
-    
-    public Point2D getTopLeft(){
-        return topLeft;
-    }
-    
+    }    
+    public Point2D getTopLeft(){return topLeft;}    
     public void setTopLeft(Point2D pos){
         this.topLeft = pos;
-    }
-    
-    
-    
+    }         
 }

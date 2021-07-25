@@ -10,10 +10,14 @@ import FxPaint.model.*;
 //Factory DP
 public class ShapeFactory {
     
-    public ShapeFactory(){
-        
+    public ShapeFactory(){}
+    public Shape createShape(String type, double lx, double ly,String tevo, Color color){
+    	Shape temp=null;
+    	Point2D start = new Point2D(lx,ly);
+    	Point2D end = new Point2D(lx*tevo.length()*10,ly*tevo.length()*10);
+    	temp = new Text(start,end,tevo,color);
+		return temp;    	
     }
-    
     public Shape createShape(String type, Point2D start, Point2D end, Color color){
         Shape temp=null;
         switch(type){
@@ -22,11 +26,10 @@ public class ShapeFactory {
             case"Rectangle": temp = new Rectangle(start,end,color);break;
             case"Square": temp = new Square(start,end,color);break;
             case"Line": temp = new Line(start,end,color);break;
-            case"Triangle": temp = new Triangle(start,end,color);break;
+            case"Triangle": temp = new Triangle(start,end,color);break;            
         }
         return temp;
-    }
-    
+    }    
     public Shape createShape(String type, HashMap<String,Double> m){
         Shape temp=null;
         switch(type){
