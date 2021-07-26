@@ -34,6 +34,7 @@ import javafx.scene.canvas.*;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
+import javafx.scene.control.Slider;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Alert.AlertType;
@@ -64,6 +65,7 @@ import Main.FxChartMainPage;
 public class FxPaintController implements Initializable, DrawingEngine {
 	@FXML private AnchorPane anchor;
 	@FXML private MenuBar menuBar;
+	@FXML private Slider objSize;
 	@FXML private ColorPicker ColorBox;
 	@FXML private Label Message;
 	@FXML private Label cords;
@@ -131,7 +133,9 @@ public class FxPaintController implements Initializable, DrawingEngine {
     private Stack<ArrayList<Shape>> primary = new Stack<ArrayList<Shape>>();
     private Stack<ArrayList<Shape>> secondary = new Stack<ArrayList<Shape>>();
     public void initialize(URL url, ResourceBundle rb) {
-    	//cursorMoni();
+    	//cursorMoni(); 
+    	objSize.valueProperty().addListener((obs, oldval, newVal) ->objSize.setValue(newVal.intValue()));
+    	System.out.println("#initialize");
     	graphicsContext = CanvasBox.getGraphicsContext2D();    	
     	CanvasBox.addEventHandler(MouseEvent.MOUSE_PRESSED,new EventHandler<MouseEvent>(){
     		@Override public void handle(MouseEvent event) {
@@ -438,9 +442,9 @@ public class FxPaintController implements Initializable, DrawingEngine {
 		        		tevo.setVisible(false);
 		        		tevo.setDisable(true);
 		        		ColorBox.requestFocus();
-		        		Shape sh;
+		        		Shape sh;		        	
 		                try{		                	
-		                	sh = new ShapeFactory().createShape("Text",cc.getX(),cc.getY(),tovoVal,ColorBox.getValue());
+		                	sh = new ShapeFactory().createShape("Text",cc.getX(),cc.getY(),tovoVal,ColorBox.getValue(),objSize.getValue());
 		                	tevo.setText("");
 		                }catch(Exception e) {return;}
 		                addShape(sh);
@@ -489,14 +493,15 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	else if(selectedShape == 5) {type = "Ellipse";}
     	else if(selectedShape == 6){type = "Square";}
     	System.out.println(type);
-    	if(type != "") {
-			Shape sh;        
-	        try{
-	        	sh = new ShapeFactory().createShape(type,start,end,ColorBox.getValue());
-	        }catch(Exception e) {return;}
-	        addShape(sh);
-	        sh.draw(CanvasBox);
-    	}
+    	System.out.println(objSize.getValue());
+//    	if(type != "") {
+//			Shape sh;        
+//	        try{
+//	        	sh = new ShapeFactory().createShape(type,start,end,ColorBox.getValue());
+//	        }catch(Exception e) {return;}
+//	        addShape(sh);
+//	        sh.draw(CanvasBox);
+//    	}
     }
     //Clear, configuration & remove functions	-----------------------------------
     private void cursorMoni() {	    

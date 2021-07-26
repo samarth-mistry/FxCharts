@@ -11,11 +11,11 @@ import FxPaint.model.*;
 public class ShapeFactory {
     
     public ShapeFactory(){}
-    public Shape createShape(String type, double lx, double ly,String tevo, Color color){
+    public Shape createShape(String type, double lx, double ly,String tevo, Color color,Double size){
     	Shape temp=null;		//currently used for test only
     	Point2D start = new Point2D(lx,ly);
     	Point2D end = new Point2D(lx*tevo.length()*10,ly*tevo.length()*10);    	
-    	temp = new Text(start,end,tevo,color);
+    	temp = new Text(start,end,tevo,color,size);
 		return temp;    	
     }
     public Shape createShape(String type, Point2D start, Point2D end, Color color){

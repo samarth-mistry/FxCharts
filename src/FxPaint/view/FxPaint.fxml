@@ -93,8 +93,8 @@
       <Line endX="878.5" endY="3.5" layoutX="138.0" layoutY="81.0" startX="4.5" startY="3.5" />
       <Line endX="878.5" endY="3.5" layoutX="139.0" layoutY="657.0" startX="4.5" startY="3.5" />
       <Line endX="-257.0" endY="14.0" layoutX="393.0" layoutY="479.0" startX="-386.0" startY="14.0" />
-      <Line endX="-257.0" endY="14.0" layoutX="393.0" layoutY="159.0" startX="-386.0" startY="14.0" />
-      <Button layoutX="20.0" layoutY="184.0" mnemonicParsing="false" onAction="#clearCanvas" onKeyReleased="#keyEventHand" prefHeight="24.0" prefWidth="101.0" text="Clear all">
+      <Line endX="-257.0" endY="14.0" layoutX="393.0" layoutY="301.0" startX="-386.0" startY="14.0" />
+      <Button layoutX="9.0" layoutY="324.0" mnemonicParsing="false" onAction="#clearCanvas" onKeyReleased="#keyEventHand" prefHeight="26.0" prefWidth="24.0">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -103,7 +103,7 @@
             </ImageView>
          </graphic>
       </Button>
-      <Button layoutX="20.0" layoutY="214.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" prefHeight="24.0" prefWidth="101.0" text="Refresh">
+      <Button layoutX="50.0" layoutY="324.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" prefHeight="26.0" prefWidth="25.0">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -112,7 +112,7 @@
             </ImageView>
          </graphic>
       </Button>
-      <Button fx:id="RecolorBtn" layoutX="20.0" layoutY="245.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" prefHeight="24.0" prefWidth="101.0" text="ReColor">
+      <Button fx:id="RecolorBtn" layoutX="91.0" layoutY="324.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" prefHeight="26.0" prefWidth="11.0">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -121,7 +121,7 @@
             </ImageView>
          </graphic>
       </Button>
-      <Button fx:id="MoveBtn" layoutX="20.0" layoutY="275.0" mnemonicParsing="false" onAction="#handleButtonAction" onKeyReleased="#keyEventHand" prefHeight="24.0" prefWidth="101.0" text="Move">
+      <Button fx:id="MoveBtn" layoutX="10.0" layoutY="356.0" mnemonicParsing="false" onAction="#handleButtonAction" onKeyReleased="#keyEventHand" prefHeight="26.0" prefWidth="12.0">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -130,7 +130,7 @@
             </ImageView>
          </graphic>
       </Button>
-      <Button fx:id="CopyBtn" layoutX="20.0" layoutY="305.0" mnemonicParsing="false" onAction="#handleButtonAction" onKeyReleased="#keyEventHand" prefHeight="24.0" prefWidth="101.0" text="Copy">
+      <Button fx:id="CopyBtn" layoutX="51.0" layoutY="356.0" mnemonicParsing="false" onAction="#handleButtonAction" onKeyReleased="#keyEventHand" prefHeight="26.0" prefWidth="16.0">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -138,7 +138,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button fx:id="ResizeBtn" layoutX="20.0" layoutY="335.0" mnemonicParsing="false" onAction="#handleButtonAction" onKeyReleased="#keyEventHand" prefHeight="24.0" prefWidth="101.0" text="Resize">
+      <Button fx:id="ResizeBtn" layoutX="20.0" layoutY="426.0" mnemonicParsing="false" onAction="#handleButtonAction" onKeyReleased="#keyEventHand" prefHeight="24.0" prefWidth="101.0" text="Resize">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -146,7 +146,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button fx:id="LoadBtn" layoutX="20.0" layoutY="365.0" mnemonicParsing="false" onAction="#handleButtonAction" onKeyReleased="#keyEventHand" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #60c0da;" text="Load">
+      <Button fx:id="LoadBtn" layoutX="20.0" layoutY="456.0" mnemonicParsing="false" onAction="#handleButtonAction" onKeyReleased="#keyEventHand" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #60c0da;" text="Load">
          <tooltip>
             <Tooltip text="Add single line" />
          </tooltip>
@@ -158,7 +158,7 @@
             </ImageView>
          </graphic>
       </Button>
-      <Button fx:id="DeleteBtn" layoutX="20.0" layoutY="395.0" mnemonicParsing="false" onAction="#handleButtonAction" onKeyReleased="#keyEventHand" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #ff2225;" text="Delete" textFill="WHITE">
+      <Button fx:id="DeleteBtn" layoutX="91.0" layoutY="356.0" mnemonicParsing="false" onAction="#handleButtonAction" onKeyReleased="#keyEventHand" prefHeight="26.0" prefWidth="27.0" style="-fx-background-color: #ff2225;" textFill="WHITE">
          <tooltip>
             <Tooltip text="Add single line" />
          </tooltip>
@@ -170,7 +170,7 @@
             </ImageView>
          </graphic>
       </Button>
-      <Button fx:id="UndoBtn" layoutX="20.0" layoutY="425.0" mnemonicParsing="false" onAction="#handleButtonAction" onKeyReleased="#keyEventHand" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #ffaa00;" text="Undo">
+      <Button fx:id="UndoBtn" layoutX="9.0" layoutY="388.0" mnemonicParsing="false" onAction="#handleButtonAction" onKeyReleased="#keyEventHand" prefHeight="26.0" prefWidth="7.0" style="-fx-background-color: #ffaa00;">
          <tooltip>
             <Tooltip text="Add single line" />
          </tooltip>
@@ -182,7 +182,7 @@
             </ImageView>
          </graphic>
       </Button>
-      <Button fx:id="RedoBtn" layoutX="20.0" layoutY="455.0" mnemonicParsing="false" onAction="#handleButtonAction" onKeyReleased="#keyEventHand" prefHeight="24.0" prefWidth="101.0" style="-fx-background-color: #ffaa00;" text="Redo">
+      <Button fx:id="RedoBtn" layoutX="52.0" layoutY="388.0" mnemonicParsing="false" onAction="#handleButtonAction" onKeyReleased="#keyEventHand" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #ffaa00;">
          <tooltip>
             <Tooltip text="Add single line" />
          </tooltip>
@@ -237,7 +237,7 @@
             <Cursor fx:constant="HAND" />
          </cursor>
       </ListView>
-      <ToggleButton fx:id="cir" layoutX="10.0" layoutY="77.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager" selected="true">
+      <ToggleButton fx:id="cir" layoutX="10.0" layoutY="219.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager" selected="true">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -249,7 +249,7 @@
             <Tooltip text="Circle" />
          </tooltip>
       </ToggleButton>
-      <ToggleButton fx:id="rec" layoutX="90.0" layoutY="77.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
+      <ToggleButton fx:id="rec" layoutX="90.0" layoutY="219.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -261,7 +261,7 @@
             <Tooltip text="Rectangle" />
          </tooltip>
       </ToggleButton>
-      <ToggleButton fx:id="lin" layoutX="90.0" layoutY="107.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
+      <ToggleButton fx:id="lin" layoutX="90.0" layoutY="249.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -273,7 +273,7 @@
             <Tooltip text="Line" />
          </tooltip>
       </ToggleButton>
-      <ToggleButton fx:id="tri" layoutX="50.0" layoutY="107.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
+      <ToggleButton fx:id="tri" layoutX="50.0" layoutY="249.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -285,7 +285,7 @@
             <Tooltip text="Triangle" />
          </tooltip>
       </ToggleButton>
-      <ToggleButton fx:id="ell" layoutX="50.0" layoutY="77.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
+      <ToggleButton fx:id="ell" layoutX="50.0" layoutY="219.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -297,7 +297,7 @@
             <Tooltip text="Ellipse" />
          </tooltip>
       </ToggleButton>
-      <ToggleButton fx:id="sq" layoutX="10.0" layoutY="107.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
+      <ToggleButton fx:id="sq" layoutX="10.0" layoutY="249.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -315,7 +315,7 @@
          </font>
       </Label>
       <TextField fx:id="tevo" disable="true" layoutX="143.0" layoutY="35.0" prefHeight="24.0" prefWidth="140.0" promptText="Enter text here" visible="false" />
-      <ToggleButton fx:id="txt" layoutX="10.0" layoutY="137.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
+      <ToggleButton fx:id="txt" layoutX="10.0" layoutY="279.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -327,7 +327,7 @@
             <Tooltip text="Line" />
          </tooltip>
       </ToggleButton>
-      <ToggleButton fx:id="pen" layoutX="50.0" layoutY="137.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
+      <ToggleButton fx:id="pen" layoutX="50.0" layoutY="279.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -339,6 +339,6 @@
             <Tooltip text="Line" />
          </tooltip>
       </ToggleButton>
-      <Slider layoutX="143.0" layoutY="30.0" max="20.0" min="1.0" prefHeight="35.0" prefWidth="140.0" showTickLabels="true" showTickMarks="true" />
+      <Slider fx:id="objSize" blockIncrement="1.0" majorTickUnit="1.0" minorTickCount="0" layoutX="8.0" layoutY="68.0" max="35.0" min="5.0" prefHeight="24.0" prefWidth="127.0" showTickLabels="true" showTickMarks="true" />
    </children>
 </AnchorPane>
