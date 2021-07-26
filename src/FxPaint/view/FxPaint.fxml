@@ -74,12 +74,12 @@
             </Menu>
          </menus>
       </MenuBar>
-      <Canvas fx:id="CanvasBox" height="584.0" layoutX="143.0" layoutY="85.0" onKeyReleased="#keyEventHand" onMouseClicked="#canvasClicker" onMousePressed="#startDrag" onMouseReleased="#endDrag" width="875.0">
+      <Canvas fx:id="CanvasBox" height="584.0" layoutX="143.0" layoutY="85.0" onKeyReleased="#keyEventHand" onMouseClicked="#canvasClicker" onMouseDragged="#drawOnDrag" onMousePressed="#startDrag" onMouseReleased="#endDrag" width="875.0">
          <cursor>
             <Cursor fx:constant="CROSSHAIR" />
          </cursor>
       </Canvas>
-      <ColorPicker fx:id="ColorBox" layoutX="7.0" layoutY="35.0" onKeyReleased="#keyEventHand" prefHeight="24.0" prefWidth="127.0">
+      <ColorPicker fx:id="ColorBox" layoutX="7.0" layoutY="30.0" onKeyReleased="#keyEventHand" prefHeight="24.0" prefWidth="127.0">
          <value>
             <Color />
          </value></ColorPicker>
@@ -314,7 +314,7 @@
             <Font size="17.0" />
          </font>
       </Label>
-      <TextField fx:id="tevo" disable="true" layoutX="143.0" layoutY="35.0" prefHeight="24.0" prefWidth="140.0" promptText="Enter text here" visible="false" />
+      <TextField fx:id="tevo" disable="true" layoutX="143.0" layoutY="32.0" prefHeight="24.0" prefWidth="140.0" promptText="Enter text here" visible="false" />
       <ToggleButton fx:id="txt" layoutX="10.0" layoutY="279.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
@@ -339,6 +339,7 @@
             <Tooltip text="Line" />
          </tooltip>
       </ToggleButton>
-      <Slider fx:id="objSize" blockIncrement="1.0" majorTickUnit="1.0" minorTickCount="0" layoutX="8.0" layoutY="68.0" max="35.0" min="5.0" prefHeight="24.0" prefWidth="127.0" showTickLabels="true" showTickMarks="true" />
+      <Slider fx:id="objSize" blockIncrement="1.0" layoutX="8.0" layoutY="58.0" majorTickUnit="1.0" max="35.0" min="2.0" minorTickCount="0" onMouseClicked="#sliderMoved" onMouseDragged="#sliderMoved" prefHeight="24.0" prefWidth="127.0" showTickLabels="true" showTickMarks="true" />
+      <TextField fx:id="sldrValue" layoutX="142.0" layoutY="57.0" onKeyReleased="#sldrValKey" prefHeight="14.0" prefWidth="35.0" text="2" />
    </children>
 </AnchorPane>

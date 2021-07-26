@@ -5,11 +5,8 @@ import java.util.HashMap;
 import javafx.geometry.Point2D;
 import javafx.scene.paint.Color;
 import FxPaint.model.*;
-
-
 //Factory DP
-public class ShapeFactory {
-    
+public class ShapeFactory {    
     public ShapeFactory(){}
     public Shape createShape(String type, double lx, double ly,String tevo, Color color,Double size){
     	Shape temp=null;		//currently used for test only
@@ -18,15 +15,15 @@ public class ShapeFactory {
     	temp = new Text(start,end,tevo,color,size);
 		return temp;    	
     }
-    public Shape createShape(String type, Point2D start, Point2D end, Color color){
+    public Shape createShape(String type, Point2D start, Point2D end, Color color, Double size){
         Shape temp=null;
         switch(type){
-            case"Circle": temp = new Circle(start,end,color);break;
-            case"Ellipse": temp = new Ellipse(start,end,color);break;
-            case"Rectangle": temp = new Rectangle(start,end,color);break;
-            case"Square": temp = new Square(start,end,color);break;
-            case"Line": temp = new Line(start,end,color);break;
-            case"Triangle": temp = new Triangle(start,end,color);break;            
+            case"Circle": temp = new Circle(start,end,color,size);break;
+            case"Ellipse": temp = new Ellipse(start,end,color,size);break;
+            case"Rectangle": temp = new Rectangle(start,end,color,size);break;
+            case"Square": temp = new Square(start,end,color,size);break;
+            case"Line": temp = new Line(start,end,color,size);break;
+            case"Triangle": temp = new Triangle(start,end,color,size);break;            
         }
         return temp;
     }    

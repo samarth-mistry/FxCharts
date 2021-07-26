@@ -14,15 +14,17 @@ public abstract class Shape implements iShape, java.lang.Cloneable{
     private Point2D topLeft;
     private Color color;
     private Color fillColor;
+    private Double stroke_size;
     private Map<String, Double> properties = new HashMap<String,Double>();
     
     public Shape(){}
-    public Shape(Point2D startPos, Point2D endPos , Color strockColor){
+    public Shape(Point2D startPos, Point2D endPos , Color strockColor,Double size){    	
         this.color = strockColor;
         this.startPosition = startPos;
         this.endPosition = endPos;
         this.fillColor = Color.TRANSPARENT;
         this.topLeft = calculateTopLeft();
+        this.stroke_size = size;
     }   
     /*public Shape(Point2D startPos, Point2D endPos, Color strockColor, Color fillColor){
         this.color = strockColor;
@@ -61,7 +63,8 @@ public abstract class Shape implements iShape, java.lang.Cloneable{
         fillR = (Double) properties.get("fillR");
         fillG = (Double) properties.get("fillG");
         fillB = (Double) properties.get("fillB");
-        
+        fillB = (Double) properties.get("fillB");
+        stroke_size = (Double) properties.get("strokeSize");
         color = Color.color(strockR,strockG,strockB);        
         fillColor = Color.color(fillR, fillG, fillB);        
     }    
@@ -89,12 +92,17 @@ public abstract class Shape implements iShape, java.lang.Cloneable{
         properties.put("fillR", fillColor.getRed());
         properties.put("fillG", fillColor.getGreen());
         properties.put("fillB", fillColor.getBlue());
+        properties.put("strokeSize", stroke_size);
     }
     public void addToProperties(String s, Double x){properties.put(s, x);}
     @Override
+    public void setStrokeSize(Double size) {this.stroke_size = size;}
+    @Override
+    public Double getStrokeSize() {return this.stroke_size;}
+    @Override
     public void setColor(Color color) {this.color = color;}
     @Override
-    public Color getColor() {return this.color;}
+    public Color getColor() {return this.color;}    
     @Override
     public void setFillColor(Color color) {this.fillColor = color;}
     @Override

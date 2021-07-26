@@ -6,12 +6,10 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-
 public class Triangle extends Shape{
-    private Point2D thirdPoint;
-    
-    public Triangle(Point2D startPos, Point2D endPos, Color strockColor) {
-        super(startPos, endPos, strockColor);
+    private Point2D thirdPoint;    
+    public Triangle(Point2D startPos, Point2D endPos, Color strockColor,Double size) {
+        super(startPos, endPos, strockColor,size);
         double temp = Math.abs(startPos.getX() - endPos.getX());
         if(super.getPosition().getX()<super.getEndPosition().getX()){
             thirdPoint = new Point2D(endPos.getX()-(temp*2), endPos.getY());
@@ -19,33 +17,26 @@ public class Triangle extends Shape{
             thirdPoint = new Point2D(endPos.getX()+(temp*2), endPos.getY());
         }
     }
-
-    public Triangle() {
-        
-    }
-    
+    public Triangle() {}    
     @Override
     public void setTopLeft(Point2D x){
-     Point2D temp = x.subtract(this.getPosition());
-     this.setPosition(x);
-     this.setEndPosition(this.getEndPosition().add(temp));
-     this.thirdPoint = this.thirdPoint.add(temp);
-     super.setTopLeft(x);
-    }
-    
+	     Point2D temp = x.subtract(this.getPosition());
+	     this.setPosition(x);
+	     this.setEndPosition(this.getEndPosition().add(temp));
+	     this.thirdPoint = this.thirdPoint.add(temp);
+	     super.setTopLeft(x);
+    }    
     @Override
     protected void getPropertiesToMap(){
         super.getPropertiesToMap();
         super.addToProperties("thirdPointX", thirdPoint.getX());
         super.addToProperties("thirdPointY", thirdPoint.getY());
-    }
-    
+    }    
     @Override
     protected void setPropertiesToVariables(){
         super.setPropertiesToVariables();
         thirdPoint = new Point2D(super.getFromMap("thirdPointX"),super.getFromMap("thirdPointY"));
-    }
-    
+    }    
     @Override
     public void draw(Canvas canvas){
         double x1 = super.getPosition().getX();
@@ -55,11 +46,11 @@ public class Triangle extends Shape{
         double x3 = thirdPoint.getX();
         double y3 = thirdPoint.getY();
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setStroke(super.getColor());
-        gc.strokePolygon(new double[]{x1,x2,x3}, new double[]{y1,y2,y3}, 3);
+        gc.setStroke(super.getColor());       
+        gc.setLineWidth(super.getStrokeSize());
         gc.setFill(super.getFillColor());
-        gc.fillPolygon(new double[]{x1,x2,x3}, new double[]{y1,y2,y3}, 3);
-    }
-    
-    
+        gc.strokePolygon(new double[]{x1,x2,x3}, new double[]{y1,y2,y3}, 3);        
+        //gc.setFont(new Font("Helvetica", super.getStrokeSize()));        
+        //gc.fillPolygon(new double[]{x1,x2,x3}, new double[]{y1,y2,y3}, 3);
+    }       
 }

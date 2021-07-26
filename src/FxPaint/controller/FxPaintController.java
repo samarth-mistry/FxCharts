@@ -95,6 +95,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     @FXML private ToggleButton txt;
     @FXML private ToggleButton pen;
     @FXML private TextField tevo;
+    @FXML private TextField sldrValue;
     @FXML private ListView<String> ShapeList;    
     private Point2D start;
     private Point2D end;
@@ -142,6 +143,8 @@ public class FxPaintController implements Initializable, DrawingEngine {
         		if(selectedShape == 8) {
         			freeHandList.add("/");
 	                graphicsContext.beginPath();
+	                graphicsContext.setFill(ColorBox.getValue());
+	                graphicsContext.setLineWidth(objSize.getValue());
 	                graphicsContext.moveTo(event.getX(), event.getY());
 	                graphicsContext.stroke();
         		}
@@ -166,6 +169,37 @@ public class FxPaintController implements Initializable, DrawingEngine {
         });
     }
     //Experi-----------------
+    public void drawOnDrag(MouseEvent dod) {    	
+    	String type = "";//1-cir//2-tri//3-lin//4-rec//5-ell//6-sq//7-txt
+    	if(selectedShape == 1) {type = "Circle";}
+    	else if(selectedShape == 2) {type = "Triangle";}
+    	else if(selectedShape == 3) {type = "Line";}
+    	else if(selectedShape == 4) {type = "Rectangle";}
+    	else if(selectedShape == 5) {type = "Ellipse";}
+    	else if(selectedShape == 6){type = "Square";}    	
+    	if(type != "") {
+			Shape sh;
+			end = new Point2D(dod.getX(), dod.getY());
+	        try{
+	        	sh = new ShapeFactory().createShape(type,start,end,ColorBox.getValue(),objSize.getValue());
+	        }catch(Exception e) {return;}
+	        //addShape(sh);
+	        GraphicsContext gc = CanvasBox.getGraphicsContext2D();    	
+	    	gc.clearRect(0, 0, CanvasBox.getWidth(), CanvasBox.getHeight());
+//	    	CanvasBox.getGraphicsContext2D().clearRect(0, 0, CanvasBox.getWidth(), CanvasBox.getHeight());
+//	        
+//			shapeList.forEach((p) ->
+//	        {
+//	        	int diameter = 25;
+//				CanvasBox.getGraphicsContext2D().strokeOval(
+//	                    p.getPosition() - (diameter  / 2),
+//	                    p.getY() - (diameter / 2),
+//	                    diameter,
+//	                    diameter);
+//	        });
+	        sh.draw(CanvasBox);
+    	}
+    }
     public void printFromFreeHand() {
     	System.out.println("#printFromFreehand");
     	for(int i=0;i<freeHandList.size();i++) {
@@ -193,7 +227,21 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		}
     	}
     }
-    //Events handles---------------------------------    
+    //Events handles---------------------------------
+    public void sldrValKey() {
+    	Double V=null;
+    	try {
+    		V = Double.parseDouble(sldrValue.getText());
+    		if(V <= 35) {
+        		objSize.setValue(V);
+        	}else
+        		sldrValue.setText("35");    		
+    	}catch(NumberFormatException e) {}    	
+    }
+    public void sliderMoved() {
+    	Double C = objSize.getValue();
+    	sldrValue.setText(C.toString());
+    }
     public void keyEventHand(KeyEvent e) {
     	if(e.getCode() == KeyCode.F11) {setFullscrn();e.consume();}    	
     	else if(ctrlp.match(e)) {pdfExtract();e.consume();}
@@ -474,34 +522,30 @@ public class FxPaintController implements Initializable, DrawingEngine {
         int index = ShapeList.getSelectionModel().getSelectedIndex();
         Color c = shapeList.get(index).getFillColor();
         start = shapeList.get(index).getTopLeft();
-        //Factory DP
-        Shape temp = new ShapeFactory().createShape(shapeList.get(index).getClass().getSimpleName(),start,end,ColorBox.getValue());
+
+        Shape temp = new ShapeFactory().createShape(shapeList.get(index).getClass().getSimpleName(),start,end,ColorBox.getValue(),objSize.getValue());
         if(temp.getClass().getSimpleName().equals("Line")){Message.setText("Line doesn't support this command. Sorry :(");return;}
         shapeList.remove(index);
         temp.setFillColor(c);
         shapeList.add(index, temp);
         refresh(CanvasBox);
-        
     }    
     public void dragFunction(){
-    	String type = "";//1-cir//2-tri//3-lin//4-rec//5-ell//6-sq//7-txt    	
-    	    	
+    	String type = "";//1-cir//2-tri//3-lin//4-rec//5-ell//6-sq//7-txt
     	if(selectedShape == 1) {type = "Circle";}
     	else if(selectedShape == 2) {type = "Triangle";}
     	else if(selectedShape == 3) {type = "Line";}
     	else if(selectedShape == 4) {type = "Rectangle";}
     	else if(selectedShape == 5) {type = "Ellipse";}
-    	else if(selectedShape == 6){type = "Square";}
-    	System.out.println(type);
-    	System.out.println(objSize.getValue());
-//    	if(type != "") {
-//			Shape sh;        
-//	        try{
-//	        	sh = new ShapeFactory().createShape(type,start,end,ColorBox.getValue());
-//	        }catch(Exception e) {return;}
-//	        addShape(sh);
-//	        sh.draw(CanvasBox);
-//    	}
+    	else if(selectedShape == 6){type = "Square";}    	
+    	if(type != "") {
+			Shape sh;        
+	        try{
+	        	sh = new ShapeFactory().createShape(type,start,end,ColorBox.getValue(),objSize.getValue());
+	        }catch(Exception e) {return;}
+	        addShape(sh);
+	        sh.draw(CanvasBox);
+    	}
     }
     //Clear, configuration & remove functions	-----------------------------------
     private void cursorMoni() {	    
@@ -549,7 +593,10 @@ public class FxPaintController implements Initializable, DrawingEngine {
         ObservableList<String> l = FXCollections.observableArrayList(new ArrayList<String>());
         try{
         for(int i=0;i<shapeList.size();i++){
-            String temp = shapeList.get(i).getClass().getSimpleName() + "  (" + (int) shapeList.get(i).getTopLeft().getX() + "," + (int) shapeList.get(i).getTopLeft().getY() + ")";
+            String temp = shapeList.get(i).getClass().getSimpleName() + "  (" 
+            		+ (int) shapeList.get(i).getTopLeft().getX() + "," 
+            		+ (int) shapeList.get(i).getTopLeft().getY() + ")"+"["
+            		+ shapeList.get(i).getStrokeSize() + "]";
             l.add(temp);
         }
         }catch(Exception e){}
@@ -574,7 +621,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     }   
     public void redraw(Canvas canvas){
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.clearRect(0, 0, 850, 370);
+        gc.clearRect(0, 0,CanvasBox.getWidth(), CanvasBox.getHeight());
         try{
         for(int i=0;i<shapeList.size();i++){
             shapeList.get(i).draw(canvas);
