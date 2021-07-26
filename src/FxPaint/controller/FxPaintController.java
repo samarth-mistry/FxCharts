@@ -163,7 +163,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     }
     //Experi-----------------
     public void printFromFreeHand() {
-    	System.out.println("#printFromFreehand"+freeHandList);
+    	System.out.println("#printFromFreehand");
     	for(int i=0;i<freeHandList.size();i++) {
     		String X = freeHandList.get(i);
     		if(!X.equals("/")) {
@@ -191,7 +191,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     }
     //Events handles---------------------------------    
     public void keyEventHand(KeyEvent e) {
-    	if(e.getCode() == KeyCode.F11) {printFromFreeHand();/*setFullscrn();*/e.consume();}    	
+    	if(e.getCode() == KeyCode.F11) {setFullscrn();e.consume();}    	
     	else if(ctrlp.match(e)) {pdfExtract();e.consume();}
     	else if(ctrlpn.match(e)) {pngExtract();e.consume();}
     	else if(ctrls.match(e)) {save();e.consume();}
@@ -625,11 +625,11 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save");
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("XML", "*.xml"));
-		File file = fileChooser.showSaveDialog(CanvasBox.getScene().getWindow());	    
+		File file = fileChooser.showSaveDialog(CanvasBox.getScene().getWindow());
         if (file != null) {
             SaveToXML x = new SaveToXML(file.getAbsolutePath()+".xml",shapeList);
             if(x.checkSuccess()){Message.setText("File Saved Successfully");}
-            else{Message.setText("Error occured while saving");}            
+            else{Message.setText("Error occured while saving");}
         }
     }
     @Override

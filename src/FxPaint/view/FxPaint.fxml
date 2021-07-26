@@ -10,6 +10,7 @@
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.SeparatorMenuItem?>
+<?import javafx.scene.control.Slider?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.control.ToggleButton?>
 <?import javafx.scene.control.Tooltip?>
@@ -338,5 +339,6 @@
             <Tooltip text="Line" />
          </tooltip>
       </ToggleButton>
+      <Slider layoutX="143.0" layoutY="30.0" max="20.0" min="1.0" prefHeight="35.0" prefWidth="140.0" showTickLabels="true" showTickMarks="true" />
    </children>
 </AnchorPane>
