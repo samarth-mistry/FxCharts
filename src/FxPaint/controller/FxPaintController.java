@@ -27,7 +27,6 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
 import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
-import javafx.scene.control.ComboBox;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -37,7 +36,6 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.Slider;
-import javafx.scene.control.Spinner;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
@@ -49,7 +47,6 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.*;
-import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -69,46 +66,23 @@ import Main.FxChartMainPage;
 @SuppressWarnings("deprecation")
 public class FxPaintController implements Initializable, DrawingEngine {
 	@FXML private AnchorPane anchor;
+	@FXML private ChoiceBox<String> textStyle;
 	@FXML private MenuBar menuBar;
-	@FXML private Slider objSize;
-	@FXML private ColorPicker ColorBox;
-	@FXML private ColorPicker fillColorBox;
-	@FXML private Label Message;
-	@FXML private Label cords;
+	@FXML private Slider objSize;@FXML private TextField sldrValue;
+	@FXML private ColorPicker ColorBox;@FXML private ColorPicker fillColorBox;
+	@FXML private Label Message;@FXML private Label cords;
 	@FXML private Canvas CanvasBox;
-	@FXML private GridPane After;
-    @FXML private Pane Before;
-    @FXML private Pane PathPane;
-    @FXML private Button DeleteBtn;       
-    @FXML private Button UndoBtn;
-    @FXML private Button RedoBtn;    
-    @FXML private Button SaveBtn;    
-    @FXML private Button MoveBtn;    
-    @FXML private Button RecolorBtn;    
-    @FXML private Button LoadBtn;        
-    @FXML private Button StartBtn;    
-    @FXML private Button ResizeBtn;    
-    @FXML private Button ImportBtn;    
-    @FXML private Button PathBtn;           
-    @FXML private Button CopyBtn;        
+    @FXML private Button DeleteBtn;@FXML private Button UndoBtn;@FXML private Button RedoBtn;@FXML private Button SaveBtn;@FXML private Button MoveBtn;
+    @FXML private Button RecolorBtn;@FXML private Button LoadBtn;        
+    @FXML private Button StartBtn;@FXML private Button ResizeBtn;@FXML private Button ImportBtn;@FXML private Button CopyBtn;
     @FXML private ToggleButton themeToggle;
-    @FXML private ToggleButton cir;
-    @FXML private ToggleButton lin;
-    @FXML private ToggleButton tri;
-    @FXML private ToggleButton rec;
-    @FXML private ToggleButton sq;
-    @FXML private ToggleButton ell;
-    @FXML private ToggleButton txt;
-    @FXML private ToggleButton pen;
+    @FXML private ToggleButton cir;@FXML private ToggleButton lin;@FXML private ToggleButton tri;@FXML private ToggleButton rec;@FXML private ToggleButton sq;@FXML private ToggleButton ell;@FXML private ToggleButton txt;@FXML private ToggleButton pen;
+    @FXML private ToggleButton pent;@FXML private ToggleButton hex;@FXML private ToggleButton star;@FXML private ToggleButton eras;
     @FXML private TextArea tevo;
-    @FXML private TextField sldrValue;
-    @FXML private ChoiceBox<String> textStyle;
-    @FXML private ListView<String> ShapeList;    
-    private Point2D start;
-    private Point2D end;
+    @FXML private ListView<String> ShapeList;
+    private Point2D start;private Point2D end;
     String tovoVal = "";
-    GraphicsContext graphicsContext = null;
-    GraphicsContext gc = null;//4 DOD
+    GraphicsContext graphicsContext = null,gc = null;
     final KeyCombination alt1= new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.ALT_DOWN);
     final KeyCombination alt2= new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.ALT_DOWN);
     final KeyCombination alt3= new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.ALT_DOWN);
@@ -117,6 +91,10 @@ public class FxPaintController implements Initializable, DrawingEngine {
     final KeyCombination alt6= new KeyCodeCombination(KeyCode.DIGIT6, KeyCombination.ALT_DOWN);
     final KeyCombination alt7= new KeyCodeCombination(KeyCode.DIGIT7, KeyCombination.ALT_DOWN);
     final KeyCombination alt8= new KeyCodeCombination(KeyCode.DIGIT8, KeyCombination.ALT_DOWN);
+    final KeyCombination alt9= new KeyCodeCombination(KeyCode.DIGIT9, KeyCombination.ALT_DOWN);
+    final KeyCombination alt10= new KeyCodeCombination(KeyCode.DIGIT0, KeyCombination.ALT_DOWN);
+    final KeyCombination alt11= new KeyCodeCombination(KeyCode.UNDERSCORE, KeyCombination.ALT_DOWN);
+    final KeyCombination alt12= new KeyCodeCombination(KeyCode.EQUALS, KeyCombination.ALT_DOWN);
     final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN);
     final KeyCombination ctrll= new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrle= new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN);
@@ -344,8 +322,29 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		ell.setSelected(false);
     		sq.setSelected(false);
     		e.consume();    		
+    	}else if(alt9.match(e)) {
+    		selectedShape = 9;
+    		pent.setSelected(true);
+    		txt.setSelected(false);
+    		lin.setSelected(false);
+    		tri.setSelected(false);
+    		cir.setSelected(false);
+    		rec.setSelected(false);
+    		ell.setSelected(false);
+    		sq.setSelected(false);
+    		e.consume();    		
+    	}else if(alt10.match(e)) {
+    		selectedShape = 10;
+    		hex.setSelected(true);
+    		txt.setSelected(false);
+    		lin.setSelected(false);
+    		tri.setSelected(false);
+    		cir.setSelected(false);
+    		rec.setSelected(false);
+    		ell.setSelected(false);
+    		sq.setSelected(false);
+    		e.consume();    		
     	}
-    	
     }
     public void toggleManager(MouseEvent event) {
     	if(event.getSource() == cir) {
@@ -541,7 +540,9 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	else if(selectedShape == 3) {type = "Line";}
     	else if(selectedShape == 4) {type = "Rectangle";}
     	else if(selectedShape == 5) {type = "Ellipse";}
-    	else if(selectedShape == 6){type = "Square";}    	
+    	else if(selectedShape == 6){type = "Square";}
+    	else if(selectedShape == 9){type = "Pentagon";}
+    	else if(selectedShape == 10){type = "Hexagon";}
     	if(type != "") {
 			Shape sh;        
 	        try{

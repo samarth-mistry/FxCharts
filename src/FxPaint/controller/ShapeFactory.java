@@ -24,6 +24,7 @@ public class ShapeFactory {
             case"Square": temp = new Square(start,end,color,fillcolor,size);break;
             case"Line": temp = new Line(start,end,color,size);break;
             case"Triangle": temp = new Triangle(start,end,color,fillcolor,size);break;            
+            case"Pentagon": temp = new Pentagon(start,end,color,fillcolor,size);break;
         }
         return temp;
     }    
