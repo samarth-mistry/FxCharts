@@ -25,7 +25,9 @@ import javafx.geometry.Point2D;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.ButtonType;
+import javafx.scene.control.ChoiceBox;
 import javafx.scene.control.ColorPicker;
+import javafx.scene.control.ComboBox;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Pane;
@@ -35,6 +37,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListView;
 import javafx.scene.control.MenuBar;
 import javafx.scene.control.Slider;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Alert.AlertType;
@@ -45,6 +49,7 @@ import javafx.scene.input.KeyCombination;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.paint.*;
+import javafx.scene.text.Font;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
@@ -67,6 +72,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
 	@FXML private MenuBar menuBar;
 	@FXML private Slider objSize;
 	@FXML private ColorPicker ColorBox;
+	@FXML private ColorPicker fillColorBox;
 	@FXML private Label Message;
 	@FXML private Label cords;
 	@FXML private Canvas CanvasBox;
@@ -94,13 +100,15 @@ public class FxPaintController implements Initializable, DrawingEngine {
     @FXML private ToggleButton ell;
     @FXML private ToggleButton txt;
     @FXML private ToggleButton pen;
-    @FXML private TextField tevo;
+    @FXML private TextArea tevo;
     @FXML private TextField sldrValue;
+    @FXML private ChoiceBox<String> textStyle;
     @FXML private ListView<String> ShapeList;    
     private Point2D start;
     private Point2D end;
     String tovoVal = "";
     GraphicsContext graphicsContext = null;
+    GraphicsContext gc = null;//4 DOD
     final KeyCombination alt1= new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.ALT_DOWN);
     final KeyCombination alt2= new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.ALT_DOWN);
     final KeyCombination alt3= new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.ALT_DOWN);
@@ -112,6 +120,8 @@ public class FxPaintController implements Initializable, DrawingEngine {
     final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN);
     final KeyCombination ctrll= new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrle= new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlg= new KeyCodeCombination(KeyCode.G, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrlz= new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrlshiftz= new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
     final KeyCombination ctrlc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
@@ -134,7 +144,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     private Stack<ArrayList<Shape>> primary = new Stack<ArrayList<Shape>>();
     private Stack<ArrayList<Shape>> secondary = new Stack<ArrayList<Shape>>();
     public void initialize(URL url, ResourceBundle rb) {
-    	//cursorMoni(); 
+    	cursorMoni(); 
     	objSize.valueProperty().addListener((obs, oldval, newVal) ->objSize.setValue(newVal.intValue()));
     	System.out.println("#initialize");
     	graphicsContext = CanvasBox.getGraphicsContext2D();    	
@@ -147,7 +157,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
 	                graphicsContext.setLineWidth(objSize.getValue());
 	                graphicsContext.moveTo(event.getX(), event.getY());
 	                graphicsContext.stroke();
-        		}
+        		}        		
             }
         });
     	CanvasBox.addEventHandler(MouseEvent.MOUSE_DRAGGED,new EventHandler<MouseEvent>(){
@@ -167,6 +177,9 @@ public class FxPaintController implements Initializable, DrawingEngine {
             	}
             }
         });
+    	//textStyle.-------------------- 
+    	textStyle.getItems().addAll("Arial", "Helvetica","Verdana", "Tahoma","SansSerif","Rachana","DejaVu Sans","DejaVu Sans Mono","DejaVu Serif");
+    	textStyle.getSelectionModel().select("Arial");    	
     }
     //Experi-----------------
     public void drawOnDrag(MouseEvent dod) {    	
@@ -178,25 +191,12 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	else if(selectedShape == 5) {type = "Ellipse";}
     	else if(selectedShape == 6){type = "Square";}    	
     	if(type != "") {
-			Shape sh;
+			Shape sh;			
 			end = new Point2D(dod.getX(), dod.getY());
 	        try{
-	        	sh = new ShapeFactory().createShape(type,start,end,ColorBox.getValue(),objSize.getValue());
+	        	sh = new ShapeFactory().createShape(type,start,end,ColorBox.getValue(),fillColorBox.getValue(),objSize.getValue());
 	        }catch(Exception e) {return;}
-	        //addShape(sh);
-	        GraphicsContext gc = CanvasBox.getGraphicsContext2D();    	
-	    	gc.clearRect(0, 0, CanvasBox.getWidth(), CanvasBox.getHeight());
-//	    	CanvasBox.getGraphicsContext2D().clearRect(0, 0, CanvasBox.getWidth(), CanvasBox.getHeight());
-//	        
-//			shapeList.forEach((p) ->
-//	        {
-//	        	int diameter = 25;
-//				CanvasBox.getGraphicsContext2D().strokeOval(
-//	                    p.getPosition() - (diameter  / 2),
-//	                    p.getY() - (diameter / 2),
-//	                    diameter,
-//	                    diameter);
-//	        });
+	    	refresh(CanvasBox);
 	        sh.draw(CanvasBox);
     	}
     }
@@ -230,12 +230,14 @@ public class FxPaintController implements Initializable, DrawingEngine {
     //Events handles---------------------------------
     public void sldrValKey() {
     	Double V=null;
-    	try {
+    	try {	
     		V = Double.parseDouble(sldrValue.getText());
-    		if(V <= 35) {
+    		if(V > 35)
+    			sldrValue.setText("35");
+        	else if(V<2)
+        		sldrValue.setText("2");
+        	else
         		objSize.setValue(V);
-        	}else
-        		sldrValue.setText("35");    		
     	}catch(NumberFormatException e) {}    	
     }
     public void sliderMoved() {
@@ -252,6 +254,8 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	else if(ctrlshiftz.match(e)) {redo();e.consume();}
     	else if(ctrlback.match(e)) {clearCanvas();e.consume();}
     	else if(ctrle.match(e)) {ColorBox.show();e.consume();}
+    	else if(ctrlg.match(e)) {textStyle.show();e.consume();}
+    	else if(ctrlf.match(e)) {fillColorBox.show();e.consume();}
     	else if(alt1.match(e)) {
     		selectedShape = 1;
     		cir.setSelected(true);
@@ -490,9 +494,9 @@ public class FxPaintController implements Initializable, DrawingEngine {
 		        		tevo.setVisible(false);
 		        		tevo.setDisable(true);
 		        		ColorBox.requestFocus();
-		        		Shape sh;		        	
+		        		Shape sh;
 		                try{		                	
-		                	sh = new ShapeFactory().createShape("Text",cc.getX(),cc.getY(),tovoVal,ColorBox.getValue(),objSize.getValue());
+		                	sh = new ShapeFactory().createShape("Text",cc.getX(),cc.getY(),tovoVal,ColorBox.getValue(),objSize.getValue(),textStyle.getValue());
 		                	tevo.setText("");
 		                }catch(Exception e) {return;}
 		                addShape(sh);
@@ -523,7 +527,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
         Color c = shapeList.get(index).getFillColor();
         start = shapeList.get(index).getTopLeft();
 
-        Shape temp = new ShapeFactory().createShape(shapeList.get(index).getClass().getSimpleName(),start,end,ColorBox.getValue(),objSize.getValue());
+        Shape temp = new ShapeFactory().createShape(shapeList.get(index).getClass().getSimpleName(),start,end,ColorBox.getValue(),fillColorBox.getValue(),objSize.getValue());
         if(temp.getClass().getSimpleName().equals("Line")){Message.setText("Line doesn't support this command. Sorry :(");return;}
         shapeList.remove(index);
         temp.setFillColor(c);
@@ -541,7 +545,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	if(type != "") {
 			Shape sh;        
 	        try{
-	        	sh = new ShapeFactory().createShape(type,start,end,ColorBox.getValue(),objSize.getValue());
+	        	sh = new ShapeFactory().createShape(type,start,end,ColorBox.getValue(),fillColorBox.getValue(),objSize.getValue());
 	        }catch(Exception e) {return;}
 	        addShape(sh);
 	        sh.draw(CanvasBox);

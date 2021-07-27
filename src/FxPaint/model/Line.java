@@ -30,8 +30,7 @@ public class Line extends Shape{
         double x2 = super.getEndPosition().getX();
         double y2 = super.getEndPosition().getY();
         GraphicsContext gc = canvas.getGraphicsContext2D();      
-        gc.setStroke(super.getColor());        
-        //gc.setFont(new Font("Helvetica", super.getStrokeSize()));
+        gc.setStroke(super.getColor());
         gc.setLineWidth(super.getStrokeSize());
         gc.strokeLine(x1,y1,x2,y2);
     }    

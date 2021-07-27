@@ -8,8 +8,8 @@ import javafx.scene.paint.Color;
 
 public class Triangle extends Shape{
     private Point2D thirdPoint;    
-    public Triangle(Point2D startPos, Point2D endPos, Color strockColor,Double size) {
-        super(startPos, endPos, strockColor,size);
+    public Triangle(Point2D startPos, Point2D endPos, Color strockColor,Color fillcolor,Double size) {
+        super(startPos, endPos, strockColor,fillcolor,size);
         double temp = Math.abs(startPos.getX() - endPos.getX());
         if(super.getPosition().getX()<super.getEndPosition().getX()){
             thirdPoint = new Point2D(endPos.getX()-(temp*2), endPos.getY());
@@ -46,11 +46,10 @@ public class Triangle extends Shape{
         double x3 = thirdPoint.getX();
         double y3 = thirdPoint.getY();
         GraphicsContext gc = canvas.getGraphicsContext2D();
-        gc.setStroke(super.getColor());       
-        gc.setLineWidth(super.getStrokeSize());
-        gc.setFill(super.getFillColor());
-        gc.strokePolygon(new double[]{x1,x2,x3}, new double[]{y1,y2,y3}, 3);        
-        //gc.setFont(new Font("Helvetica", super.getStrokeSize()));        
-        //gc.fillPolygon(new double[]{x1,x2,x3}, new double[]{y1,y2,y3}, 3);
+        gc.setStroke(super.getColor());
+        gc.setFill(super.getFillColor());        
+        gc.setLineWidth(super.getStrokeSize());               
+        gc.strokePolygon(new double[]{x1,x2,x3}, new double[]{y1,y2,y3}, 3);               
+        gc.fillPolygon(new double[]{x1,x2,x3}, new double[]{y1,y2,y3}, 3);
     }       
 }

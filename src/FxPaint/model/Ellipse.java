@@ -16,8 +16,8 @@ public class Ellipse extends Shape{
     public void setvRadius(double vRadius) {this.vRadius = vRadius;}
     public double gethRadius() {return hRadius;}
     public double getvRadius() {return vRadius;}    
-    public Ellipse(Point2D startPos, Point2D endPos, Color strockColor,Double size) {
-        super(startPos, endPos, strockColor,size);
+    public Ellipse(Point2D startPos, Point2D endPos, Color strockColor, Color fillcolor,Double size) {
+        super(startPos, endPos, strockColor,fillcolor,size);
         hRadius = Math.abs(startPos.getX() - endPos.getX())/2;
         vRadius = Math.abs(startPos.getY() - endPos.getY())/2;        
     }    
@@ -38,9 +38,8 @@ public class Ellipse extends Shape{
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setStroke(super.getColor());
         gc.setLineWidth(super.getStrokeSize());
-        gc.strokeOval(super.getTopLeft().getX(), super.getTopLeft().getY(), hRadius*2, vRadius*2);
         gc.setFill(super.getFillColor());
-        //gc.setFont(new Font("Helvetica", super.getStrokeSize()));        
-        //gc.fillOval(super.getTopLeft().getX(), super.getTopLeft().getY(), hRadius*2, vRadius*2);
+        gc.strokeOval(super.getTopLeft().getX(), super.getTopLeft().getY(), hRadius*2, vRadius*2);                      
+        gc.fillOval(super.getTopLeft().getX(), super.getTopLeft().getY(), hRadius*2, vRadius*2);
     }       
 }

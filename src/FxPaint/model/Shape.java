@@ -26,12 +26,14 @@ public abstract class Shape implements iShape, java.lang.Cloneable{
         this.topLeft = calculateTopLeft();
         this.stroke_size = size;
     }   
-    /*public Shape(Point2D startPos, Point2D endPos, Color strockColor, Color fillColor){
+    public Shape(Point2D startPos, Point2D endPos, Color strockColor, Color fillColor,Double size){
         this.color = strockColor;
         this.startPosition = startPos;
         this.endPosition = endPos;
         this.fillColor = fillColor;
-    }*/
+        this.topLeft = calculateTopLeft();
+        this.stroke_size = size;
+    }
     @Override
     public void setPosition(Point2D position) {this.startPosition = position;}    
     public void setEndPosition(Point2D position) {this.endPosition = position;}

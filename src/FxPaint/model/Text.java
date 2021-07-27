@@ -7,10 +7,12 @@ import javafx.scene.paint.Color;
 import javafx.scene.text.Font;
 
 public class Text extends Shape{
-	String textVal = "";		
-	public Text(Point2D startPos,Point2D endPos, String tevo,Color strockColor,Double size) {
+	String textVal = "";
+	private String text_style;
+	public Text(Point2D startPos,Point2D endPos, String tevo,Color strockColor,Double size,String textStyle) {
 		super(startPos,endPos,strockColor,size);
-		textVal = tevo;		
+		textVal = tevo;
+		this.text_style = textStyle;
     }
 	public Text() {}    
     @Override
@@ -28,7 +30,7 @@ public class Text extends Shape{
         double y1 = super.getPosition().getY();        
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setFill(super.getColor());
-        gc.setFont(new Font("Helvetica", super.getStrokeSize()));
+        gc.setFont(new Font(text_style, super.getStrokeSize()));
         gc.fillText(textVal, x1, y1);                       
     }
 }

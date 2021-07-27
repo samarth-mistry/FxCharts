@@ -16,8 +16,8 @@ public class Rectangle extends Shape{
     public void setHeight(double height) {this.height = height;}
     public double getWidth() {return width;}
     public double getHeight() {return height;}
-    public Rectangle(Point2D startPos, Point2D endPos, Color strockColor,Double size) {
-        super(startPos, endPos, strockColor,size);
+    public Rectangle(Point2D startPos, Point2D endPos, Color strockColor, Color fillcolor,Double size) {
+        super(startPos, endPos, strockColor,fillcolor,size);
         width = Math.abs(startPos.getX() - endPos.getX());
         height = Math.abs(startPos.getY() - endPos.getY());
     }
@@ -38,9 +38,8 @@ public class Rectangle extends Shape{
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setStroke(super.getColor());
         gc.setLineWidth(super.getStrokeSize());
-        gc.strokeRect(super.getTopLeft().getX(), super.getTopLeft().getY(), width, height);
         gc.setFill(super.getFillColor());
-        //gc.setFont(new Font("Helvetica", super.getStrokeSize()));        
+        gc.strokeRect(super.getTopLeft().getX(), super.getTopLeft().getY(), width, height);               
         gc.fillRect(super.getTopLeft().getX(), super.getTopLeft().getY(), width, height);
     }    
 }
