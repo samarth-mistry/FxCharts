@@ -6,61 +6,54 @@ import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
 
-public class Pentagon extends Shape{
-    private Point2D thirdPoint;
-    private Point2D fourthPoint;
-    private Point2D fifthPoint;
+public class Pentagon extends Shape{	  
+	double px[] = new double[5];
+	double py[] = new double[5];
     public Pentagon(Point2D startPos, Point2D endPos, Color strockColor,Color fillcolor,Double size) {
-        super(startPos, endPos, strockColor,fillcolor,size);
-        double temp = Math.abs(startPos.getX() - endPos.getX());
-        if(super.getPosition().getX()<super.getEndPosition().getX()){
-            thirdPoint = new Point2D(endPos.getX()-(temp*2), endPos.getY());
-            fourthPoint = new Point2D(startPos.getX()-(temp*3), startPos.getY());
-            fifthPoint = new Point2D(endPos.getX()-(temp*4), endPos.getY());
+        super(startPos, endPos, strockColor,fillcolor,size);        
+        double x1 = startPos.getX();
+        double y1 = startPos.getY();
+        double x2 = endPos.getX();
+        double y2 = endPos.getY();
+        double center_x = (x1+x2)/2;
+		double center_y = (y1+y2)/2;
+		double radius = Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1))/2;		
+		Double angle = 2*Math.PI/5;
+        if(super.getPosition().getX()<super.getEndPosition().getX()){        	
+        	for (int i=0; i<5; i++){        		    		            		
+    		    px[i] = center_x+radius*Math.sin(i*angle+120);//120--erect null--invert
+    		    py[i] = center_y+radius*Math.cos(i*angle+120);
+    		}
         }else{
-        	System.out.println("fjdj");
-            thirdPoint = new Point2D(endPos.getX()+(temp*2), endPos.getY());
-            fourthPoint = new Point2D(startPos.getX()+(temp*3), startPos.getY());
-            fifthPoint = new Point2D((startPos.getX()+(temp*3))*4, (endPos.getY()));
+        	for (int i=0; i<5; i++){        		    		            		
+    		    px[i] = center_x-radius*Math.sin(i*angle+120);
+    		    py[i] = center_y-radius*Math.cos(i*angle+120);
+    		}
         }
     }
-    public Pentagon() {}    
+    public Pentagon() {}
     @Override
     public void setTopLeft(Point2D x){
 	     Point2D temp = x.subtract(this.getPosition());
 	     this.setPosition(x);
-	     this.setEndPosition(this.getEndPosition().add(temp));
-	     this.thirdPoint = this.thirdPoint.add(temp);
+	     this.setEndPosition(this.getEndPosition().add(temp));	     
 	     super.setTopLeft(x);
     }    
     @Override
     protected void getPropertiesToMap(){
-        super.getPropertiesToMap();
-        super.addToProperties("thirdPointX", thirdPoint.getX());
-        super.addToProperties("thirdPointY", thirdPoint.getY());
+        super.getPropertiesToMap();        
     }    
     @Override
     protected void setPropertiesToVariables(){
-        super.setPropertiesToVariables();
-        thirdPoint = new Point2D(super.getFromMap("thirdPointX"),super.getFromMap("thirdPointY"));
+        super.setPropertiesToVariables();        
     }    
     @Override
-    public void draw(Canvas canvas){
-        double x1 = super.getPosition().getX();
-        double y1 = super.getPosition().getY();
-        double x2 = super.getEndPosition().getX();
-        double y2 = super.getEndPosition().getY();
-        double x3 = thirdPoint.getX();
-        double y3 = thirdPoint.getY();
-        double x4 = fourthPoint.getX();
-        double y4 = fourthPoint.getY();
-        double x5 = fifthPoint.getX();
-        double y5 = fifthPoint.getY();
+    public void draw(Canvas canvas){    	
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.setStroke(super.getColor());
         gc.setFill(super.getFillColor());        
         gc.setLineWidth(super.getStrokeSize());               
-        gc.strokePolygon(new double[]{x1,x2,x3,x4,x5}, new double[]{y1,y2,y3,y4,y5}, 5);               
-        gc.fillPolygon(new double[]{x1,x2,x3,x4,x5}, new double[]{y1,y2,y3,y4,y5}, 5);
+        gc.strokePolygon(px, py,5);               
+        gc.fillPolygon(px,py,5);
     }       
 }

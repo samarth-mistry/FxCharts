@@ -403,7 +403,7 @@
             <Tooltip text="Pentagon" />
          </tooltip>
       </ToggleButton>
-      <ToggleButton fx:id="hexa" layoutX="137.0" layoutY="315.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
+      <ToggleButton fx:id="hex" layoutX="137.0" layoutY="315.0" mnemonicParsing="false" onKeyReleased="#keyEventHand" onMouseClicked="#toggleManager">
          <graphic>
             <ImageView fitHeight="18.0" fitWidth="17.0" pickOnBounds="true" preserveRatio="true">
                <image>
