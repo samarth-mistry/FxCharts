@@ -163,12 +163,14 @@ public class FxPaintController implements Initializable, DrawingEngine {
     public void drawOnDrag(MouseEvent dod) {    	
     	String type = "";//1-cir//2-tri//3-lin//4-rec//5-ell//6-sq//7-txt
     	if(selectedShape == 1) {type = "Circle";}
-    	else if(selectedShape == 2) {type = "Triangle";}
-    	else if(selectedShape == 3) {type = "Line";}
+    	else if(selectedShape == 2){type = "Triangle";}
+    	else if(selectedShape == 3){type = "Line";}
     	else if(selectedShape == 4) {type = "Rectangle";}
-    	else if(selectedShape == 5) {type = "Ellipse";}
+    	else if(selectedShape == 5){type = "Ellipse";}
     	else if(selectedShape == 6){type = "Square";}
     	else if(selectedShape == 9){type = "Pentagon";}
+    	else if(selectedShape == 10){type = "Hexagon";}
+    	else if(selectedShape == 11){type = "Star";}
     	if(type != "") {
 			Shape sh;			
 			end = new Point2D(dod.getX(), dod.getY());
@@ -247,6 +249,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		pen.setSelected(false);    		
     		hex.setSelected(false);
     		pent.setSelected(false);
+    		star.setSelected(false);
     		e.consume();
     	}else if(alt2.match(e)) {
     		selectedShape = 5;
@@ -260,6 +263,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		pen.setSelected(false);
     		hex.setSelected(false);
     		pent.setSelected(false);
+    		star.setSelected(false);
     		e.consume();    		
     	}else if(alt3.match(e)) {
     		selectedShape = 4;
@@ -273,6 +277,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		pen.setSelected(false);
     		hex.setSelected(false);
     		pent.setSelected(false);
+    		star.setSelected(false);
     		e.consume();    		
     	}else if(alt4.match(e)) {
     		selectedShape = 6;
@@ -286,6 +291,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		pen.setSelected(false);
     		hex.setSelected(false);
     		pent.setSelected(false);
+    		star.setSelected(false);
     		e.consume();
     	}else if(alt5.match(e)) {
     		selectedShape = 2;
@@ -299,6 +305,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		pen.setSelected(false);
     		hex.setSelected(false);
     		pent.setSelected(false);
+    		star.setSelected(false);
     		e.consume();
     	}else if(alt6.match(e)) {
     		selectedShape = 3;//1-cir//2-tri//3-lin//4-rec//5-ell//6-sq
@@ -312,6 +319,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		pen.setSelected(false);
     		hex.setSelected(false);
     		pent.setSelected(false);
+    		star.setSelected(false);
     		e.consume();    		
     	}else if(alt7.match(e)) {
     		selectedShape = 7;
@@ -325,6 +333,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		pen.setSelected(false);
     		hex.setSelected(false);
     		pent.setSelected(false);
+    		star.setSelected(false);
     		e.consume();    		
     	}else if(alt8.match(e)) {
     		selectedShape = 8;
@@ -338,6 +347,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		sq.setSelected(false);
     		hex.setSelected(false);
     		pent.setSelected(false);
+    		star.setSelected(false);
     		e.consume();    		
     	}else if(alt9.match(e)) {//pentagon
     		selectedShape = 9;
@@ -351,6 +361,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		ell.setSelected(false);
     		sq.setSelected(false);
     		hex.setSelected(false);
+    		star.setSelected(false);
     		e.consume();
     	}else if(alt10.match(e)) {//hexagon
     		selectedShape = 10;
@@ -364,6 +375,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		rec.setSelected(false);
     		ell.setSelected(false);
     		sq.setSelected(false);
+    		star.setSelected(false);
     		e.consume();    		
     	}
     }
@@ -380,6 +392,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		pen.setSelected(false);
     		hex.setSelected(false);
     		pent.setSelected(false);
+    		star.setSelected(false);
     	}else if(event.getSource() == tri) {    		
     		selectedShape = 2;
     		tri.setSelected(true);
@@ -392,6 +405,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		pen.setSelected(false);
     		hex.setSelected(false);
     		pent.setSelected(false);
+    		star.setSelected(false);
     	} else if(event.getSource() == lin) {
     		selectedShape = 3;
     		lin.setSelected(true);
@@ -404,6 +418,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		pen.setSelected(false);
     		hex.setSelected(false);
     		pent.setSelected(false);
+    		star.setSelected(false);
     	} else if(event.getSource() == rec) {
     		selectedShape = 4;
     		rec.setSelected(true);
@@ -416,6 +431,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		pen.setSelected(false);
     		hex.setSelected(false);
     		pent.setSelected(false);
+    		star.setSelected(false);
     	} else if(event.getSource() == 	ell) {
     		selectedShape = 5;
     		ell.setSelected(true);
@@ -428,6 +444,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		pen.setSelected(false);
     		hex.setSelected(false);
     		pent.setSelected(false);
+    		star.setSelected(false);
     	} else if(event.getSource() == sq){
     		selectedShape = 6;
     		sq.setSelected(true);
@@ -440,6 +457,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		pen.setSelected(false);
     		hex.setSelected(false);
     		pent.setSelected(false);
+    		star.setSelected(false);
     	} else if(event.getSource() == txt){
     		selectedShape = 7;
     		txt.setSelected(true);
@@ -452,6 +470,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		pen.setSelected(false);
     		hex.setSelected(false);
     		pent.setSelected(false);
+    		star.setSelected(false);
     	} else if(event.getSource() == pen){
     		selectedShape = 8;
     		pen.setSelected(true);
@@ -464,6 +483,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		txt.setSelected(false);
     		hex.setSelected(false);
     		pent.setSelected(false);
+    		star.setSelected(false);
     	} else if(event.getSource() == pent){
     		selectedShape = 9;
     		pen.setSelected(false);
@@ -476,6 +496,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		txt.setSelected(false);
     		hex.setSelected(false);
     		pent.setSelected(true);
+    		star.setSelected(false);
     	} else if(event.getSource() == hex){
     		selectedShape = 10;
     		pen.setSelected(false);
@@ -487,6 +508,20 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		cir.setSelected(false);
     		txt.setSelected(false);
     		hex.setSelected(true);
+    		pent.setSelected(false);
+    		star.setSelected(false);
+    	}else if(event.getSource() == star){
+    		selectedShape = 11;
+    		star.setSelected(true);
+    		pen.setSelected(false);
+    		sq.setSelected(false);
+    		tri.setSelected(false);
+    		lin.setSelected(false);
+    		rec.setSelected(false);
+    		ell.setSelected(false);
+    		cir.setSelected(false);
+    		txt.setSelected(false);
+    		hex.setSelected(false);
     		pent.setSelected(false);
     	}
     }
@@ -604,6 +639,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	else if(selectedShape == 6){type = "Square";}
     	else if(selectedShape == 9){type = "Pentagon";}
     	else if(selectedShape == 10){type = "Hexagon";}
+    	else if(selectedShape == 11){type = "Star";}
     	if(type != "") {
 			Shape sh;        
 	        try{

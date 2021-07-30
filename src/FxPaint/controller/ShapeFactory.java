@@ -25,6 +25,8 @@ public class ShapeFactory {
             case"Line": temp = new Line(start,end,color,size);break;
             case"Triangle": temp = new Triangle(start,end,color,fillcolor,size);break;            
             case"Pentagon": temp = new Pentagon(start,end,color,fillcolor,size);break;
+            case"Hexagon": temp = new Hexagon(start,end,color,fillcolor,size);break;
+            case"Star": temp = new Star(start,end,color,fillcolor,size);break;
         }
         return temp;
     }    

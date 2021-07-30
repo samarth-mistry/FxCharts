@@ -23,13 +23,13 @@ import javafx.scene.layout.GridPane;
 public class FxChartMainPage extends Application{
 	public void start(Stage primaryStage) throws Exception {	
 		//auth(primaryStage);
-		//chartSelector(primaryStage);
+		chartSelector(primaryStage);
 		//URL url = new File("resources/views/LineChart.fxml").toURI().toURL();
 		//Parent root =FXMLLoader.load(url);
-		setStage(primaryStage,"Paint");
+		//setStage(primaryStage,"Paint");
 	}
 	private void chartSelector(Stage primaryStage) throws IOException {
-		String chrt[] = {"Pie chart", "Line chart", "Stacked chart", "Bar chart"};
+		String chrt[] = {"Pie chart", "Line chart", "Bar chart", "FxPaint"};
 		ChoiceDialog<String> d = new ChoiceDialog<String>(chrt[0], chrt);
 		d.setHeaderText("Select the chart type to simulate");        
         d.showAndWait();
@@ -45,11 +45,9 @@ public class FxChartMainPage extends Application{
         	root =FXMLLoader.load(getClass().getResource("/LineChart/LineChartModel2.fxml"));
         } else if(sel.equals("Bar chart")) {
         	root =FXMLLoader.load(getClass().getResource("/BarChart/BarChartModel2.fxml"));
-        } else if(sel.equals("Paint")) {
+        } else if(sel.equals("FxPaint")) {
         	root = FXMLLoader.load(getClass().getResource("/FxPaint/view/FxPaint.fxml"));
-        	//scene.getStylesheets().add(getClass().getResource("view/styles.css").toExternalForm());
-        }
-        else if(sel.equals("Stacked chart")) {
+        } else if(sel.equals("Stacked chart")) {
         	//root =FXMLLoader.load(getClass().getResource("/LineChart/LineChart.fxml"));
         } else {
         	root =FXMLLoader.load(getClass().getResource("/LineChart/LineChart.fxml"));
