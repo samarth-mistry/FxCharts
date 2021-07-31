@@ -23,10 +23,10 @@ import javafx.scene.layout.GridPane;
 public class FxChartMainPage extends Application{
 	public void start(Stage primaryStage) throws Exception {	
 		//auth(primaryStage);
-		chartSelector(primaryStage);
+		//chartSelector(primaryStage);
 		//URL url = new File("resources/views/LineChart.fxml").toURI().toURL();
 		//Parent root =FXMLLoader.load(url);
-		//setStage(primaryStage,"Paint");
+		setStage(primaryStage,"FxPaint");
 	}
 	private void chartSelector(Stage primaryStage) throws IOException {
 		String chrt[] = {"Pie chart", "Line chart", "Bar chart", "FxPaint"};

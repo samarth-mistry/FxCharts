@@ -71,25 +71,19 @@ public class FxPaintController implements Initializable, DrawingEngine {
 	@FXML private Label Message;@FXML private Label cords;
 	@FXML private Canvas CanvasBox;
     @FXML private Button DeleteBtn;@FXML private Button UndoBtn;@FXML private Button RedoBtn;@FXML private Button SaveBtn;@FXML private Button MoveBtn;
-    @FXML private Button RecolorBtn;@FXML private Button LoadBtn;        
-    @FXML private Button StartBtn;@FXML private Button ResizeBtn;@FXML private Button ImportBtn;@FXML private Button CopyBtn;
+    @FXML private Button RecolorBtn;@FXML private Button LoadBtn;@FXML private Button ref_btn;
+    @FXML private Button StartBtn;@FXML private Button ResizeBtn;@FXML private Button ImportBtn;@FXML private Button CopyBtn;    
     @FXML private ToggleButton themeToggle;
     @FXML private ToggleButton cir;@FXML private ToggleButton lin;@FXML private ToggleButton tri;@FXML private ToggleButton rec;@FXML private ToggleButton sq;@FXML private ToggleButton ell;@FXML private ToggleButton txt;@FXML private ToggleButton pen;
     @FXML private ToggleButton pent;@FXML private ToggleButton hex;@FXML private ToggleButton star;@FXML private ToggleButton eras;
     @FXML private TextArea tevo;
     @FXML private ListView<String> ShapeList;
     private Point2D start;private Point2D end;
-    String tovoVal = "";
+    private String tovoVal = "";
     GraphicsContext graphicsContext = null,gc = null;
-    final KeyCombination alt1= new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.ALT_DOWN);
-    final KeyCombination alt2= new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.ALT_DOWN);
-    final KeyCombination alt3= new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.ALT_DOWN);
-    final KeyCombination alt4= new KeyCodeCombination(KeyCode.DIGIT4, KeyCombination.ALT_DOWN);
-    final KeyCombination alt5= new KeyCodeCombination(KeyCode.DIGIT5, KeyCombination.ALT_DOWN);
-    final KeyCombination alt6= new KeyCodeCombination(KeyCode.DIGIT6, KeyCombination.ALT_DOWN);
-    final KeyCombination alt7= new KeyCodeCombination(KeyCode.DIGIT7, KeyCombination.ALT_DOWN);
-    final KeyCombination alt8= new KeyCodeCombination(KeyCode.DIGIT8, KeyCombination.ALT_DOWN);
-    final KeyCombination alt9= new KeyCodeCombination(KeyCode.DIGIT9, KeyCombination.ALT_DOWN);
+    final KeyCombination alt1= new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.ALT_DOWN),alt2= new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.ALT_DOWN),alt3= new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.ALT_DOWN);        
+    final KeyCombination alt4= new KeyCodeCombination(KeyCode.DIGIT4, KeyCombination.ALT_DOWN),alt5= new KeyCodeCombination(KeyCode.DIGIT5, KeyCombination.ALT_DOWN),alt6= new KeyCodeCombination(KeyCode.DIGIT6, KeyCombination.ALT_DOWN);
+    final KeyCombination alt7= new KeyCodeCombination(KeyCode.DIGIT7, KeyCombination.ALT_DOWN),alt8= new KeyCodeCombination(KeyCode.DIGIT8, KeyCombination.ALT_DOWN),alt9= new KeyCodeCombination(KeyCode.DIGIT9, KeyCombination.ALT_DOWN);
     final KeyCombination alt10= new KeyCodeCombination(KeyCode.DIGIT0, KeyCombination.ALT_DOWN);
     final KeyCombination alt11= new KeyCodeCombination(KeyCode.UNDERSCORE, KeyCombination.ALT_DOWN);
     final KeyCombination alt12= new KeyCodeCombination(KeyCode.EQUALS, KeyCombination.ALT_DOWN);
@@ -117,17 +111,19 @@ public class FxPaintController implements Initializable, DrawingEngine {
     private boolean copy=false;
     private boolean resize=false;
     private boolean isFullScr=false;
+    private String biezure = new String();
     private Stack<ArrayList<Shape>> primary = new Stack<ArrayList<Shape>>();
     private Stack<ArrayList<Shape>> secondary = new Stack<ArrayList<Shape>>();
     public void initialize(URL url, ResourceBundle rb) {
     	cursorMoni(); 
     	objSize.valueProperty().addListener((obs, oldval, newVal) ->objSize.setValue(newVal.intValue()));
     	System.out.println("#initialize");
+    	
     	graphicsContext = CanvasBox.getGraphicsContext2D();    	
     	CanvasBox.addEventHandler(MouseEvent.MOUSE_PRESSED,new EventHandler<MouseEvent>(){
     		@Override public void handle(MouseEvent event) {
-        		if(selectedShape == 8) {
-        			freeHandList.add("/");
+        		if(selectedShape == 8) {        			
+        			biezure = "/";
 	                graphicsContext.beginPath();
 	                graphicsContext.setFill(ColorBox.getValue());
 	                graphicsContext.setLineWidth(objSize.getValue());
@@ -141,15 +137,15 @@ public class FxPaintController implements Initializable, DrawingEngine {
             	if(selectedShape == 8) {
             		graphicsContext.lineTo(event.getX(), event.getY());
                 	graphicsContext.stroke();
-                	//System.out.println(graphicsContext.getStroke());                	
-                	freeHandList.add("("+event.getX()+","+event.getY()+")");
+                	biezure+="("+event.getX()+","+event.getY()+")";                	
             	}
             }
         });
     	CanvasBox.addEventHandler(MouseEvent.MOUSE_RELEASED,new EventHandler<MouseEvent>(){
             @Override public void handle(MouseEvent event) {
             	if(selectedShape == 8) {            		
-                	freeHandList.add("/");
+                	//freeHandList.add("/");
+                	freeHandList.add(biezure);
             	}
             }
         });
@@ -207,6 +203,9 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	}
     }
     //Events handles---------------------------------
+    public void ref_btnAction() {
+    	System.out.println(freeHandList);
+    }
     public void sldrValKey() {
     	Double V=null;
     	try {	
@@ -750,15 +749,16 @@ public class FxPaintController implements Initializable, DrawingEngine {
     }
     @Override
     public void undo() {
+    	
         if(secondary.size()<21){
-        ArrayList<Shape> temp = (ArrayList<Shape>) primary.pop();
-        secondary.push(temp);
-        
-        if(primary.empty()){shapeList = new ArrayList<Shape>();}
-        else{temp = (ArrayList<Shape>) primary.peek(); shapeList = temp;}
-        
-        redraw(CanvasBox);
-        ShapeList.setItems((getStringList()));
+	        ArrayList<Shape> temp = (ArrayList<Shape>) primary.pop();
+	        secondary.push(temp);
+	        
+	        if(primary.empty()){shapeList = new ArrayList<Shape>();}
+	        else{temp = (ArrayList<Shape>) primary.peek(); shapeList = temp;}
+	        
+	        redraw(CanvasBox);
+	        ShapeList.setItems((getStringList()));
         }else{Message.setText("Sorry, Cannot do more than 20 Undo's :'(");}
     }
     @Override
