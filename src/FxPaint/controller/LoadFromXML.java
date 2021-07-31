@@ -11,8 +11,8 @@ import FxPaint.model.Shape;
 
 public class LoadFromXML {
     private String path;
-    private ArrayList myList = new ArrayList<Shape>();
-    private HashMap m;
+    private ArrayList<Shape> myList = new ArrayList<Shape>();
+    private HashMap<String, Double> m;
     private boolean success=false;
     
     public LoadFromXML(String path) throws SAXException, ParserConfigurationException, IOException{
@@ -43,27 +43,21 @@ public class LoadFromXML {
         }while(!x.getNextSibling().equals(null));
         }catch(Exception e){}
         success=true;
-        
-    }
-    
+    }    
     private void copyMapToList(String type){
         Shape temp = new ShapeFactory().createShape(type, m);
-        myList.add(temp);
-        
-    }
-    
+        myList.add(temp);        
+    }    
     private void addToMap(String s){
         int ind = s.indexOf('=');
         String key = s.substring(0, ind);
         double val = Double.parseDouble(s.substring(ind+2, s.length()-1));
         //System.out.println(key + " " +val);
         m.put(key, val);
-    }
-    
+    }    
     public ArrayList<Shape> getList(){
         return myList;
-    }
-    
+    }    
     public boolean checkSuccess(){
         return success;
     }

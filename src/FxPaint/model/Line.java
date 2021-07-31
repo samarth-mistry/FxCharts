@@ -4,14 +4,11 @@ import javafx.geometry.Point2D;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.text.Font;
 
 public class Line extends Shape{    
-    private double length;
-    
     public Line(Point2D start, Point2D end, Color color,Double size){
         super(start,end,color,size);
-        length = start.distance(end);
+        start.distance(end);
     }
     public Line() {}    
     @Override

@@ -1,17 +1,14 @@
 
 package FxPaint.controller;
 
-import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Map;
 import javax.xml.parsers.*;
 import javax.xml.transform.*;
 import javax.xml.transform.dom.*;
 import javax.xml.transform.stream.*;
-import org.xml.sax.*;
 import org.w3c.dom.*;
 import FxPaint.model.Shape;
 
@@ -25,8 +22,7 @@ public class SaveToXML {
         this.path = path;
         this.l = l;
         try{doTheJob();}catch(Exception e){System.out.println("Failed to save xml");}
-    }
-    
+    }    
     private void doTheJob() throws ParserConfigurationException, FileNotFoundException{
         DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         DocumentBuilder db = dbf.newDocumentBuilder();
@@ -44,29 +40,19 @@ public class SaveToXML {
             rootEle.appendChild(sh);
         }
         dom.appendChild(rootEle);
-        
-        
         try {
             Transformer tr = TransformerFactory.newInstance().newTransformer();
             tr.setOutputProperty(OutputKeys.INDENT, "yes");
             tr.setOutputProperty(OutputKeys.METHOD, "xml");
             tr.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-
             // send DOM to file
-            tr.transform(new DOMSource(dom), 
-                                 new StreamResult(new FileOutputStream(path)));
-
+            tr.transform(new DOMSource(dom),new StreamResult(new FileOutputStream(path)));
         } catch (Exception e) {
             System.out.println("Failed to save the xml document");
             success=false;
             return;
-        }
-        
-        success=true;
-        
-    }
-    
-    public boolean checkSuccess(){
-        return success;
-    }
+        }        
+        success=true;        
+    }    
+    public boolean checkSuccess(){return success;}
 }

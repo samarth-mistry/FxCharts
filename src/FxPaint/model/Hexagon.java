@@ -18,8 +18,7 @@ public class Hexagon extends Shape{
         double center_x = (x1+x2)/2;
 		double center_y = (y1+y2)/2;
 		double radius = Math.sqrt((x2-x1)*(x2-x1)+(y2-y1)*(y2-y1))/2;		
-		Double angle = 2*Math.PI/6;
-		double theta = Math.atan2((y2-y1),(x2-x1));//tangent angle with X axis
+		Double angle = 2*Math.PI/6;		
         if(super.getPosition().getX()<super.getEndPosition().getX()){        	
         	for (int i=0; i<6; i++){        		    		            		
     		    px[i] = center_x+radius*Math.sin(i*angle);//120--erect null--invert
