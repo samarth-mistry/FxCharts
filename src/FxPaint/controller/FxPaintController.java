@@ -39,6 +39,8 @@ import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleButton;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -48,6 +50,7 @@ import javafx.scene.paint.*;
 import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
+import javafx.stage.Popup;
 
 import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;
@@ -71,7 +74,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
 	@FXML private Label Message;@FXML private Label cords;
 	@FXML private Canvas CanvasBox;
     @FXML private Button DeleteBtn;@FXML private Button UndoBtn;@FXML private Button RedoBtn;@FXML private Button SaveBtn;@FXML private Button MoveBtn;
-    @FXML private Button RecolorBtn;@FXML private Button LoadBtn;@FXML private Button ref_btn;
+    @FXML private Button RecolorBtn;@FXML private Button LoadBtn;@FXML private Button ref_btn;@FXML private Button cpClpBrdBtn;
     @FXML private Button StartBtn;@FXML private Button ResizeBtn;@FXML private Button ImportBtn;@FXML private Button CopyBtn;    
     @FXML private ToggleButton themeToggle;
     @FXML private ToggleButton cir;@FXML private ToggleButton lin;@FXML private ToggleButton tri;@FXML private ToggleButton rec;@FXML private ToggleButton sq;@FXML private ToggleButton ell;@FXML private ToggleButton txt;@FXML private ToggleButton pen;
@@ -94,6 +97,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     final KeyCombination ctrlg= new KeyCodeCombination(KeyCode.G, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrlz= new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrlshiftz= new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
+    final KeyCombination ctrlshiftc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
     final KeyCombination ctrlc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrlx= new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrlp = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
@@ -151,7 +155,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
         });
     	//textStyle.-------------------- 
     	textStyle.getItems().addAll("Arial", "Helvetica","Verdana", "Tahoma","SansSerif","Rachana","DejaVu Sans","DejaVu Sans Mono","DejaVu Serif");
-    	textStyle.getSelectionModel().select("Arial");    	
+    	textStyle.getSelectionModel().select("Arial");
     }
     //Experi-----------------
     public void drawOnDrag(MouseEvent dod) {    	
@@ -227,6 +231,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	else if(ctrlp.match(e)) {pdfExtract();e.consume();}
     	else if(ctrlpn.match(e)) {pngExtract();e.consume();}
     	else if(ctrls.match(e)) {save();e.consume();}
+    	else if(ctrlQ.match(e)) {exit();e.consume();}
     	else if(ctrll.match(e)) {load();e.consume();}
     	else if(ctrlz.match(e)) {undo();e.consume();}
     	else if(ctrlshiftz.match(e)) {redo();e.consume();}
@@ -234,6 +239,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	else if(ctrle.match(e)) {ColorBox.show();e.consume();}
     	else if(ctrlg.match(e)) {textStyle.show();e.consume();}
     	else if(ctrlf.match(e)) {fillColorBox.show();e.consume();}
+    	else if(ctrlshiftc.match(e)) {copyImgToClipBoard();e.consume();}
     	else if(alt1.match(e)) {
     		selectedShape = 1;
     		cir.setSelected(true);
@@ -559,7 +565,8 @@ public class FxPaintController implements Initializable, DrawingEngine {
         if(event.getSource()==UndoBtn){if(primary.empty()){jbp();return;}undo();}
         if(event.getSource()==RedoBtn){if(secondary.empty()){jbp();return;}redo();}
         if(event.getSource()==SaveBtn){save();}
-        if(event.getSource()==LoadBtn){load();}        
+        if(event.getSource()==LoadBtn){load();}
+        if(event.getSource()==cpClpBrdBtn){copyImgToClipBoard();}
         if(event.getSource()==ImportBtn){installPluginShape(null);}                
     }           
     public void startDrag(MouseEvent event){    	
@@ -817,6 +824,22 @@ public class FxPaintController implements Initializable, DrawingEngine {
     @Override
     public void installPluginShape(String jarPath) {Message.setText("Not supported yet.");}
     //Export------------------------------------------------
+    public void copyImgToClipBoard() {
+    	WritableImage nodeshot = CanvasBox.snapshot(new SnapshotParameters(), null);
+    	
+    	Clipboard clipboard = Clipboard.getSystemClipboard();	 
+		ClipboardContent content = new ClipboardContent();
+		content.putImage(nodeshot);
+		clipboard.setContent(content);
+    	
+    	final Popup popup = new Popup();
+        popup.setAutoFix(true);
+        popup.setAutoHide(true);
+        popup.setHideOnEscape(true);
+        Label mess = new Label("Image Copied to Clipboard!");
+        popup.getContent().add(mess);
+        popup.show(anchor.getScene().getWindow());
+    }
     public void pngExtract() {
 		  FileChooser fileChooser = new FileChooser();
 	      fileChooser.setTitle("Save");
@@ -824,9 +847,9 @@ public class FxPaintController implements Initializable, DrawingEngine {
 	      File file = fileChooser.showSaveDialog(CanvasBox.getScene().getWindow());
 	      
         if (file != null) {		    
-			WritableImage nodeshot = CanvasBox.snapshot(new SnapshotParameters(), null);
+			WritableImage nodeshot = CanvasBox.snapshot(new SnapshotParameters(), null);			
 			file = new File(file.getAbsolutePath()+".png");
-			try {
+			try {				
 				ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", file);
 				Message.setText("PNG Image exported");
 			} catch (IOException e) {

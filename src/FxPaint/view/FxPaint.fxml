@@ -100,12 +100,12 @@
             <Font size="14.0" />
          </font>
       </Label>
-      <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="135.0" layoutY="94.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="140.0" layoutY="94.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../../../resources/imgs/fillColor.png" />
          </image>
       </ImageView>
-      <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="135.0" layoutY="67.0" pickOnBounds="true" preserveRatio="true">
+      <ImageView fitHeight="24.0" fitWidth="24.0" layoutX="139.0" layoutY="67.0" pickOnBounds="true" preserveRatio="true">
          <image>
             <Image url="@../../../resources/imgs/strokeColor.png" />
          </image>
@@ -439,5 +439,17 @@
             <Tooltip text="Eraser" />
          </tooltip>
       </ToggleButton>
+      <Button fx:id="cpClpBrdBtn" layoutX="9.0" layoutY="347.0" mnemonicParsing="false" onAction="#handleButtonAction" onKeyReleased="#keyEventHand" prefHeight="26.0" prefWidth="35.0" style="-fx-background-color: #86b56e;">
+         <tooltip>
+            <Tooltip text="Copy image to ClipBoard" />
+         </tooltip>
+         <graphic>
+            <ImageView fitHeight="18.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../../resources/imgs/copy-to-clipboard.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
    </children>
 </AnchorPane>
