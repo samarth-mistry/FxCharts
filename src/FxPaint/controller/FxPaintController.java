@@ -66,58 +66,40 @@ import Main.FxChartMainPage;
 
 @SuppressWarnings("deprecation")
 public class FxPaintController implements Initializable, DrawingEngine {
-	@FXML private AnchorPane anchor;
-	@FXML private ChoiceBox<String> textStyle;
-	@FXML private MenuBar menuBar;
+	@FXML private AnchorPane anchor;@FXML private ChoiceBox<String> textStyle;@FXML private MenuBar menuBar;
 	@FXML private Slider objSize;@FXML private TextField sldrValue;
 	@FXML private ColorPicker ColorBox;@FXML private ColorPicker fillColorBox;
-	@FXML private Label Message;@FXML private Label cords;
-	@FXML private Canvas CanvasBox;
+	@FXML private Label Message;@FXML private Label cords;@FXML private Canvas CanvasBox;
     @FXML private Button DeleteBtn;@FXML private Button UndoBtn;@FXML private Button RedoBtn;@FXML private Button SaveBtn;@FXML private Button MoveBtn;
     @FXML private Button RecolorBtn;@FXML private Button LoadBtn;@FXML private Button ref_btn;@FXML private Button cpClpBrdBtn;
     @FXML private Button StartBtn;@FXML private Button ResizeBtn;@FXML private Button ImportBtn;@FXML private Button CopyBtn;    
-    @FXML private ToggleButton themeToggle;
+    @FXML private ToggleButton themeToggle;@FXML private TextArea tevo;
     @FXML private ToggleButton cir;@FXML private ToggleButton lin;@FXML private ToggleButton tri;@FXML private ToggleButton rec;@FXML private ToggleButton sq;@FXML private ToggleButton ell;@FXML private ToggleButton txt;@FXML private ToggleButton pen;
     @FXML private ToggleButton pent;@FXML private ToggleButton hex;@FXML private ToggleButton star;@FXML private ToggleButton eras;
-    @FXML private TextArea tevo;
-    @FXML private ListView<String> ShapeList;
-    private Point2D start;private Point2D end;
-    private String tovoVal = "";
-    GraphicsContext graphicsContext = null,gc = null;
+    @FXML private ListView<String> ShapeList;    
+    
     final KeyCombination alt1= new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.ALT_DOWN),alt2= new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.ALT_DOWN),alt3= new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.ALT_DOWN);        
     final KeyCombination alt4= new KeyCodeCombination(KeyCode.DIGIT4, KeyCombination.ALT_DOWN),alt5= new KeyCodeCombination(KeyCode.DIGIT5, KeyCombination.ALT_DOWN),alt6= new KeyCodeCombination(KeyCode.DIGIT6, KeyCombination.ALT_DOWN);
     final KeyCombination alt7= new KeyCodeCombination(KeyCode.DIGIT7, KeyCombination.ALT_DOWN),alt8= new KeyCodeCombination(KeyCode.DIGIT8, KeyCombination.ALT_DOWN),alt9= new KeyCodeCombination(KeyCode.DIGIT9, KeyCombination.ALT_DOWN);
-    final KeyCombination alt10= new KeyCodeCombination(KeyCode.DIGIT0, KeyCombination.ALT_DOWN);
-    final KeyCombination alt11= new KeyCodeCombination(KeyCode.UNDERSCORE, KeyCombination.ALT_DOWN);
-    final KeyCombination alt12= new KeyCodeCombination(KeyCode.EQUALS, KeyCombination.ALT_DOWN);
+    final KeyCombination alt10= new KeyCodeCombination(KeyCode.DIGIT0, KeyCombination.ALT_DOWN);final KeyCombination alt11= new KeyCodeCombination(KeyCode.UNDERSCORE, KeyCombination.ALT_DOWN);final KeyCombination alt12= new KeyCodeCombination(KeyCode.EQUALS, KeyCombination.ALT_DOWN);
     final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN);
-    final KeyCombination ctrll= new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrle= new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlg= new KeyCodeCombination(KeyCode.G, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlz= new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrll= new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN);final KeyCombination ctrle= new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN);final KeyCombination ctrlf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlg= new KeyCodeCombination(KeyCode.G, KeyCombination.CONTROL_DOWN);final KeyCombination ctrlz= new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrlshiftz= new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
-    final KeyCombination ctrlshiftc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
-    final KeyCombination ctrlc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlx= new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlp = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlpn = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN);    
-    final KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrls= new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrli= new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrla= new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlback= new KeyCodeCombination(KeyCode.BACK_SPACE, KeyCombination.CONTROL_DOWN);    
+    final KeyCombination ctrlshiftc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);final KeyCombination ctrlc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);final KeyCombination ctrlx= new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrlp = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);final KeyCombination ctrlpn = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN);final KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
+    final KeyCombination ctrls= new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);final KeyCombination ctrli= new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);final KeyCombination ctrla= new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);final KeyCombination ctrlback= new KeyCodeCombination(KeyCode.BACK_SPACE, KeyCombination.CONTROL_DOWN);    
     //SINGLETON DP
     private static ArrayList<Shape> shapeList = new ArrayList<Shape>();
     private ArrayList<String> freeHandList = new ArrayList<String>();
     private int selectedShape = 1;	//1-cir//2-tri//3-lin//4-rec//5-ell//6-sq
-    private boolean move=false;
-    private boolean copy=false;
-    private boolean resize=false;
-    private boolean isFullScr=false;
-    private String biezure = new String();
+    private boolean move=false, copy=false, resize=false, isFullScr=false;
+    GraphicsContext graphicsContext = null,gc = null;
+    private Point2D start, end;
+    private String biezure = new String(),tovoVal = "";
     private Stack<ArrayList<Shape>> primary = new Stack<ArrayList<Shape>>();
     private Stack<ArrayList<Shape>> secondary = new Stack<ArrayList<Shape>>();
+    //initialize---------------------------------------------------------
     public void initialize(URL url, ResourceBundle rb) {
     	cursorMoni(); 
     	objSize.valueProperty().addListener((obs, oldval, newVal) ->objSize.setValue(newVal.intValue()));
@@ -127,7 +109,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	CanvasBox.addEventHandler(MouseEvent.MOUSE_PRESSED,new EventHandler<MouseEvent>(){
     		@Override public void handle(MouseEvent event) {
         		if(selectedShape == 8) {        			
-        			biezure = "/";
+        			//biezure = "/";
 	                graphicsContext.beginPath();
 	                graphicsContext.setFill(ColorBox.getValue());
 	                graphicsContext.setLineWidth(objSize.getValue());
@@ -157,7 +139,12 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	textStyle.getItems().addAll("Arial", "Helvetica","Verdana", "Tahoma","SansSerif","Rachana","DejaVu Sans","DejaVu Sans Mono","DejaVu Serif");
     	textStyle.getSelectionModel().select("Arial");
     }
-    //Experi-----------------
+    //Experiments-----------------
+    public void experimentHandler() {
+    	printFromFreeHand();
+    	System.out.println("#experimentHandler");
+    	System.out.println(freeHandList);
+    }
     public void drawOnDrag(MouseEvent dod) {    	
     	String type = "";//1-cir//2-tri//3-lin//4-rec//5-ell//6-sq//7-txt
     	if(selectedShape == 1) {type = "Circle";}
@@ -183,25 +170,32 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	System.out.println("#printFromFreehand");
     	for(int i=0;i<freeHandList.size();i++) {
     		String X = freeHandList.get(i);
-    		if(!X.equals("/")) {
+    		System.out.println("X : "+X);
+    		//if(!X.equals("/")) {
+    		if(true) {
 	    		String xval = "";
 				String yval = "";
-	    		for(int j=0;j<X.length();j++) {    			
-	    			if(X.charAt(j)=='(') {    				
-	    				for(int k=0;X.charAt(k+1)!=',';k++) {
+	    		for(int j=0;j<X.length();j++) {
+	    			if(X.charAt(j)=='(') {
+	    				xval = "";
+	    				for(int k=j;X.charAt(k+1)!=',';k++) {
 	    					xval+=X.charAt(k+1);
 	    				}
 	    			}
 	    			if(X.charAt(j)==',') {
+	    				yval = "";
 	    				for(int k=j;X.charAt(k+1)!=')';k++) {
 	    					yval+=X.charAt(k+1);
 	    				}
 	    			}
+	    			if(yval !="") {
+	    			System.out.println("("+xval+","+yval+")");
+	    			
+	    			graphicsContext.lineTo(Double.parseDouble(xval), Double.parseDouble(yval));
+		    		graphicsContext.stroke();
+	    			}
 	    		}
-	    		graphicsContext.lineTo(Double.parseDouble(xval), Double.parseDouble(yval));
-	    		graphicsContext.stroke();
-    		}else {
-    			graphicsContext.beginPath();
+	    		graphicsContext.beginPath();
     			graphicsContext.stroke();
     		}
     	}

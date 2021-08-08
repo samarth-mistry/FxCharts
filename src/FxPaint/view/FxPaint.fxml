@@ -451,5 +451,6 @@
             </ImageView>
          </graphic>
       </Button>
+      <Button layoutX="111.0" layoutY="386.0" mnemonicParsing="false" onAction="#experimentHandler" style="-fx-border-color: RED; -fx-border-width: 2px;" text="EXP" />
    </children>
 </AnchorPane>
