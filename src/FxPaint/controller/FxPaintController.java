@@ -89,16 +89,20 @@ public class FxPaintController implements Initializable, DrawingEngine {
     final KeyCombination ctrlshiftc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);final KeyCombination ctrlc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);final KeyCombination ctrlx= new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrlp = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);final KeyCombination ctrlpn = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN);final KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
     final KeyCombination ctrls= new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);final KeyCombination ctrli= new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);final KeyCombination ctrla= new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);final KeyCombination ctrlback= new KeyCodeCombination(KeyCode.BACK_SPACE, KeyCombination.CONTROL_DOWN);    
-    //SINGLETON DP
+    //1-cir//2-tri//3-lin//4-rec//5-ell//6-sq
     private static ArrayList<Shape> shapeList = new ArrayList<Shape>();
     private ArrayList<String> freeHandList = new ArrayList<String>();
-    private int selectedShape = 1;	//1-cir//2-tri//3-lin//4-rec//5-ell//6-sq
+    private ArrayList<Boolean> shapeTypeList = new ArrayList<Boolean>();//true-FreeHand | false-regular
+    private int selectedShape = 1;
     private boolean move=false, copy=false, resize=false, isFullScr=false;
     GraphicsContext graphicsContext = null,gc = null;
     private Point2D start, end;
     private String biezure = new String(),tovoVal = "";
     private Stack<ArrayList<Shape>> primary = new Stack<ArrayList<Shape>>();
     private Stack<ArrayList<Shape>> secondary = new Stack<ArrayList<Shape>>();
+    
+    private Stack<ArrayList<String>> primaryTy = new Stack<ArrayList<String>>();
+    private Stack<ArrayList<String>> secondaryTy = new Stack<ArrayList<String>>();
     //initialize---------------------------------------------------------
     public void initialize(URL url, ResourceBundle rb) {
     	cursorMoni(); 
@@ -109,7 +113,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	CanvasBox.addEventHandler(MouseEvent.MOUSE_PRESSED,new EventHandler<MouseEvent>(){
     		@Override public void handle(MouseEvent event) {
         		if(selectedShape == 8) {        			
-        			//biezure = "/";
+        			biezure = "";
 	                graphicsContext.beginPath();
 	                graphicsContext.setFill(ColorBox.getValue());
 	                graphicsContext.setLineWidth(objSize.getValue());
@@ -123,15 +127,17 @@ public class FxPaintController implements Initializable, DrawingEngine {
             	if(selectedShape == 8) {
             		graphicsContext.lineTo(event.getX(), event.getY());
                 	graphicsContext.stroke();
-                	biezure+="("+event.getX()+","+event.getY()+")";                	
+                	biezure+="("+event.getX()+","+event.getY()+")";
+                	//System.out.println("ADD : ("+event.getX()+","+event.getY()+")");
             	}
             }
         });
     	CanvasBox.addEventHandler(MouseEvent.MOUSE_RELEASED,new EventHandler<MouseEvent>(){
             @Override public void handle(MouseEvent event) {
-            	if(selectedShape == 8) {            		
-                	//freeHandList.add("/");
+            	if(selectedShape == 8) {
                 	freeHandList.add(biezure);
+                	shapeTypeList.add(true);
+                	refreshTy();
             	}
             }
         });
@@ -140,10 +146,12 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	textStyle.getSelectionModel().select("Arial");
     }
     //Experiments-----------------
-    public void experimentHandler() {
-    	printFromFreeHand();
+    public void experimentHandler() {    	
     	System.out.println("#experimentHandler");
-    	System.out.println(freeHandList);
+    	//System.out.println("SHAPEList : "+shapeList);
+    	System.out.println("ShapeTypeList : "+shapeTypeList);
+    	//System.out.println("FreeHandList : "freeHandList);
+    	//printFromFreeHand();
     }
     public void drawOnDrag(MouseEvent dod) {    	
     	String type = "";//1-cir//2-tri//3-lin//4-rec//5-ell//6-sq//7-txt
@@ -168,37 +176,52 @@ public class FxPaintController implements Initializable, DrawingEngine {
     }
     public void printFromFreeHand() {
     	System.out.println("#printFromFreehand");
+    	String xval = "",yval = "";
     	for(int i=0;i<freeHandList.size();i++) {
     		String X = freeHandList.get(i);
-    		System.out.println("X : "+X);
-    		//if(!X.equals("/")) {
+    		graphicsContext.beginPath();
+    		graphicsContext.stroke();
     		if(true) {
-	    		String xval = "";
-				String yval = "";
 	    		for(int j=0;j<X.length();j++) {
 	    			if(X.charAt(j)=='(') {
 	    				xval = "";
-	    				for(int k=j;X.charAt(k+1)!=',';k++) {
+	    				int k;
+	    				for(k=j;X.charAt(k+1)!=',';k++) {
 	    					xval+=X.charAt(k+1);
 	    				}
-	    			}
-	    			if(X.charAt(j)==',') {
 	    				yval = "";
-	    				for(int k=j;X.charAt(k+1)!=')';k++) {
+	    				k++;
+	    				for(;X.charAt(k+1)!=')';k++) {
 	    					yval+=X.charAt(k+1);
 	    				}
-	    			}
-	    			if(yval !="") {
-	    			System.out.println("("+xval+","+yval+")");
-	    			
-	    			graphicsContext.lineTo(Double.parseDouble(xval), Double.parseDouble(yval));
-		    		graphicsContext.stroke();
+		    			graphicsContext.lineTo(Double.parseDouble(xval), Double.parseDouble(yval));
+			    		graphicsContext.stroke();
 	    			}
 	    		}
-	    		graphicsContext.beginPath();
-    			graphicsContext.stroke();
     		}
     	}
+    }
+    private void stringToBeizure(String X) {
+    	graphicsContext.beginPath();
+    	graphicsContext.stroke();		
+    	String xval,yval;
+		for(int j=0;j<X.length();j++) {
+			if(X.charAt(j)=='(') {
+				xval = "";
+				int k;
+				for(k=j;X.charAt(k+1)!=',';k++) {
+					xval+=X.charAt(k+1);
+				}
+				yval = "";
+				k++;
+				for(;X.charAt(k+1)!=')';k++) {
+					yval+=X.charAt(k+1);
+				}
+    			graphicsContext.lineTo(Double.parseDouble(xval), Double.parseDouble(yval));
+	    		graphicsContext.stroke();
+			}
+		}
+	
     }
     //Events handles---------------------------------
     public void ref_btnAction() {
@@ -634,8 +657,8 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	else if(selectedShape == 3) {type = "Line";}
     	else if(selectedShape == 4) {type = "Rectangle";}
     	else if(selectedShape == 5) {type = "Ellipse";}
-    	else if(selectedShape == 6){type = "Square";}
-    	else if(selectedShape == 9){type = "Pentagon";}
+    	else if(selectedShape == 6) {type = "Square";}
+    	else if(selectedShape == 9) {type = "Pentagon";}
     	else if(selectedShape == 10){type = "Hexagon";}
     	else if(selectedShape == 11){type = "Star";}
     	if(type != "") {
@@ -688,7 +711,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
 			System.exit(0);
 		}		
 	}
-    //Undo - redo and else imp functionalities-------------------------------------
+    //Undo - Redo and else imp functionalities-------------------------------------
     public ObservableList<String> getStringList(){
         ObservableList<String> l = FXCollections.observableArrayList(new ArrayList<String>());
         try{
@@ -708,7 +731,14 @@ public class FxPaintController implements Initializable, DrawingEngine {
             temp.add(l.get(i).cloneShape());
         }
         return temp;
-    }       
+    }
+    public ArrayList<String> cloneListTy(ArrayList<String> l) throws CloneNotSupportedException{
+        ArrayList<String> temp = new ArrayList<String>();
+        for(int i=0;i<l.size();i++){
+            temp.add(l.get(i));
+        }
+        return temp;
+    }
     @Override
     public void refresh(Object canvas) {
         try {
@@ -718,7 +748,15 @@ public class FxPaintController implements Initializable, DrawingEngine {
         }
         redraw((Canvas) canvas);
        ShapeList.setItems((getStringList()));
-    }   
+    }
+    private void refreshTy() {
+    	try {
+			primaryTy.push(new ArrayList<String>(cloneListTy(freeHandList)));
+		} catch (CloneNotSupportedException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+    }
     public void redraw(Canvas canvas){
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0, 0,CanvasBox.getWidth(), CanvasBox.getHeight());
@@ -731,11 +769,13 @@ public class FxPaintController implements Initializable, DrawingEngine {
     @Override
     public void addShape(Shape shape) {
         shapeList.add(shape);
+        shapeTypeList.add(false);
         refresh(CanvasBox);
     }
     @Override
     public void removeShape(Shape shape) {
         shapeList.remove(shape);
+        shapeList.remove(false);
         refresh(CanvasBox);
     }
     @Override
@@ -750,17 +790,32 @@ public class FxPaintController implements Initializable, DrawingEngine {
     }
     @Override
     public void undo() {
-    	
-        if(secondary.size()<21){
-	        ArrayList<Shape> temp = (ArrayList<Shape>) primary.pop();
-	        secondary.push(temp);
-	        
-	        if(primary.empty()){shapeList = new ArrayList<Shape>();}
-	        else{temp = (ArrayList<Shape>) primary.peek(); shapeList = temp;}
-	        
-	        redraw(CanvasBox);
-	        ShapeList.setItems((getStringList()));
-        }else{Message.setText("Sorry, Cannot do more than 20 Undo's :'(");}
+        //if(secondary.size()<21){
+        	//System.out.println("last: "+shapeTypeList.get(shapeTypeList.size()-1));
+        	if(shapeTypeList.get(shapeTypeList.size()-1)) {//then it is freehand
+        		ArrayList<String> temp = (ArrayList<String>) primaryTy.pop();
+    	        secondaryTy.push(temp);
+    	        
+    	        if(primary.empty()){shapeTypeList = new ArrayList<Boolean>();}
+    	        else{temp = (ArrayList<String>) primaryTy.peek(); freeHandList = temp;}
+    	        
+    	        redraw(CanvasBox);
+    	        printFromFreeHand();
+    	        //[Note: need to make stack of string that can for freeHand]
+    	        //make change in global arraylist freeHandList!
+    	        //stringToBeizure("");
+    	        //ShapeList.setItems((getStringList()));
+        	}else {//normal shape
+        		ArrayList<Shape> temp = (ArrayList<Shape>) primary.pop();
+    	        secondary.push(temp);
+    	        
+    	        if(primary.empty()){shapeList = new ArrayList<Shape>();}
+    	        else{temp = (ArrayList<Shape>) primary.peek(); shapeList = temp;}
+    	        
+    	        redraw(CanvasBox);
+    	        ShapeList.setItems((getStringList()));
+        	}
+        //}else{Message.setText("Sorry, Cannot do more than 20 Undo's :'(");}
     }
     @Override
     public void redo() {
