@@ -103,6 +103,9 @@ public class FxPaintController implements Initializable, DrawingEngine {
     
     private Stack<ArrayList<String>> primaryTy = new Stack<ArrayList<String>>();
     private Stack<ArrayList<String>> secondaryTy = new Stack<ArrayList<String>>();
+    
+    private Stack<ArrayList<Boolean>> priList = new Stack<ArrayList<Boolean>>();
+    private Stack<ArrayList<Boolean>> secList = new Stack<ArrayList<Boolean>>();
     //initialize---------------------------------------------------------
     public void initialize(URL url, ResourceBundle rb) {
     	cursorMoni(); 
@@ -138,6 +141,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
                 	freeHandList.add(biezure);
                 	shapeTypeList.add(true);
                 	refreshTy();
+                	refreshBool();
             	}
             }
         });
@@ -579,8 +583,8 @@ public class FxPaintController implements Initializable, DrawingEngine {
                 Message.setText("Click on the new right-button position below to resize the selected shape.");
             }else{Message.setText("Select the shape from List view first to resize it.");}
         }       
-        if(event.getSource()==UndoBtn){if(primary.empty()){jbp();return;}undo();}
-        if(event.getSource()==RedoBtn){if(secondary.empty()){jbp();return;}redo();}
+        if(event.getSource()==UndoBtn){if(primaryTy.empty()){jbp();return;}undo();}
+        if(event.getSource()==RedoBtn){if(secondaryTy.empty()){jbp();return;}redo();}
         if(event.getSource()==SaveBtn){save();}
         if(event.getSource()==LoadBtn){load();}
         if(event.getSource()==cpClpBrdBtn){copyImgToClipBoard();}
@@ -699,6 +703,8 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	GraphicsContext gc = CanvasBox.getGraphicsContext2D();    	
     	gc.clearRect(0, 0, CanvasBox.getWidth(), CanvasBox.getHeight());
     	shapeList.clear();
+    	shapeTypeList.clear();
+    	freeHandList.clear();
     	ShapeList.getItems().clear();
     }
     public void exit() {
@@ -739,14 +745,23 @@ public class FxPaintController implements Initializable, DrawingEngine {
         }
         return temp;
     }
+    public ArrayList<Boolean> cloneListBool(ArrayList<Boolean> l) throws CloneNotSupportedException{
+    	ArrayList<Boolean> temp = new ArrayList<Boolean>();
+        for(int i=0;i<l.size();i++){
+            temp.add(l.get(i));
+        }
+        return temp;
+    }
     @Override
     public void refresh(Object canvas) {
         try {
             primary.push(new ArrayList<Shape>(cloneList(shapeList)));
+            priList.push(new ArrayList<Boolean>(cloneListBool(shapeTypeList)));
         } catch (CloneNotSupportedException ex) {
             Logger.getLogger(FxPaintController.class.getName()).log(Level.SEVERE, null, ex);
         }
         redraw((Canvas) canvas);
+        printFromFreeHand();
        ShapeList.setItems((getStringList()));
     }
     private void refreshTy() {
@@ -757,13 +772,18 @@ public class FxPaintController implements Initializable, DrawingEngine {
 			e.printStackTrace();
 		}
     }
+    private void refreshBool() {
+    	try {
+			priList.push(new ArrayList<Boolean>(cloneListBool(shapeTypeList)));
+		} catch (CloneNotSupportedException e) {e.printStackTrace();}
+    }
     public void redraw(Canvas canvas){
         GraphicsContext gc = canvas.getGraphicsContext2D();
         gc.clearRect(0, 0,CanvasBox.getWidth(), CanvasBox.getHeight());
         try{
-        for(int i=0;i<shapeList.size();i++){
-            shapeList.get(i).draw(canvas);
-        }
+        	for(int i=0;i<shapeList.size();i++){
+        		shapeList.get(i).draw(canvas);
+        	}
         }catch(Exception e){}
     }
     @Override
@@ -775,7 +795,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     @Override
     public void removeShape(Shape shape) {
         shapeList.remove(shape);
-        shapeList.remove(false);
+        //shapeTypeList.remove(false);
         refresh(CanvasBox);
     }
     @Override
@@ -790,43 +810,85 @@ public class FxPaintController implements Initializable, DrawingEngine {
     }
     @Override
     public void undo() {
-        //if(secondary.size()<21){
-        	//System.out.println("last: "+shapeTypeList.get(shapeTypeList.size()-1));
+        if(secondaryTy.size()<21){
+        	System.out.print("#UNDO");
+//        	System.out.println(shapeTypeList);
         	if(shapeTypeList.get(shapeTypeList.size()-1)) {//then it is freehand
+        		System.out.println("\t#BIEZURE");
+        		
+        		ArrayList<Boolean> tempGList = (ArrayList<Boolean>) priList.pop();
+    	        secList.push(tempGList);
+    	        
+    	        if(priList.empty()){shapeTypeList = new ArrayList<Boolean>();}
+    	        else{tempGList = (ArrayList<Boolean>) priList.peek(); shapeTypeList = tempGList;}
+        		
         		ArrayList<String> temp = (ArrayList<String>) primaryTy.pop();
     	        secondaryTy.push(temp);
     	        
-    	        if(primary.empty()){shapeTypeList = new ArrayList<Boolean>();}
-    	        else{temp = (ArrayList<String>) primaryTy.peek(); freeHandList = temp;}
-    	        
+    	        if(primaryTy.empty()){freeHandList = new ArrayList<String>();}
+    	        else{
+    	        	temp = (ArrayList<String>) primaryTy.peek(); 
+    	        	freeHandList = temp;
+    	        	System.out.println("Temp : "+temp);
+    	        }
     	        redraw(CanvasBox);
     	        printFromFreeHand();
-    	        //[Note: need to make stack of string that can for freeHand]
-    	        //make change in global arraylist freeHandList!
-    	        //stringToBeizure("");
-    	        //ShapeList.setItems((getStringList()));
         	}else {//normal shape
+        		System.out.println("\t#NORMAL");
         		ArrayList<Shape> temp = (ArrayList<Shape>) primary.pop();
     	        secondary.push(temp);
     	        
     	        if(primary.empty()){shapeList = new ArrayList<Shape>();}
     	        else{temp = (ArrayList<Shape>) primary.peek(); shapeList = temp;}
-    	        
+    	        shapeTypeList.remove(shapeTypeList.size() -1 );
     	        redraw(CanvasBox);
+    	        printFromFreeHand();
     	        ShapeList.setItems((getStringList()));
+    	        
+    	        ArrayList<Boolean> tempGList = (ArrayList<Boolean>) priList.pop();
+    	        secList.push(tempGList);
+    	        
+    	        if(priList.empty()){shapeTypeList = new ArrayList<Boolean>();}
+    	        else{tempGList = (ArrayList<Boolean>) priList.peek(); shapeTypeList = tempGList;}
         	}
-        //}else{Message.setText("Sorry, Cannot do more than 20 Undo's :'(");}
+        }else{Message.setText("Sorry, Cannot do more than 20 Undo's :'(");}
     }
     @Override
     public void redo() {
-        ArrayList<Shape> temp = (ArrayList<Shape>) secondary.pop();
-        primary.push(temp);
-        
-        temp = (ArrayList<Shape>) primary.peek();
-        shapeList = temp;
-        
-        redraw(CanvasBox);
-        ShapeList.setItems((getStringList()));
+    	System.out.print("#UNDO");
+//    	System.out.println(shapeTypeList);
+    	if(shapeTypeList.isEmpty()) {
+    		shapeTypeList.add(false);
+    	}
+    	if(shapeTypeList.get(shapeTypeList.size()-1)) {//then it is freehand
+    		System.out.println("\t#BIEZURE");
+    		
+    		ArrayList<String> temp = (ArrayList<String>) secondaryTy.pop();
+	        primaryTy.push(temp);	        
+	        temp = (ArrayList<String>) primaryTy.peek();
+            freeHandList = temp;
+	        redraw(CanvasBox);
+	        printFromFreeHand();
+	        
+	        ArrayList<Boolean> tempGList = (ArrayList<Boolean>) secList.pop();
+	        priList.push(tempGList);	        	            	
+	        tempGList = (ArrayList<Boolean>) priList.peek();
+            shapeTypeList = tempGList;
+    	}else {
+    		System.out.println("\t#NORMAL");
+    		
+            ArrayList<Shape> temp = (ArrayList<Shape>) secondary.pop();
+            primary.push(temp);            
+            temp = (ArrayList<Shape>) primary.peek();
+            shapeList = temp;            
+            redraw(CanvasBox);
+            ShapeList.setItems((getStringList()));
+            
+            ArrayList<Boolean> tempGList = (ArrayList<Boolean>) secList.pop();
+	        priList.push(tempGList);	        	            	
+	        tempGList = (ArrayList<Boolean>) priList.peek();
+            shapeTypeList = tempGList;
+    	}
     }
     @Override
     public void save() {
