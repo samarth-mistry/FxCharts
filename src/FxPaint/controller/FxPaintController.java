@@ -99,11 +99,9 @@ public class FxPaintController implements Initializable, DrawingEngine {
     private Point2D start, end;
     private String biezure = new String(),tovoVal = "";
     private Stack<ArrayList<Shape>> primary = new Stack<ArrayList<Shape>>();
-    private Stack<ArrayList<Shape>> secondary = new Stack<ArrayList<Shape>>();
-    
+    private Stack<ArrayList<Shape>> secondary = new Stack<ArrayList<Shape>>();    
     private Stack<ArrayList<String>> primaryTy = new Stack<ArrayList<String>>();
     private Stack<ArrayList<String>> secondaryTy = new Stack<ArrayList<String>>();
-    
     private Stack<ArrayList<Boolean>> priList = new Stack<ArrayList<Boolean>>();
     private Stack<ArrayList<Boolean>> secList = new Stack<ArrayList<Boolean>>();
     //initialize---------------------------------------------------------
@@ -205,28 +203,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     		}
     	}
     }
-    private void stringToBeizure(String X) {
-    	graphicsContext.beginPath();
-    	graphicsContext.stroke();		
-    	String xval,yval;
-		for(int j=0;j<X.length();j++) {
-			if(X.charAt(j)=='(') {
-				xval = "";
-				int k;
-				for(k=j;X.charAt(k+1)!=',';k++) {
-					xval+=X.charAt(k+1);
-				}
-				yval = "";
-				k++;
-				for(;X.charAt(k+1)!=')';k++) {
-					yval+=X.charAt(k+1);
-				}
-    			graphicsContext.lineTo(Double.parseDouble(xval), Double.parseDouble(yval));
-	    		graphicsContext.stroke();
-			}
-		}
-	
-    }
+   
     //Events handles---------------------------------
     public void ref_btnAction() {
     	System.out.println(freeHandList);
@@ -675,6 +652,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	}
     }
     //Clear, configuration & remove functions	-----------------------------------
+    private void jbp() {Toolkit.getDefaultToolkit().beep();}
     private void cursorMoni() {	    
 	    CanvasBox.setOnMouseMoved(new EventHandler<MouseEvent>() {
 	        @Override public void handle(MouseEvent mouseEvent) {	        	
@@ -907,7 +885,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save");
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("XML", "*.xml"));
-		File file = fileChooser.showOpenDialog(CanvasBox.getScene().getWindow());	    
+		File file = fileChooser.showOpenDialog(CanvasBox.getScene().getWindow());
         if (file != null) {
         	System.out.println(file.getAbsolutePath());
             try {
@@ -927,7 +905,8 @@ public class FxPaintController implements Initializable, DrawingEngine {
             }           
         }        
     }
-    private void jbp() {Toolkit.getDefaultToolkit().beep();}
+    //unsupported shapes
+    
     @Override
     public List<Class<? extends Shape>> getSupportedShapes() {
         return null;
