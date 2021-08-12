@@ -66,7 +66,7 @@ public class FxChartMainPage extends Application{
 			@Override
 			public void run() {
 				Dialog<Pair<String, String>> dialog = new Dialog<>();
-				dialog.setTitle("LineChart-Login");
+				dialog.setTitle("FxChart-Login");
 				dialog.setHeaderText("If authentication gets invalid then,\napplication shuts automatically");
 
 				ButtonType loginButtonType = new ButtonType("Login", ButtonData.OK_DONE);
