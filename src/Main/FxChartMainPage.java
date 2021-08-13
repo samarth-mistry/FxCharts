@@ -26,7 +26,7 @@ public class FxChartMainPage extends Application{
 		//chartSelector(primaryStage);
 		//URL url = new File("resources/views/LineChart.fxml").toURI().toURL();
 		//Parent root =FXMLLoader.load(url);
-		setStage(primaryStage,"FxPaint");
+		setStage(primaryStage,"Pie chart");
 	}
 	private void chartSelector(Stage primaryStage) throws IOException {
 		String chrt[] = {"Pie chart", "Line chart", "Bar chart", "FxPaint"};
