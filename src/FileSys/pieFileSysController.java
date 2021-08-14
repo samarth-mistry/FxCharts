@@ -6,41 +6,49 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
+import javafx.scene.chart.PieChart;
+
 public class pieFileSysController {
 	static FileWriter locFile = null;
 	@SuppressWarnings("null")
-	public static void writeDataInFile(ArrayList<String> name, ArrayList<Double> value) {
+	public static void writeDataInFile(ArrayList<PieChart.Data> pieList) {
 		System.out.println("File System Report:\n");
 		clearFile("pieFileData.txt");
-	    try {	    
-	    	locFile = new FileWriter("dat/pieFileData.txt",true);
-	    	for(int i=0;i<name.size();i++) {
-	    		locFile.append("["+name.get(i)+","+value.get(i)+"]\n");
-	    	}	    	
-	        System.out.println("\tFile Appended");
-	    } catch(IOException e) {
-	        System.out.println("\tFileWriter Catch block");
+		try {
+			locFile = new FileWriter("dat/pieFileData.txt",true);
+			for(int i=0;i<pieList.size();i++)
+	    		locFile.append(pieList.get(i).getName()+","+pieList.get(i).getPieValue()+"\n");
+		}catch(IOException e) {
+			System.out.println("\tFileWriter Catch block");
 	        e.printStackTrace();
-	    } finally {
-            System.out.println("\tFileWriter Finally block");
-            try {if(locFile != null) {locFile.close();}} 
-            catch(IOException e) {e.printStackTrace();}
-        }
+		}finally {
+			System.out.println("\tFileWriter Finally block");
+			try {if(locFile != null) {locFile.close();}} 
+			catch(IOException e) {e.printStackTrace();}
+		}
 	}
-	public static ArrayList<String> readDataFromFile() {
+	public static ArrayList<PieChart.Data> readDataFromFile() {
 		Scanner scanner = null;
 		System.out.println("File System Report:\n");
-		ArrayList<String> pieData = new ArrayList<String>();
+		ArrayList<PieChart.Data> pieData = new ArrayList<PieChart.Data>();
         try {
             scanner = new Scanner(new FileReader("dat/pieFileData.txt"));
-            scanner.useDelimiter(",");            
-            while(scanner.hasNextLine()) {                
-                String line = scanner.nextLine();                
-                pieData.add(line);                
-                //System.out.println(line);
+            scanner.useDelimiter(",");
+            String nm="",val="";
+            int j,k;
+            while(scanner.hasNextLine()) {
+                String line = scanner.nextLine();
+                nm="";val="";
+                for(j=0; line.charAt(j) != ',';j++) 
+        			nm+=line.charAt(j);
+        		
+        		for(k=j+1;k<line.length();k++)
+        			val+=line.charAt(k);
+        		
+        		pieData.add(new PieChart.Data(nm,Double.parseDouble(val)));
             }
     		System.out.println("\tFile Reading");
-        } catch(IOException e) {
+        } catch(Exception e) {
             e.printStackTrace();
     		System.out.println("\tFile Reading error");
         } finally {
@@ -49,7 +57,6 @@ public class pieFileSysController {
             }
     		System.out.println("\tFile Reading finally");
         }
-        //System.out.println(pieData);
         return pieData;        
 	}
 	public static void clearFile(String fileName) {

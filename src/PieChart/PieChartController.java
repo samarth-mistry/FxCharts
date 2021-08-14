@@ -13,6 +13,7 @@ import java.io.Writer;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Optional;
 import java.util.Stack;
 
@@ -28,7 +29,6 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import FileSys.pieFileSysController;
-import FxPaint.model.Shape;
 import Main.FxChartMainPage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -97,8 +97,6 @@ public class PieChartController {
 	Stage stage = null;
 	private boolean theame=true,isFullScr=false;
 	private ObservableList<PieChart.Data> pie_data;
-	private ArrayList<String> nmArr = new ArrayList<String>();
-	private ArrayList<Double> valArr = new ArrayList<Double>();
 	private ArrayList<PieChart.Data> pieList = new ArrayList<PieChart.Data>();
 	private Stack<ArrayList<PieChart.Data>> priList = new Stack<ArrayList<PieChart.Data>>(),secList = new Stack<ArrayList<PieChart.Data>>();
 	
@@ -253,8 +251,7 @@ public class PieChartController {
 	//Clearing functions----------------------------------------------
 	public void clearChart() {
 		pChart.getData().clear();
-		nmArr.clear();
-		valArr.clear();
+		pieList.clear();
 		error_label.setText("Chart Data Cleared! Click load data to reload");				
 	}
 	public void clearFile() {
@@ -302,11 +299,7 @@ public class PieChartController {
 		}		
 	}
 	public void removeLast() {
-		int index = nmArr.size() - 1;
-		nmArr.remove(index);
-		valArr.remove(index);		
-		callWriter();
-		loadDataFromFile();
+		
 	}
 	public void refresh(ActionEvent event) {
 		//editFromTable();
@@ -390,8 +383,6 @@ public class PieChartController {
 	public void addData() {				
 		if(addValidator()) {
 			error_label.setText("");
-			nmArr.add(nm.getText());
-			valArr.add(Double.parseDouble(val.getText()));
 			pieList.add(new PieChart.Data(nm.getText(),Double.parseDouble(val.getText())));
 			priList.push(new ArrayList<PieChart.Data>(cloneList(pieList)));
 			drawChart(true);			
@@ -409,16 +400,12 @@ public class PieChartController {
 					tit_1 = "";
 					for(int j=i;bk.charAt(j+1)!=',';j++)
 						tit_1 +=bk.charAt(j+1);
-					
-					nmArr.add(tit_1);
 					a=true;
 				}
 				if(bk.charAt(i)==',') {
 					tit_2 = "";
 					for(int j=i;bk.charAt(j+1)!=']';j++)
 						tit_2 += bk.charAt(j+1);
-
-					valArr.add(Double.parseDouble(tit_2));
 					b=true;
 				}
 				if(a && b) {
@@ -478,16 +465,6 @@ public class PieChartController {
 			table.getItems().add(row);
 		}
 		pChart.setData(pie_data);
-//		pie_data = FXCollections.observableArrayList();
-//		System.out.println("Drawing\n\tString\tDouble\n\t-------------------");
-//		for(int i=0; i<nmArr.size();i++) {
-//			System.out.println("\t"+nmArr.get(i)+"\t"+valArr.get(i));
-//			pie_data.add(new PieChart.Data(nmArr.get(i),valArr.get(i)));
-//			PieTableController row = new PieTableController(nmArr.get(i),valArr.get(i));
-//			table.getItems().add(row);
-//		}
-//		System.out.println("\t-------------------");
-//		pChart.setData(pie_data);
 	}
 	private void pieDetailPercentage() {				        
 		for (final PieChart.Data data : pChart.getData()) {
@@ -566,7 +543,7 @@ public class PieChartController {
 	}
 	//loading functions------------------------------------------------------
 	private void callWriter() {		
-		pieFileSysController.writeDataInFile(nmArr,valArr);
+		pieFileSysController.writeDataInFile(pieList);
 	}
 	public void loadDataFromFile() {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -579,39 +556,17 @@ public class PieChartController {
 			loadDataFromFileConfirmed();			
 		}		
 	}
-	public void loadDataFromFileConfirmed() {
+	private void loadDataFromFileConfirmed() {
 		clearChart();
-		ArrayList<String> read = pieFileSysController.readDataFromFile();
-		for(int seriIndex=0;seriIndex< read.size();seriIndex++) {			
-			String X = read.get(seriIndex);			
-			for(int i=0;i< X.length();i++) {						
-				if(X.charAt(i) == '[') {
-					int j=0;
-					String xCo = new String();
-					for(j=i;X.charAt(j+1)!=',';j++) {					
-						xCo+=X.charAt(j+1);
-						System.out.print(X.charAt(j+1));
-					}
-					System.out.print("\t");
-					nmArr.add(xCo);					
-				} else if(X.charAt(i)==',') {
-					int j=0;
-					String yCo = new String();
-					for(j=i;X.charAt(j+1)!=']';j++) {					
-						yCo+=X.charAt(j+1);
-						System.out.print(X.charAt(j+1));
-					}
-					System.out.println();
-					valArr.add(Double.parseDouble(yCo));												
-				} else {}			
-			}			
-		}	
+		System.out.println("Read");
+		ArrayList<PieChart.Data> read = pieFileSysController.readDataFromFile();
+		pieList = new ArrayList<PieChart.Data>(read);
 		drawChart(false);	
 	}	
 	public void loadDataInTable() {
 		//loadDataFromFile();	
-		for(int i=0;i<nmArr.size();i++) {
-			PieTableController row = new PieTableController(nmArr.get(i),valArr.get(i));
+		for(int i=0;i<pieList.size();i++) {
+			PieTableController row = new PieTableController(pieList.get(i).getName(),pieList.get(i).getPieValue());
 			table.getItems().add(row);			
 		}
 	}	
@@ -629,15 +584,13 @@ public class PieChartController {
 			}
 		}
 		if(isDvalid) {
-			nmArr.clear();
-			valArr.clear();
+			pieList.clear();
 			for(i=0;i<table.getItems().size();i++) {				
 				String x = table.getItems().get(i).getS();
 				Double y = table.getItems().get(i).getD();
 				
 				System.out.println("\t"+x+"\t"+y);
-				nmArr.add(x);
-				valArr.add(y);			
+				pieList.add(new PieChart.Data(x, y));
 			}
 			drawChart(true);
 			if(fileEnable.isSelected())
@@ -717,14 +670,14 @@ public class PieChartController {
 	}
 	public void csvExtract() throws IOException {
 	    FileChooser fileChooser = new FileChooser();
-        fileChooser.setTitle("Save");
+        fileChooser.setTitle("Save as CSV");
         fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV", "*.csv"));
         File file = fileChooser.showSaveDialog(primaryStage);
       
         if(file != null) {        	
         	final ObservableList<PieTableController> data = FXCollections.observableArrayList();
-    		for(int i=0;i<nmArr.size();i++)
-    			data.add(new PieTableController(nmArr.get(i),valArr.get(i)));
+    		for(int i=0;i<pieList.size();i++)
+    			data.add(new PieTableController(pieList.get(i).getName(),pieList.get(i).getPieValue()));
     		Writer writer = null;
             try {        	
             	file = new File(file.getAbsolutePath()+".csv");
@@ -734,7 +687,7 @@ public class PieChartController {
                     writer.write(text);
                     System.out.println("Export CSV\n\t CSV exported");
                 }
-            } catch (Exception ex) {ex.printStackTrace();System.out.println("Export CSV\n\t CSV exported error");}
+            } catch (Exception ex) {ex.printStackTrace();error_label.setText("Export CSV\n\t CSV exported error");}
             finally {writer.flush();writer.close();}
         }		
     }	
