@@ -1,5 +1,6 @@
 package PieChart;
 
+import java.awt.Toolkit;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,6 +14,8 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.Stack;
+
 import javax.imageio.ImageIO;
 
 import com.itextpdf.text.Document;
@@ -25,6 +28,7 @@ import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
 import FileSys.pieFileSysController;
+import FxPaint.model.Shape;
 import Main.FxChartMainPage;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -73,56 +77,50 @@ import javafx.util.converter.DoubleStringConverter;
 @SuppressWarnings("deprecation")
 public class PieChartController {
 	@FXML private MenuBar menuBar;
-	@FXML PieChart pChart;
-	@FXML private Label error_label;	
-	@FXML private Label pieValue;
-	@FXML private Label l3;
-	@FXML private Label l2;
-	@FXML private Label l1;
-	@FXML private TextField pieChartTitle;	
-	@FXML private TextField nm;
-	@FXML private TextField val;
+	@FXML private PieChart pChart;
+	@FXML private Label error_label,pieValue;
+	@FXML private TextField pieChartTitle,nm,val;	
 	@FXML private TextArea bulk;
 	@FXML private TableView<PieTableController> table;
 	@FXML private TableColumn<PieTableController, String> c1;
 	@FXML private TableColumn<PieTableController, Double> c2;
-	@FXML private CheckBox bulkEnable;
-	@FXML private CheckBox dbEnable;
-	@FXML private CheckBox fileEnable;
-	@FXML private Button loadDataFromFile;
-	@FXML private Button loadDataFromDb;
-	@FXML private Button loadDataInTable;
-	@FXML private Button add_data;
-	@FXML private Button add_b_data;
+	@FXML private CheckBox bulkEnable,dbEnable,fileEnable;	
+	@FXML private Button loadDataFromFile,loadDataFromDb,loadDataInTable,add_data,add_b_data;
 	@FXML private AnchorPane anchor;
 	@FXML private DatePicker setDate;
 	@FXML private ToggleButton themeToggle;
 	@FXML private Circle theameCircle;
+	
 	static String pdfTextApp = null;
 	private DateTimeFormatter classic=DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	final Stage primaryStage = null;
 	Stage stage = null;
-	private boolean theame=true;
-	private boolean isFullScr=false;
+	private boolean theame=true,isFullScr=false;
 	private ObservableList<PieChart.Data> pie_data;
 	private ArrayList<String> nmArr = new ArrayList<String>();
 	private ArrayList<Double> valArr = new ArrayList<Double>();
+	private ArrayList<PieChart.Data> pieList = new ArrayList<PieChart.Data>();
+	private Stack<ArrayList<PieChart.Data>> priList = new Stack<ArrayList<PieChart.Data>>(),secList = new Stack<ArrayList<PieChart.Data>>();
+	
 	final double SCALE_DELTA = 1.1;
-	final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN);
-    final KeyCombination altj= new KeyCodeCombination(KeyCode.J, KeyCombination.ALT_DOWN);
-    final KeyCombination altk= new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN);
-    final KeyCombination altl= new KeyCodeCombination(KeyCode.L, KeyCombination.ALT_DOWN);
-    final KeyCombination ctrlb= new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrld= new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlPrintPDF = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlPrintPNG = new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
-    final KeyCombination altT= new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
-    final KeyCombination altF11= new KeyCodeCombination(KeyCode.F11, KeyCombination.ALT_DOWN);
+	final KeyCombination 
+	altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN),
+    altj= new KeyCodeCombination(KeyCode.J, KeyCombination.ALT_DOWN),
+    altk= new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN),
+    altl= new KeyCodeCombination(KeyCode.L, KeyCombination.ALT_DOWN),
+    ctrlb= new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN),
+    ctrlf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN),
+    ctrld= new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN),
+    ctrlPrintPDF = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN),
+    ctrlPrintPNG = new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN),
+    ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN),
+    ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN),
+    altT= new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN),
+    altF11= new KeyCodeCombination(KeyCode.F11, KeyCombination.ALT_DOWN);
+	
     //ShortCut functions----------------------------------------------------
     @FXML public void initialize() {
+    	pieDetailPercentage();
         System.out.println("#initialized#");
         setDate.setValue(LocalDate.now());
         setDate.setConverter(new StringConverter<LocalDate>(){            
@@ -238,7 +236,7 @@ public class PieChartController {
 			setFullscrn();
 		else
 			event.consume();
-		nm.requestFocus();
+		//nm.requestFocus();
 	}
 	//Zooming---------------------------------------------------------------------
 	public void zoomPieChart(ScrollEvent event) {
@@ -366,9 +364,6 @@ public class PieChartController {
 			anchor.setStyle("-fx-background-color:  #666666");
 			pChart.setStyle("-fx-border-color:  #d8d8d8");			
 			Color c = Color.web("#d8d8d8");
-			l1.setTextFill(c);
-			l2.setTextFill(c);
-			l3.setTextFill(c);
 			pieValue.setTextFill(c);
 			fileEnable.setTextFill(c);
 			dbEnable.setTextFill(c);
@@ -380,10 +375,7 @@ public class PieChartController {
 		else {			//dark			
 			anchor.setStyle("-fx-background-color:  #d8d8d8");
 			pChart.setStyle("-fx-border-color:  #666666");			
-			Color c = Color.web("#666666");
-			l1.setTextFill(c);
-			l2.setTextFill(c);
-			l3.setTextFill(c);
+			Color c = Color.web("#666666");			
 			pieValue.setTextFill(c);
 			fileEnable.setTextFill(c);
 			dbEnable.setTextFill(c);
@@ -392,38 +384,47 @@ public class PieChartController {
 			themeToggle.setText("Dark");
 			theame = true;
 		}
-	}	
+	}
+	private void jbp() {Toolkit.getDefaultToolkit().beep();}
 	//Add data functions-----------------------------------------------
 	public void addData() {				
 		if(addValidator()) {
 			error_label.setText("");
 			nmArr.add(nm.getText());
 			valArr.add(Double.parseDouble(val.getText()));
-			drawChart(true);
+			pieList.add(new PieChart.Data(nm.getText(),Double.parseDouble(val.getText())));
+			priList.push(new ArrayList<PieChart.Data>(cloneList(pieList)));
+			drawChart(true);			
 			if(fileEnable.isSelected())
 				callWriter();
 		}		
 	}
 	public void addBulkData() {		
-		if(bulkValidator()) {					
-			//nmArr.clear();
-			//valArr.clear();
+		if(bulkValidator()) {
 			String bk = bulk.getText();
+			String tit_1 = null,tit_2 = null;
+			Boolean a = false, b = false;
 			for(int i=0;i<bk.length();i++) {
-				String tit_1 = "";
-				String tit_2 = "";
 				if(bk.charAt(i)=='[') {
-					for(int j=i;bk.charAt(j+1)!=',';j++) {
+					tit_1 = "";
+					for(int j=i;bk.charAt(j+1)!=',';j++)
 						tit_1 +=bk.charAt(j+1);
-					}
+					
 					nmArr.add(tit_1);
+					a=true;
 				}
 				if(bk.charAt(i)==',') {
-					for(int j=i;bk.charAt(j+1)!=']';j++) {
+					tit_2 = "";
+					for(int j=i;bk.charAt(j+1)!=']';j++)
 						tit_2 += bk.charAt(j+1);
-					}
+
 					valArr.add(Double.parseDouble(tit_2));
-				}								
+					b=true;
+				}
+				if(a && b) {
+					pieList.add(new PieChart.Data(tit_1,Double.parseDouble(tit_2)));
+					a=false;b=false;
+				}
 			}			
 			drawChart(true);
 			if(fileEnable.isSelected())
@@ -432,20 +433,61 @@ public class PieChartController {
 			error_label.setText("Invalid input in bulk data enter. Please check again");
 		}
 	}
+	//undo-redo----------------------------------------------
+	public void undo() {
+		System.out.print("#UNDO_PIE");
+		if(!priList.isEmpty()) {
+			if(secList.size() < 21) {
+				ArrayList<PieChart.Data> temp = (ArrayList<PieChart.Data>) priList.pop();
+		        secList.push(temp);
+		        
+		        if(priList.empty()){pieList = new ArrayList<PieChart.Data>();}
+		        else{temp = (ArrayList<PieChart.Data>) priList.peek(); pieList = temp;}
+		        
+		        drawChart(true);
+			}else
+				error_label.setText("Can't do more than 20 undo's");
+		}else
+			jbp();
+	}
+	public void redo() {
+		System.out.print("#REDO_PIE");
+		if(!secList.isEmpty()) {
+			ArrayList<PieChart.Data> temp = (ArrayList<PieChart.Data>) secList.pop();
+	        priList.push(temp);            
+	        temp = (ArrayList<PieChart.Data>) priList.peek();
+	        pieList = temp;
+	        drawChart(true);
+		}else
+			jbp();
+	}
+	private ArrayList<PieChart.Data> cloneList(ArrayList<PieChart.Data> l) {
+		ArrayList<PieChart.Data> temp = new ArrayList<PieChart.Data>();
+        for(int i=0;i<l.size();i++){
+            temp.add(l.get(i));
+        }
+        return temp;
+	}
 	//Draw & decoding Validations Functions-----------------------------------------------------------
 	private void drawChart(Boolean whoCalled) {
 		clearTable();
 		pie_data = FXCollections.observableArrayList();
-		System.out.println("Drawing\n\tString\tDouble\n\t-------------------");
-		for(int i=0; i<nmArr.size();i++) {
-			System.out.println("\t"+nmArr.get(i)+"\t"+valArr.get(i));
-			pie_data.add(new PieChart.Data(nmArr.get(i),valArr.get(i)));
-			PieTableController row = new PieTableController(nmArr.get(i),valArr.get(i));
+		for(PieChart.Data ent_no : pieList){
+			pie_data.add(new PieChart.Data(ent_no.getName(),ent_no.getPieValue()));
+			PieTableController row = new PieTableController(ent_no.getName(),ent_no.getPieValue());
 			table.getItems().add(row);
 		}
-		System.out.println("\t-------------------");
 		pChart.setData(pie_data);
-		pieDetailPercentage();
+//		pie_data = FXCollections.observableArrayList();
+//		System.out.println("Drawing\n\tString\tDouble\n\t-------------------");
+//		for(int i=0; i<nmArr.size();i++) {
+//			System.out.println("\t"+nmArr.get(i)+"\t"+valArr.get(i));
+//			pie_data.add(new PieChart.Data(nmArr.get(i),valArr.get(i)));
+//			PieTableController row = new PieTableController(nmArr.get(i),valArr.get(i));
+//			table.getItems().add(row);
+//		}
+//		System.out.println("\t-------------------");
+//		pChart.setData(pie_data);
 	}
 	private void pieDetailPercentage() {				        
 		for (final PieChart.Data data : pChart.getData()) {

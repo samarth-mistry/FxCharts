@@ -223,8 +223,8 @@
                </image>
             </ImageView>
          </graphic></Button>      
-      <PieChart layoutX="222.0" layoutY="75.0" onMouseClicked="#zoomNormal" onScroll="#zoomPieChart" prefHeight="538.0" prefWidth="849.0" style="-fx-border-color: #666666;" title="PieChart title" />
-      <Button fx:id="RedoBtn" layoutX="56.0" layoutY="278.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #ffaa00;">
+      <PieChart fx:id="pChart" layoutX="222.0" layoutY="75.0" onMouseClicked="#zoomNormal" onScroll="#zoomPieChart" prefHeight="538.0" prefWidth="849.0" style="-fx-border-color: #666666;" title="PieChart title" />
+      <Button layoutX="56.0" layoutY="278.0" mnemonicParsing="false" onAction="#redo" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #ffaa00;">
          <tooltip>
             <Tooltip text="Redo" />
          </tooltip>
@@ -236,7 +236,7 @@
             </ImageView>
          </graphic>
       </Button>
-      <Button layoutX="10.0" layoutY="278.0" mnemonicParsing="false" prefHeight="26.0" prefWidth="7.0" style="-fx-background-color: #ffaa00;">
+      <Button layoutX="10.0" layoutY="278.0" mnemonicParsing="false" onAction="#undo" prefHeight="26.0" prefWidth="7.0" style="-fx-background-color: #ffaa00;">
          <tooltip>
             <Tooltip text="Undo" />
          </tooltip>

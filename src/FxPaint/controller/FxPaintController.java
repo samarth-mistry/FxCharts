@@ -66,29 +66,50 @@ import Main.FxChartMainPage;
 
 @SuppressWarnings("deprecation")
 public class FxPaintController implements Initializable, DrawingEngine {
-	@FXML private AnchorPane anchor;@FXML private ChoiceBox<String> textStyle;@FXML private MenuBar menuBar;
-	@FXML private Slider objSize;@FXML private TextField sldrValue;
-	@FXML private ColorPicker ColorBox;@FXML private ColorPicker fillColorBox;
-	@FXML private Label Message;@FXML private Label cords;@FXML private Canvas CanvasBox;
-    @FXML private Button DeleteBtn;@FXML private Button UndoBtn;@FXML private Button RedoBtn;@FXML private Button SaveBtn;@FXML private Button MoveBtn;
-    @FXML private Button RecolorBtn;@FXML private Button LoadBtn;@FXML private Button ref_btn;@FXML private Button cpClpBrdBtn;
-    @FXML private Button StartBtn;@FXML private Button ResizeBtn;@FXML private Button ImportBtn;@FXML private Button CopyBtn;    
-    @FXML private ToggleButton themeToggle;@FXML private TextArea tevo;
-    @FXML private ToggleButton cir;@FXML private ToggleButton lin;@FXML private ToggleButton tri;@FXML private ToggleButton rec;@FXML private ToggleButton sq;@FXML private ToggleButton ell;@FXML private ToggleButton txt;@FXML private ToggleButton pen;
-    @FXML private ToggleButton pent;@FXML private ToggleButton hex;@FXML private ToggleButton star;@FXML private ToggleButton eras;
+	@FXML private AnchorPane anchor;
+	@FXML private ChoiceBox<String> textStyle;
+	@FXML private MenuBar menuBar;
+	@FXML private Slider objSize;
+	@FXML private TextArea tevo;
+	@FXML private TextField sldrValue;
+	@FXML private ColorPicker ColorBox,fillColorBox;
+	@FXML private Label Message,cords;
+	@FXML private Canvas CanvasBox;
+    @FXML private Button DeleteBtn,UndoBtn,RedoBtn,SaveBtn,MoveBtn,RecolorBtn,LoadBtn,ref_btn,cpClpBrdBtn;
+    @FXML private Button StartBtn,ResizeBtn,ImportBtn,CopyBtn;    
+    @FXML private ToggleButton themeToggle,cir,lin,tri,rec,sq,ell,txt,pen,pent,hex,eras,star;    
     @FXML private ListView<String> ShapeList;    
     
-    final KeyCombination alt1= new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.ALT_DOWN),alt2= new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.ALT_DOWN),alt3= new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.ALT_DOWN);        
-    final KeyCombination alt4= new KeyCodeCombination(KeyCode.DIGIT4, KeyCombination.ALT_DOWN),alt5= new KeyCodeCombination(KeyCode.DIGIT5, KeyCombination.ALT_DOWN),alt6= new KeyCodeCombination(KeyCode.DIGIT6, KeyCombination.ALT_DOWN);
-    final KeyCombination alt7= new KeyCodeCombination(KeyCode.DIGIT7, KeyCombination.ALT_DOWN),alt8= new KeyCodeCombination(KeyCode.DIGIT8, KeyCombination.ALT_DOWN),alt9= new KeyCodeCombination(KeyCode.DIGIT9, KeyCombination.ALT_DOWN);
-    final KeyCombination alt10= new KeyCodeCombination(KeyCode.DIGIT0, KeyCombination.ALT_DOWN);final KeyCombination alt11= new KeyCodeCombination(KeyCode.UNDERSCORE, KeyCombination.ALT_DOWN);final KeyCombination alt12= new KeyCodeCombination(KeyCode.EQUALS, KeyCombination.ALT_DOWN);
-    final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN);
-    final KeyCombination ctrll= new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN);final KeyCombination ctrle= new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN);final KeyCombination ctrlf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlg= new KeyCodeCombination(KeyCode.G, KeyCombination.CONTROL_DOWN);final KeyCombination ctrlz= new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlshiftz= new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);
-    final KeyCombination ctrlshiftc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN);final KeyCombination ctrlc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN);final KeyCombination ctrlx= new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlp = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);final KeyCombination ctrlpn = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN);final KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrls= new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN);final KeyCombination ctrli= new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);final KeyCombination ctrla= new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN);final KeyCombination ctrlback= new KeyCodeCombination(KeyCode.BACK_SPACE, KeyCombination.CONTROL_DOWN);    
+    final KeyCombination 
+    alt1= new KeyCodeCombination(KeyCode.DIGIT1, KeyCombination.ALT_DOWN),
+    alt2= new KeyCodeCombination(KeyCode.DIGIT2, KeyCombination.ALT_DOWN),
+    alt3= new KeyCodeCombination(KeyCode.DIGIT3, KeyCombination.ALT_DOWN),        
+    alt4= new KeyCodeCombination(KeyCode.DIGIT4, KeyCombination.ALT_DOWN),
+    alt5= new KeyCodeCombination(KeyCode.DIGIT5, KeyCombination.ALT_DOWN),
+    alt6= new KeyCodeCombination(KeyCode.DIGIT6, KeyCombination.ALT_DOWN),
+    alt7= new KeyCodeCombination(KeyCode.DIGIT7, KeyCombination.ALT_DOWN),
+    alt8= new KeyCodeCombination(KeyCode.DIGIT8, KeyCombination.ALT_DOWN),
+    alt9= new KeyCodeCombination(KeyCode.DIGIT9, KeyCombination.ALT_DOWN),
+    alt10= new KeyCodeCombination(KeyCode.DIGIT0, KeyCombination.ALT_DOWN),
+    alt11= new KeyCodeCombination(KeyCode.UNDERSCORE, KeyCombination.ALT_DOWN),
+    alt12= new KeyCodeCombination(KeyCode.EQUALS, KeyCombination.ALT_DOWN),
+    altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN),
+    ctrll= new KeyCodeCombination(KeyCode.L, KeyCombination.CONTROL_DOWN),
+    ctrle= new KeyCodeCombination(KeyCode.E, KeyCombination.CONTROL_DOWN),
+    ctrlf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN),
+    ctrlg= new KeyCodeCombination(KeyCode.G, KeyCombination.CONTROL_DOWN),
+    ctrlz= new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN),
+    ctrlshiftz= new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN),
+    ctrlshiftc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN),
+    ctrlc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN),
+    ctrlx= new KeyCodeCombination(KeyCode.X, KeyCombination.CONTROL_DOWN),
+    ctrlp = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN),
+    ctrlpn = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN),
+    ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN),
+    ctrls= new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN),
+    ctrli= new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN),
+    ctrla= new KeyCodeCombination(KeyCode.A, KeyCombination.CONTROL_DOWN),
+    ctrlback= new KeyCodeCombination(KeyCode.BACK_SPACE, KeyCombination.CONTROL_DOWN);    
     //1-cir//2-tri//3-lin//4-rec//5-ell//6-sq
     private static ArrayList<Shape> shapeList = new ArrayList<Shape>();
     private ArrayList<String> freeHandList = new ArrayList<String>();
@@ -98,12 +119,9 @@ public class FxPaintController implements Initializable, DrawingEngine {
     GraphicsContext graphicsContext = null,gc = null;
     private Point2D start, end;
     private String biezure = new String(),tovoVal = "";
-    private Stack<ArrayList<Shape>> primary = new Stack<ArrayList<Shape>>();
-    private Stack<ArrayList<Shape>> secondary = new Stack<ArrayList<Shape>>();    
-    private Stack<ArrayList<String>> primaryTy = new Stack<ArrayList<String>>();
-    private Stack<ArrayList<String>> secondaryTy = new Stack<ArrayList<String>>();
-    private Stack<ArrayList<Boolean>> priList = new Stack<ArrayList<Boolean>>();
-    private Stack<ArrayList<Boolean>> secList = new Stack<ArrayList<Boolean>>();
+    private Stack<ArrayList<Shape>> primary = new Stack<ArrayList<Shape>>(),secondary = new Stack<ArrayList<Shape>>();    
+    private Stack<ArrayList<String>> primaryTy = new Stack<ArrayList<String>>(),secondaryTy = new Stack<ArrayList<String>>();
+    private Stack<ArrayList<Boolean>> priList = new Stack<ArrayList<Boolean>>(),secList = new Stack<ArrayList<Boolean>>();
     //initialize---------------------------------------------------------
     public void initialize(URL url, ResourceBundle rb) {
     	cursorMoni(); 
@@ -790,7 +808,6 @@ public class FxPaintController implements Initializable, DrawingEngine {
     public void undo() {
         if(secondaryTy.size()<21){
         	System.out.print("#UNDO");
-//        	System.out.println(shapeTypeList);
         	if(shapeTypeList.get(shapeTypeList.size()-1)) {//then it is freehand
         		System.out.println("\t#BIEZURE");
         		
@@ -833,8 +850,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     }
     @Override
     public void redo() {
-    	System.out.print("#UNDO");
-//    	System.out.println(shapeTypeList);
+    	System.out.print("#REDO");
     	if(shapeTypeList.isEmpty()) {
     		shapeTypeList.add(false);
     	}
