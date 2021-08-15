@@ -83,40 +83,41 @@ import javafx.util.converter.DoubleStringConverter;
 public class LineChartController {
 	@FXML private MenuBar menuBar;
 	@FXML private LineChart<Double, Double> lChart;
-	@FXML private Label error_label;@FXML private Label table_error_label;@FXML private Label lineValue;@FXML private Label l4;@FXML private Label l3;@FXML private Label l2;@FXML private Label l1;
-	@FXML private Label app_log;
+	@FXML private Label error_label,table_error_label,lineValue,l4,l3,l2,l1,app_log;
 	@FXML private TextArea xVal;
-	@FXML private TextField lineChartTitle;@FXML private TextField seriesLabel;@FXML private TextField xxisLabel;@FXML private TextField yxisLabel;@FXML private NumberAxis xxis;
-	@FXML private NumberAxis yxis;
+	@FXML private TextField lineChartTitle,seriesLabel,xxisLabel,yxisLabel;
+	@FXML private NumberAxis xxis,yxis;
 	@FXML private TableView<LineTableController> table;
-	@FXML private TableColumn<LineTableController, String> c1;@FXML private TableColumn<LineTableController, Double> c2;@FXML private TableColumn<LineTableController, Double> c3;
-	@FXML private CheckBox dbEnable;@FXML private CheckBox fileEnable;@FXML private CheckBox clickDraw;
-	@FXML private Button loadDataFromFile;@FXML private Button loadDataFromDb;@FXML private Button loadDataInTable;@FXML private Button add_data;@FXML private Button add_click_data;	
+	@FXML private TableColumn<LineTableController, String> c1;
+	@FXML private TableColumn<LineTableController, Double> c2,c3;
+	@FXML private CheckBox dbEnable,fileEnable,clickDraw;
+	@FXML private Button loadDataFromFile,loadDataFromDb,loadDataInTable,add_data,add_click_data;	
 	@FXML private AnchorPane anchor;
 	@FXML private Circle theameCircle;
 	@FXML private DatePicker setDate;
 	@FXML private ToggleButton themeToggle;
-	private DateTimeFormatter classic=DateTimeFormatter.ofPattern("dd/MM/yyyy");
-	private boolean theame=true;
-	private String clickDataStr = null;
 	final Stage primaryStage = null;
-	Stage stage = null;
 	final double SCALE_DELTA = 1.1;
-	private boolean isFullScr=false;
+	private DateTimeFormatter classic=DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	private boolean theame=true,isFullScr=false;;
+	private String clickDataStr = null;
+	Stage stage = null;
 	static String pdfTextApp = null;
-	final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN);
-    final KeyCombination altj= new KeyCodeCombination(KeyCode.J, KeyCombination.ALT_DOWN);
-    final KeyCombination altk= new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN);
-    final KeyCombination altl= new KeyCodeCombination(KeyCode.L, KeyCombination.ALT_DOWN);
-    final KeyCombination ctrlb= new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrld= new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlPrintPDF = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlPrintPNG = new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
-    final KeyCombination altT= new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
-    final KeyCombination altF11= new KeyCodeCombination(KeyCode.F11, KeyCombination.ALT_DOWN);	
+	
+	final KeyCombination 
+	altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN),
+    altj= new KeyCodeCombination(KeyCode.J, KeyCombination.ALT_DOWN),
+    altk= new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN),
+    altl= new KeyCodeCombination(KeyCode.L, KeyCombination.ALT_DOWN),
+    ctrlb= new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN),
+    ctrlf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN),
+    ctrld= new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN),
+    ctrlPrintPDF = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN),
+    ctrlPrintPNG = new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN),
+    ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN),
+    ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN),
+    altT= new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN),
+    altF11= new KeyCodeCombination(KeyCode.F11, KeyCombination.ALT_DOWN);	
 	//ShortCut functions----------------------------------------------------
     @FXML public void initialize() {
         System.out.println("#initialized#");
@@ -217,7 +218,7 @@ public class LineChartController {
         lChart.setScaleX(lChart.getScaleX() * scaleFactor);
         lChart.setScaleY(lChart.getScaleY() * scaleFactor);
 	}
-	public void zoomNormal(MouseEvent e) {				    
+	public void zoomNormal(MouseEvent e) {
 	    if (e.getClickCount() == 2) {
 	        lChart.setScaleX(1.0);
 	        lChart.setScaleY(1.0);
@@ -459,23 +460,23 @@ public class LineChartController {
 	}
 	private boolean inputValidator(String X) {
 		System.out.println("#PatternValidator#");		
-		for(int i=0;i< X.length();i++) {			
+		for(int i=0;i< X.length();i++) {
 			if(X.charAt(0) != '{' || X.charAt(X.length()-1) != ']') {
 				System.out.println("valid 1");
 				return false;
-			}			
+			}
 			if(X.charAt(i) == '[') {					
 				String xCo = new String();
 				for(int j=i;X.charAt(j+1)!=',' && X.charAt(j+1)!=']';j++) {					
-					xCo+=X.charAt(j+1);					
-				}				
+					xCo+=X.charAt(j+1);
+				}
 				if(!dblChecker(xCo))
-					return false;					
+					return false;
 			} else if(X.charAt(i)==',') {					
 				String xCo = new String();
 				for(int j=i;X.charAt(j+1)!=',' && X.charAt(j+1) != ']' ;j++) {					
-					xCo+=X.charAt(j+1);					
-				}						
+					xCo+=X.charAt(j+1);
+				}
 				if(!dblChecker(xCo))
 					return false;
 			} else {}			

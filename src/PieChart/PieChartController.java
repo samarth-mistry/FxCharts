@@ -83,7 +83,7 @@ public class PieChartController {
 	@FXML private TableView<PieTableController> table;
 	@FXML private TableColumn<PieTableController, String> c1;
 	@FXML private TableColumn<PieTableController, Double> c2;
-	@FXML private CheckBox bulkEnable;	
+	@FXML private CheckBox bulkEnable;
 	@FXML private Button load,add_data,add_b_data;
 	@FXML private AnchorPane anchor;
 	@FXML private DatePicker setDate;
@@ -205,18 +205,11 @@ public class PieChartController {
 			buttonEnabler();
 		}
 		else if (ctrlf.match(event)) {
-//			if(fileEnable.isSelected())
-//				fileEnable.setSelected(false);
-//			else
-//				fileEnable.setSelected(true);
+
 			event.consume();
 			buttonEnabler();
 		}
 		else if (ctrld.match(event)) {
-//			if(dbEnable.isSelected())
-//				dbEnable.setSelected(false);
-//			else
-//				dbEnable.setSelected(true);
 			event.consume();
 			buttonEnabler();
 		}		
