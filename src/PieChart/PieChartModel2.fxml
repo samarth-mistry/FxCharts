@@ -29,11 +29,13 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
+                  <MenuItem mnemonicParsing="false" text="Open       [ctrl+o]" />
                   <MenuItem mnemonicParsing="false" text="New File [ctrl+o]" />
                   <MenuItem mnemonicParsing="false" onAction="#openBarKit" text="New BarChart" />
                   <MenuItem mnemonicParsing="false" onAction="#openPieKit" text="New PieChart" />
                   <MenuItem mnemonicParsing="false" onAction="#openLineKit" text="New LineChart" />
                   <MenuItem mnemonicParsing="false" onAction="#openStackKit" text="New StackedAreaChart" />
+                  <MenuItem mnemonicParsing="false" onAction="#openFxPaintKit" text="New FxPaint" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" text="Save       [ctrl+s]" />
                   <SeparatorMenuItem mnemonicParsing="false" />
@@ -77,13 +79,9 @@
           </Menu>
         </menus>
       </MenuBar>
-      <Label fx:id="error_label" alignment="CENTER" layoutX="308.0" layoutY="40.0" prefHeight="25.0" prefWidth="658.0" style="-fx-border-color: black;" textFill="#e01f8d" wrapText="true">
+      <Label fx:id="error_label" alignment="CENTER" layoutX="684.0" layoutY="40.0" prefHeight="25.0" prefWidth="658.0" style="-fx-border-color: black;" textFill="#e01f8d" wrapText="true">
          <font>
             <Font name="System Bold Italic" size="14.0" />
-         </font></Label>
-      <Label fx:id="pieValue" alignment="CENTER" layoutX="381.0" layoutY="519.0" prefHeight="25.0" prefWidth="486.0">
-         <font>
-            <Font name="DejaVu Sans Bold" size="16.0" />
          </font></Label>
       <Line endX="-140.0" endY="-138.0" layoutX="344.0" layoutY="592.0" startX="-336.0" startY="-138.0" />
       <DatePicker fx:id="setDate" layoutX="10.0" layoutY="41.0" onKeyReleased="#btnOnKeyPressed" prefHeight="24.0" prefWidth="199.0" promptText="Set date [DD/MM/YYYY]" />      
@@ -91,7 +89,7 @@
       <TextField fx:id="nm" layoutX="11.0" layoutY="107.0" onKeyReleased="#nmValEntriesPressed" prefHeight="24.0" prefWidth="199.0" promptText="Name" text="PieSlice" />      
       <TextField fx:id="val" layoutX="11.0" layoutY="140.0" onKeyReleased="#nmValEntriesPressed" prefHeight="24.0" prefWidth="199.0" promptText="Value" text="10.8" />
       <TextArea fx:id="bulk" disable="true" layoutX="10.0" layoutY="172.0" onKeyReleased="#bulkEntriesPressed" prefHeight="99.0" prefWidth="199.0" promptText="Bulk entry here eg. [abc,23.4][efg,34.2]........" />
-      <Button fx:id="add_data" layoutX="174.0" layoutY="278.0" mnemonicParsing="false" onAction="#addData" prefHeight="28.0" prefWidth="28.0" style="-fx-background-color: #60c0da;">
+      <Button fx:id="add_data" layoutX="147.0" layoutY="277.0" mnemonicParsing="false" onAction="#addData" prefHeight="28.0" prefWidth="28.0" style="-fx-background-color: #60c0da;">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -99,7 +97,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button fx:id="add_b_data" disable="true" layoutX="98.0" layoutY="278.0" mnemonicParsing="false" onAction="#addBulkData" style="-fx-background-color: #60c0da;" text="Bulk">
+      <Button fx:id="add_b_data" disable="true" layoutX="98.0" layoutY="312.0" mnemonicParsing="false" onAction="#addBulkData" style="-fx-background-color: #60c0da;" text="Bulk">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -107,11 +105,9 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <CheckBox fx:id="bulkEnable" layoutX="106.0" layoutY="544.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable Bulk" />
-      <CheckBox fx:id="fileEnable" layoutX="106.0" layoutY="568.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable File" />
-      <CheckBox fx:id="dbEnable" layoutX="106.0" layoutY="592.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable DB" />                       
-      <Button layoutX="14.0" layoutY="584.0" mnemonicParsing="false" onAction="#exit" style="-fx-background-color: #ff2225;" text="Exit" textFill="WHITE" />
-      <Button fx:id="loadDataFromFile" disable="true" layoutX="98.0" layoutY="345.0" mnemonicParsing="false" onAction="#loadDataFromFile" prefHeight="28.0" prefWidth="71.0" style="-fx-background-color: #60c0da;" text="File">
+      <CheckBox fx:id="bulkEnable" layoutX="101.0" layoutY="418.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable Bulk" />                       
+      <Button layoutX="10.0" layoutY="531.0" mnemonicParsing="false" onAction="#exit" prefHeight="24.0" prefWidth="84.0" style="-fx-background-color: #ff2225;" text="Exit" textFill="WHITE" />
+      <Button fx:id="load" layoutX="10.0" layoutY="379.0" mnemonicParsing="false" onAction="#load" prefHeight="28.0" prefWidth="84.0" style="-fx-background-color: #60c0da;" text="Open">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -127,22 +123,6 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button layoutX="9.0" layoutY="379.0" mnemonicParsing="false" onAction="#clearDb" prefHeight="28.0" prefWidth="84.0" style="-fx-background-color: #ffaa00;" text="DB">
-         <graphic>
-            <ImageView fitHeight="20.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../resources/imgs/clear.png" />
-               </image>
-            </ImageView>
-         </graphic></Button>
-      <Button fx:id="loadDataFromDb" disable="true" layoutX="99.0" layoutY="311.0" mnemonicParsing="false" onAction="#loadDataFromDb" prefHeight="28.0" prefWidth="71.0" style="-fx-background-color: #60c0da;" text="DB">
-         <graphic>
-            <ImageView fitHeight="20.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../resources/imgs/add.png" />
-               </image>
-            </ImageView>
-         </graphic></Button>
       <Button layoutX="10.0" layoutY="345.0" mnemonicParsing="false" onAction="#clearFile" prefHeight="28.0" prefWidth="84.0" style="-fx-background-color: #ffaa00;" text="File">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
@@ -151,7 +131,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button layoutX="174.0" layoutY="311.0" mnemonicParsing="false" onAction="#refresh">
+      <Button layoutX="100.0" layoutY="277.0" mnemonicParsing="false" onAction="#refresh">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -159,7 +139,7 @@
                </image>
             </ImageView>
          </graphic></Button>                
-      <Button layoutX="106.0" layoutY="461.0" mnemonicParsing="false" onAction="#pdfExtract" prefHeight="28.0" prefWidth="84.0" style="-fx-background-color: #81af6a;" text="PDF" textFill="WHITE">
+      <Button layoutX="100.0" layoutY="461.0" mnemonicParsing="false" onAction="#pdfExtract" prefHeight="28.0" prefWidth="114.0" style="-fx-background-color: #81af6a;" text="PDF" textFill="WHITE">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -175,14 +155,8 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Circle fx:id="theameCircle" fill="#666666" layoutX="34.0" layoutY="567.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
-      <Button layoutX="124.0" layoutY="497.0" mnemonicParsing="false" onAction="#removeLast" prefHeight="26.0" prefWidth="49.0" style="-fx-border-color: #eb8484;" text="EXP" textFill="#cd3737" />
-      <Label fx:id="pieValue" alignment="CENTER" layoutX="403.0" layoutY="518.0" prefHeight="25.0" prefWidth="486.0">
-         <font>
-            <Font name="DejaVu Sans Bold" size="16.0" />
-         </font>
-      </Label>
-      <TableView fx:id="table" editable="true" layoutX="1081.0" layoutY="37.0" prefHeight="577.0" prefWidth="261.0">
+      <Circle fx:id="theameCircle" fill="#666666" layoutX="196.0" layoutY="326.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
+      <TableView fx:id="table" editable="true" layoutX="1081.0" layoutY="76.0" prefHeight="538.0" prefWidth="261.0">
          <columns>
             <TableColumn fx:id="c1" minWidth="5.0" prefWidth="160.0" text="Name" />
             <TableColumn fx:id="c2" prefWidth="100.0" text="Value" />
@@ -191,22 +165,6 @@
             <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
          </opaqueInsets>
       </TableView>
-      <Button fx:id="loadDataInTable" disable="true" layoutX="98.0" layoutY="379.0" mnemonicParsing="false" onAction="#loadDataInTable" prefHeight="28.0" prefWidth="78.0" style="-fx-background-color: #60c0da;" text="Table">
-         <graphic>
-            <ImageView fitHeight="20.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../resources/imgs/add.png" />
-               </image>
-            </ImageView>
-         </graphic></Button>
-      <Button layoutX="10.0" layoutY="413.0" mnemonicParsing="false" onAction="#clearTable" prefHeight="28.0" prefWidth="84.0" style="-fx-background-color: #ffaa00;" text="Table">
-         <graphic>
-            <ImageView fitHeight="20.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
-               <image>
-                  <Image url="@../../resources/imgs/clear.png" />
-               </image>
-            </ImageView>
-         </graphic></Button>
       <Button layoutX="9.0" layoutY="461.0" mnemonicParsing="false" onAction="#csvExtract" prefHeight="28.0" prefWidth="84.0" style="-fx-background-color: #81af6a;" text="CSV" textFill="WHITE">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
@@ -215,15 +173,14 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button layoutX="99.0" layoutY="413.0" mnemonicParsing="false" onAction="#pdfTableExtract" prefHeight="28.0" prefWidth="114.0" style="-fx-background-color: #81af6a;" text="Table PDF" textFill="WHITE">
+      <Button layoutX="100.0" layoutY="496.0" mnemonicParsing="false" onAction="#pdfTableExtract" prefHeight="28.0" prefWidth="114.0" style="-fx-background-color: #81af6a;" text="Table PDF" textFill="WHITE">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../../resources/imgs/export.png" />
                </image>
             </ImageView>
-         </graphic></Button>      
-      <PieChart fx:id="pChart" layoutX="222.0" layoutY="75.0" onMouseClicked="#zoomNormal" onScroll="#zoomPieChart" prefHeight="538.0" prefWidth="849.0" style="-fx-border-color: #666666;" title="PieChart title" />
+         </graphic></Button>
       <Button layoutX="56.0" layoutY="278.0" mnemonicParsing="false" onAction="#redo" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #ffaa00;">
          <tooltip>
             <Tooltip text="Redo" />
@@ -247,6 +204,21 @@
                </image>
             </ImageView>
          </graphic>
+      </Button>      
+      <PieChart fx:id="pChart" layoutX="222.0" layoutY="75.0" onMouseClicked="#zoomNormal" onScroll="#zoomPieChart" prefHeight="538.0" prefWidth="849.0" style="-fx-border-color: #666666;" title="PieChart title" />
+      <Button layoutX="10.0" layoutY="413.0" mnemonicParsing="false" onAction="#pdfExtract" prefHeight="28.0" prefWidth="84.0" style="-fx-background-color: #81af6a;" text="Save" textFill="WHITE">
+         <graphic>
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../resources/imgs/save.png" />
+               </image>
+            </ImageView>
+         </graphic>
       </Button>
+      <Label fx:id="pieValue" alignment="CENTER" layoutX="222.0" layoutY="40.0" prefHeight="25.0" prefWidth="240.0">
+         <font>
+            <Font name="DejaVu Sans Bold" size="16.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

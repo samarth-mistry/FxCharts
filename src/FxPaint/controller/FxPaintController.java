@@ -899,7 +899,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     @Override
     public void load() {
     	FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Save");
+		fileChooser.setTitle("Open");
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("XML", "*.xml"));
 		File file = fileChooser.showOpenDialog(CanvasBox.getScene().getWindow());
         if (file != null) {

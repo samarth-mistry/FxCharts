@@ -9,13 +9,13 @@ import java.util.Scanner;
 import javafx.scene.chart.PieChart;
 
 public class pieFileSysController {
-	static FileWriter locFile = null;
+	static FileWriter locFile = null; 
 	@SuppressWarnings("null")
-	public static void writeDataInFile(ArrayList<PieChart.Data> pieList) {
+	public static void writeDataInFile(ArrayList<PieChart.Data> pieList, String FilePath) {
 		System.out.println("File System Report:\n");
-		clearFile("pieFileData.txt");
+		clearFile(FilePath);
 		try {
-			locFile = new FileWriter("dat/pieFileData.txt",true);
+			locFile = new FileWriter(FilePath,true);
 			for(int i=0;i<pieList.size();i++)
 	    		locFile.append(pieList.get(i).getName()+","+pieList.get(i).getPieValue()+"\n");
 		}catch(IOException e) {
@@ -27,12 +27,12 @@ public class pieFileSysController {
 			catch(IOException e) {e.printStackTrace();}
 		}
 	}
-	public static ArrayList<PieChart.Data> readDataFromFile() {
+	public static ArrayList<PieChart.Data> readDataFromFile(String FilePath) {
 		Scanner scanner = null;
-		System.out.println("File System Report:\n");
+		System.out.println("File System Report:\n"+FilePath);
 		ArrayList<PieChart.Data> pieData = new ArrayList<PieChart.Data>();
         try {
-            scanner = new Scanner(new FileReader("dat/pieFileData.txt"));
+            scanner = new Scanner(new FileReader(FilePath));
             scanner.useDelimiter(",");
             String nm="",val="";
             int j,k;
@@ -59,10 +59,10 @@ public class pieFileSysController {
         }
         return pieData;        
 	}
-	public static void clearFile(String fileName) {
+	public static void clearFile(String FilePath) {
 		System.out.println("File System Report:\n");
 		try {
-			locFile = new FileWriter("dat/"+fileName,false);
+			locFile = new FileWriter(FilePath,false);
 	    	locFile.flush();
 	    	locFile.close();
 			System.out.println("\tFile Cleared");

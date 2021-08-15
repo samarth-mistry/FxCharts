@@ -13,7 +13,6 @@ import java.io.Writer;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.Optional;
 import java.util.Stack;
 
@@ -84,14 +83,15 @@ public class PieChartController {
 	@FXML private TableView<PieTableController> table;
 	@FXML private TableColumn<PieTableController, String> c1;
 	@FXML private TableColumn<PieTableController, Double> c2;
-	@FXML private CheckBox bulkEnable,dbEnable,fileEnable;	
-	@FXML private Button loadDataFromFile,loadDataFromDb,loadDataInTable,add_data,add_b_data;
+	@FXML private CheckBox bulkEnable;	
+	@FXML private Button load,add_data,add_b_data;
 	@FXML private AnchorPane anchor;
 	@FXML private DatePicker setDate;
 	@FXML private ToggleButton themeToggle;
 	@FXML private Circle theameCircle;
 	
 	static String pdfTextApp = null;
+	private static String FILE_PATH = "";
 	private DateTimeFormatter classic=DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	final Stage primaryStage = null;
 	Stage stage = null;
@@ -109,6 +109,8 @@ public class PieChartController {
     ctrlb= new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN),
     ctrlf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN),
     ctrld= new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN),
+    ctrls= new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN),
+    ctrlo= new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN),
     ctrlPrintPDF = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN),
     ctrlPrintPNG = new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN),
     ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN),
@@ -189,7 +191,9 @@ public class PieChartController {
 		if (altT.match(event)) {changeTheme();event.consume();}		
 		else if (altj.match(event)) {clearChart();event.consume();}
 		else if (altk.match(event)) {clearFile();event.consume();}
-		else if (altl.match(event)) {clearDb();event.consume();}		
+		else if (altl.match(event)) {clearDb();event.consume();}
+		else if (ctrls.match(event)) {save();event.consume();}
+		else if (ctrlo.match(event)) {load();event.consume();}
 		else if (ctrlb.match(event)) {
 			if(bulkEnable.isSelected()) {
 				bulkEnable.setSelected(false);
@@ -201,18 +205,18 @@ public class PieChartController {
 			buttonEnabler();
 		}
 		else if (ctrlf.match(event)) {
-			if(fileEnable.isSelected())
-				fileEnable.setSelected(false);
-			else
-				fileEnable.setSelected(true);
+//			if(fileEnable.isSelected())
+//				fileEnable.setSelected(false);
+//			else
+//				fileEnable.setSelected(true);
 			event.consume();
 			buttonEnabler();
 		}
 		else if (ctrld.match(event)) {
-			if(dbEnable.isSelected())
-				dbEnable.setSelected(false);
-			else
-				dbEnable.setSelected(true);
+//			if(dbEnable.isSelected())
+//				dbEnable.setSelected(false);
+//			else
+//				dbEnable.setSelected(true);
 			event.consume();
 			buttonEnabler();
 		}		
@@ -252,7 +256,7 @@ public class PieChartController {
 	public void clearChart() {
 		pChart.getData().clear();
 		pieList.clear();
-		error_label.setText("Chart Data Cleared! Click load data to reload");				
+		//error_label.setText("Chart Data Cleared! Click load data to reload");				
 	}
 	public void clearFile() {
 		Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -262,12 +266,12 @@ public class PieChartController {
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
-			pieFileSysController.clearFile("pieFileData.txt");	
+			pieFileSysController.clearFile(FILE_PATH);	
 			error_label.setText("File is Cleared");
 		}		
 	}
 	public void clearTable() {
-		error_label.setText("PieTable it cleared! To reload click on load button");
+		//error_label.setText("PieTable it cleared! To reload click on load button");
 		table.getItems().clear();
 	}
 	public void clearDb() {
@@ -325,19 +329,6 @@ public class PieChartController {
 			pChart.setTitle(pieChartTitle.getText());
 	}
 	public void buttonEnabler() {
-		if(fileEnable.isSelected()) {
-			loadDataFromFile.setDisable(false);
-			loadDataInTable.setDisable(false);
-		}else {
-			loadDataInTable.setDisable(true);
-			loadDataFromFile.setDisable(true);
-		}
-		if(dbEnable.isSelected()) {
-			loadDataFromDb.setDisable(false);
-		}
-		if(!dbEnable.isSelected()){
-			loadDataFromDb.setDisable(true);
-		}
 		if(bulkEnable.isSelected()){
 			nm.setDisable(true);
 			val.setDisable(true);
@@ -358,8 +349,6 @@ public class PieChartController {
 			pChart.setStyle("-fx-border-color:  #d8d8d8");			
 			Color c = Color.web("#d8d8d8");
 			pieValue.setTextFill(c);
-			fileEnable.setTextFill(c);
-			dbEnable.setTextFill(c);
 			bulkEnable.setTextFill(c);			
 			theameCircle.setFill(c);
 			themeToggle.setText("Light");
@@ -370,8 +359,6 @@ public class PieChartController {
 			pChart.setStyle("-fx-border-color:  #666666");			
 			Color c = Color.web("#666666");			
 			pieValue.setTextFill(c);
-			fileEnable.setTextFill(c);
-			dbEnable.setTextFill(c);
 			bulkEnable.setTextFill(c);			
 			theameCircle.setFill(c);
 			themeToggle.setText("Dark");
@@ -380,14 +367,12 @@ public class PieChartController {
 	}
 	private void jbp() {Toolkit.getDefaultToolkit().beep();}
 	//Add data functions-----------------------------------------------
-	public void addData() {				
+	public void addData() {
 		if(addValidator()) {
 			error_label.setText("");
 			pieList.add(new PieChart.Data(nm.getText(),Double.parseDouble(val.getText())));
 			priList.push(new ArrayList<PieChart.Data>(cloneList(pieList)));
-			drawChart(true);			
-			if(fileEnable.isSelected())
-				callWriter();
+			drawChart(true);
 		}		
 	}
 	public void addBulkData() {		
@@ -414,13 +399,11 @@ public class PieChartController {
 				}
 			}			
 			drawChart(true);
-			if(fileEnable.isSelected())
-				callWriter();
 		}else {
 			error_label.setText("Invalid input in bulk data enter. Please check again");
 		}
 	}
-	//undo-redo----------------------------------------------
+	//undo-redo-save-open----------------------------------------------
 	public void undo() {
 		System.out.print("#UNDO_PIE");
 		if(!priList.isEmpty()) {
@@ -448,6 +431,25 @@ public class PieChartController {
 		}else
 			jbp();
 	}
+	public void save() {
+		if(FILE_PATH == "") {
+			FileChooser fileChooser = new FileChooser();
+		    fileChooser.setTitle("Save");
+		    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("FXCHART", "*.fxchart"));
+		    File file = fileChooser.showSaveDialog(primaryStage);
+  
+	        if (file != null) {
+	        	FILE_PATH = file.getPath()+".fxchart";
+	        	callWriter();
+	        	error_label.setText("File Saved '"+FILE_PATH+"'");
+	        }
+		}else {
+			callWriter();
+			error_label.setText("Saved");
+		}
+	}
+	public void load() {loadDataFromFileConfirmed();}
+	//utilities Core functions---------------------------------------------
 	private ArrayList<PieChart.Data> cloneList(ArrayList<PieChart.Data> l) {
 		ArrayList<PieChart.Data> temp = new ArrayList<PieChart.Data>();
         for(int i=0;i<l.size();i++){
@@ -465,6 +467,7 @@ public class PieChartController {
 			table.getItems().add(row);
 		}
 		pChart.setData(pie_data);
+		pieDetailPercentage();
 	}
 	private void pieDetailPercentage() {				        
 		for (final PieChart.Data data : pChart.getData()) {
@@ -542,29 +545,22 @@ public class PieChartController {
 		return true;
 	}
 	//loading functions------------------------------------------------------
-	private void callWriter() {		
-		pieFileSysController.writeDataInFile(pieList);
-	}
-	public void loadDataFromFile() {
-		Alert alert = new Alert(AlertType.CONFIRMATION);
-		alert.setTitle("ALERT");
-		alert.setHeaderText("Clearing PieFile will permanently delete your data!");
-		alert.setContentText("Are you sure?");
-
-		Optional<ButtonType> result = alert.showAndWait();
-		if (result.get() == ButtonType.OK){
-			loadDataFromFileConfirmed();			
-		}		
-	}
+	private void callWriter() {pieFileSysController.writeDataInFile(pieList,FILE_PATH);}
 	private void loadDataFromFileConfirmed() {
-		clearChart();
-		System.out.println("Read");
-		ArrayList<PieChart.Data> read = pieFileSysController.readDataFromFile();
-		pieList = new ArrayList<PieChart.Data>(read);
-		drawChart(false);	
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open");
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("FXCHART", "*.fxchart"));
+		File file = fileChooser.showOpenDialog(anchor.getScene().getWindow());        
+		
+		if (file != null) {
+			clearChart();
+			ArrayList<PieChart.Data> read = pieFileSysController.readDataFromFile(file.getAbsolutePath());
+			FILE_PATH = file.getAbsolutePath();
+			pieList = new ArrayList<PieChart.Data>(read);
+			drawChart(false);
+		}	
 	}	
 	public void loadDataInTable() {
-		//loadDataFromFile();	
 		for(int i=0;i<pieList.size();i++) {
 			PieTableController row = new PieTableController(pieList.get(i).getName(),pieList.get(i).getPieValue());
 			table.getItems().add(row);			
@@ -593,8 +589,6 @@ public class PieChartController {
 				pieList.add(new PieChart.Data(x, y));
 			}
 			drawChart(true);
-			if(fileEnable.isSelected())
-				callWriter();
 		}else
 			error_label.setText("Value of "+table.getItems().get(i).getS()+" must be a number");
 	}
@@ -720,37 +714,41 @@ public class PieChartController {
         cell.setHorizontalAlignment(alignment);        
         return cell;
     }
+	//New Window opening functions-------------------------------------
 	//Open new chart--------------------------------------------------------------------
 	public void openPieKit() {	
 		FxChartMainPage openNew = new FxChartMainPage();
 		try {
-			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			Stage thisstage = new Stage();
 			openNew.setStage(thisstage,"Pie chart");
-			System.out.println("Opening Pie Chart closed bar chart");
 		} catch (IOException e) {e.printStackTrace();}
 	}
 	public void openBarKit() {
 		FxChartMainPage openNew = new FxChartMainPage();
 		try {
-			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			Stage thisstage = new Stage();
 			openNew.setStage(thisstage,"Bar chart");
-			System.out.println("Opening Pie Chart closed bar chart");
 		} catch (IOException e) {e.printStackTrace();}
 	}
 	public void openLineKit() {
 		FxChartMainPage openNew = new FxChartMainPage();
 		try {
-			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			Stage thisstage = new Stage();
 			openNew.setStage(thisstage,"Line chart");
-			System.out.println("Opening Pie Chart closed bar chart");
 		} catch (IOException e) {e.printStackTrace();}
 	}
 	public void openStackKit() {
 		FxChartMainPage openNew = new FxChartMainPage();
 		try {
-			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			Stage thisstage = new Stage();
 			openNew.setStage(thisstage,"Stacked chart");
-			System.out.println("Opening Pie Chart closed bar chart");
+		} catch (IOException e) {e.printStackTrace();}
+	}
+	public void openFxPaintKit() {
+		FxChartMainPage openNew = new FxChartMainPage();
+		try {
+			Stage thisstage = new Stage();
+			openNew.setStage(thisstage,"FxPaint");
 		} catch (IOException e) {e.printStackTrace();}
 	}
 }
