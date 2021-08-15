@@ -17,7 +17,6 @@ import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Optional;
 import javax.imageio.ImageIO;
 
@@ -83,15 +82,15 @@ import javafx.util.converter.DoubleStringConverter;
 public class LineChartController {
 	@FXML private MenuBar menuBar;
 	@FXML private LineChart<Double, Double> lChart;
-	@FXML private Label error_label,table_error_label,lineValue,l4,l3,l2,l1,app_log;
+	@FXML private Label error_label,lineValue,app_log;
 	@FXML private TextArea xVal;
 	@FXML private TextField lineChartTitle,seriesLabel,xxisLabel,yxisLabel;
 	@FXML private NumberAxis xxis,yxis;
 	@FXML private TableView<LineTableController> table;
 	@FXML private TableColumn<LineTableController, String> c1;
 	@FXML private TableColumn<LineTableController, Double> c2,c3;
-	@FXML private CheckBox dbEnable,fileEnable,clickDraw;
-	@FXML private Button loadDataFromFile,loadDataFromDb,loadDataInTable,add_data,add_click_data;	
+	@FXML private CheckBox clickDraw;
+	@FXML private Button loadDataFromFile,add_data,add_click_data;	
 	@FXML private AnchorPane anchor;
 	@FXML private Circle theameCircle;
 	@FXML private DatePicker setDate;
@@ -101,8 +100,10 @@ public class LineChartController {
 	private DateTimeFormatter classic=DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	private boolean theame=true,isFullScr=false;;
 	private String clickDataStr = null;
+	private static String FILE_PATH = "";
 	Stage stage = null;
 	static String pdfTextApp = null;
+	private ArrayList<XYChart.Series<Double, Double>> SeriList = new ArrayList<XYChart.Series<Double, Double>>();
 	
 	final KeyCombination 
 	altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN),
@@ -112,6 +113,8 @@ public class LineChartController {
     ctrlb= new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN),
     ctrlf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN),
     ctrld= new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN),
+    ctrls= new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN),
+    ctrlo= new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN),
     ctrlPrintPDF = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN),
     ctrlPrintPNG = new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN),
     ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN),
@@ -178,24 +181,26 @@ public class LineChartController {
 		else if (altk.match(event)) {clearFile();event.consume();}
 		else if (altl.match(event)) {clearDb();event.consume();}				
 		else if (ctrlf.match(event)) {
-			if(fileEnable.isSelected())
-				fileEnable.setSelected(false);
-			else
-				fileEnable.setSelected(true);
+//			if(fileEnable.isSelected())
+//				fileEnable.setSelected(false);
+//			else
+//				fileEnable.setSelected(true);
 			event.consume();
 			buttonEnabler();
 		}
 		else if (ctrld.match(event)) {
-			if(dbEnable.isSelected())
-				dbEnable.setSelected(false);
-			else
-				dbEnable.setSelected(true);
+//			if(dbEnable.isSelected())
+//				dbEnable.setSelected(false);
+//			else
+//				dbEnable.setSelected(true);
 			event.consume();
 			buttonEnabler();
 		}		
 		else if (ctrlPrintPDF.match(event)) {pdfExtract();}
 		else if (ctrlPrintPNG.match(event)) {pngExtract();}
 		else if (ctrlQ.match(event)) {exit();}
+		else if (ctrls.match(event)) {save();}
+		else if (ctrlo.match(event)) {load();}
 		else if (ctrlPrintTPDF.match(event)) {        	
         	try {
 				pdfTableExtract();
@@ -227,7 +232,7 @@ public class LineChartController {
 	//Clear Functions-----------------------------------------------------------
 	public void clearChart() {
 		lChart.getData().clear();
-		error_label.setText("Chart Data Cleared!\nClick load data to reload");				
+		//error_label.setText("Chart Data Cleared!\nClick load data to reload");				
 	}
 	public void clearFile() {		
 		Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -238,11 +243,11 @@ public class LineChartController {
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
 			lineFileSysController.clearFile("locations.txt");
-			error_label.setText("File is Cleared\nData is permanently lost");
+			///error_label.setText("File is Cleared\nData is permanently lost");
 		}		
 	}
 	public void clearTable() {
-		error_label.setText("Table it cleared!\n To reload click on load button");
+		//error_label.setText("Table it cleared!\n To reload click on load button");
 		table.getItems().clear();
 	}
 	public void clearDb() {
@@ -254,7 +259,7 @@ public class LineChartController {
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
 			DbController.clearSeries();
-			error_label.setText("DB is Cleared\nData is permanently lost");
+			//error_label.setText("DB is Cleared\nData is permanently lost");
 		}		
 	}
 	public void exit() {
@@ -277,123 +282,6 @@ public class LineChartController {
 		clearFile();
 	}
 	//Configuration functions Functions-----------------------------------------------------------
-	public void setFullscrn() {
-		System.out.println("#FullScreen");
-		stage = (Stage) anchor.getScene().getWindow();
-		stage.setFullScreenExitHint("Press Alt + F11 to exit full-screen mode");
-		if(!isFullScr) {
-			stage.setFullScreen(true);
-			isFullScr=true;
-		}else {
-			stage.setFullScreen(false);
-			isFullScr=false;
-		}		
-	}
-	public void axisRenamed() {
-		lChart.setTitle(lineChartTitle.getText());				
-		xxis.setLabel(xxisLabel.getText());
-		yxis.setLabel(yxisLabel.getText());
-		c2.setText(xxisLabel.getText());
-		c3.setText(yxisLabel.getText());
-		if(lineChartTitle.getText() == "")
-			lChart.setTitle("Line Chart");		
-		if(xxisLabel.getText() == "")
-			xxis.setLabel("X->");
-		if(yxisLabel.getText() == "")
-			yxis.setLabel("X->");		
-	}
-	public void buttonEnabler() {
-		if(fileEnable.isSelected()) {
-			loadDataFromFile.setDisable(false);
-			loadDataInTable.setDisable(false);
-		}else {
-			loadDataInTable.setDisable(true);
-			loadDataFromFile.setDisable(true);
-		}
-		if(dbEnable.isSelected()) {
-			loadDataFromDb.setDisable(false);
-		}
-		if(!dbEnable.isSelected()){
-			loadDataFromDb.setDisable(true);
-		}
-		if(clickDraw.isSelected()) {
-			add_click_data.setDisable(false);			
-		}else {			
-			add_click_data.setDisable(true);
-		}
-	}
-	public void changeTheme() {
-		if(theame) {				//light=Theme(true)#666666->white[light->dark]
-			Color c = Color.web("white");			
-			error_label.setStyle("-fx-border-color: white");
-			app_log.setStyle("-fx-border-color: white");
-			app_log.setTextFill(c);
-			anchor.setStyle("-fx-background-color:  #666666");			
-			lChart.setStyle("-fx-border-color: white");
-		    lChart.setStyle("-fx-text-fill: white");			
-			lineValue.setTextFill(c);
-			xxis.setTickLabelFill(c);
-			yxis.setTickLabelFill(c);			
-			xxis.setStyle("-fx-text-fill: black");
-			yxis.setStyle("-fx-text-fill: black");			
-			l1.setTextFill(c);
-			l2.setTextFill(c);
-			l3.setTextFill(c);
-			l4.setTextFill(c);
-			fileEnable.setTextFill(c);
-			dbEnable.setTextFill(c);					
-			theameCircle.setFill(Color.web("#d8d8d8"));
-			theame = false;
-		}
-		else {		//dark[if dark then set Light]
-			Color c = Color.web("black");			
-			error_label.setStyle("-fx-border-color: black");
-			app_log.setStyle("-fx-border-color: black");
-			app_log.setTextFill(c);
-			anchor.setStyle("-fx-background-color:  #d8d8d8");			
-			lChart.setStyle("-fx-border-color: black");
-			lChart.setStyle("-fx-text-fill: black");			
-			lineValue.setTextFill(c);
-			xxis.setTickLabelFill(c);
-			yxis.setTickLabelFill(c);
-			xxis.setStyle("-fx-text-fill: white");
-			yxis.setStyle("-fx-text-fill: white");
-			l1.setTextFill(c);
-			l2.setTextFill(c);
-			l3.setTextFill(c);
-			l4.setTextFill(c);
-			fileEnable.setTextFill(c);
-			dbEnable.setTextFill(c);					
-			theameCircle.setFill(c);
-			theame = true;
-		}
-	}
-	//Add Functions-----------------------------------------------------------
-	public void addData() {		
-		System.out.println("#AddData#");
-		String X = "{"+seriesLabel.getText()+"}"+xVal.getText();
-		if(xVal.getText().isEmpty())
-			error_label.setText("Enter Pattern before adding");
-		else if(seriesLabel == null) {
-			error_label.setText("Please enter the name of Line");
-		}
-		else if(!inputValidator(X)) {
-			error_label.setText("");
-			error_label.setText("Entered pattern is not valid\nPlease try again!");
-			System.out.println("Invalid Pattern");
-		} else {
-			if(dbEnable.isSelected()) {
-				try {if(!DbController.insertSeries(seriesLabel.getText(),1,X)) {error_label.setText("Error in Database");}} 
-				catch (SQLException e) {e.printStackTrace();}
-			}			
-			decodeAndDraw(seriesLabel.getText(),X,true);			
-		}
-	}
-	public void addClickData() {
-		decodeAndDraw(seriesLabel.getText(),clickDataStr,true);
-		clickDataStr="";
-	}
-	//Draw & decoding Validations Functions-----------------------------------------------------------
 	private void cursorMoni() {
 	    final Axis<Double> xAxis = lChart.getXAxis();
 	    final Axis<Double> yAxis = lChart.getYAxis();	    	    
@@ -427,37 +315,111 @@ public class LineChartController {
 	        }
 	    });
 	}
-	private void drawChart(String lineName,Double xValues[],Double yValues[],int filled,Boolean whoCalled) {
-		System.out.println("#drawChart#");
-		try {									
-			Series<Double, Double> series = new XYChart.Series<Double, Double>();			
-			int i=0;
-			for(i=0;i<filled;i++) {
-				if(!whoCalled) {
-					series.setName(lineName);
-				}
-				series.getData().add(new Data<Double,Double>(xValues[i],yValues[i]));
-				LineTableController row;
-				if(i==0)
-					row = new LineTableController(lineName,xValues[i],yValues[i]);
-				else
-					row = new LineTableController("",xValues[i],yValues[i]);				
-				table.getItems().add(row);										
-			}
-			Double[] xFin= new Double[i];
-			Double[] yFin= new Double[i];
-			for(i=0;i<filled;i++) {
-				xFin[i] = xValues[i];
-				yFin[i] = yValues[i];
-			}
-			lChart.getData().add(series);			
-			if(whoCalled) {				
-				series.setName(seriesLabel.getText());
-				if(fileEnable.isSelected())
-					callWriter(lineName, xFin, yFin);
-			}
-		}catch(Exception e) {e.printStackTrace();}
+	public void setFullscrn() {
+		System.out.println("#FullScreen");
+		stage = (Stage) anchor.getScene().getWindow();
+		stage.setFullScreenExitHint("Press Alt + F11 to exit full-screen mode");
+		if(!isFullScr) {
+			stage.setFullScreen(true);
+			isFullScr=true;
+		}else {
+			stage.setFullScreen(false);
+			isFullScr=false;
+		}		
 	}
+	public void axisRenamed() {
+		lChart.setTitle(lineChartTitle.getText());				
+		xxis.setLabel(xxisLabel.getText());
+		yxis.setLabel(yxisLabel.getText());
+		c2.setText(xxisLabel.getText());
+		c3.setText(yxisLabel.getText());
+		if(lineChartTitle.getText() == "")
+			lChart.setTitle("Line Chart");		
+		if(xxisLabel.getText() == "")
+			xxis.setLabel("X->");
+		if(yxisLabel.getText() == "")
+			yxis.setLabel("X->");		
+	}
+	public void buttonEnabler() {
+//		if(fileEnable.isSelected()) {
+//			loadDataFromFile.setDisable(false);
+//			loadDataInTable.setDisable(false);
+//		}else {
+//			loadDataInTable.setDisable(true);
+//			loadDataFromFile.setDisable(true);
+//		}
+//		if(dbEnable.isSelected()) {
+//			loadDataFromDb.setDisable(false);
+//		}
+//		if(!dbEnable.isSelected()){
+//			loadDataFromDb.setDisable(true);
+//		}
+		if(clickDraw.isSelected()) {
+			add_click_data.setDisable(false);			
+		}else {			
+			add_click_data.setDisable(true);
+		}
+	}
+	public void changeTheme() {
+		if(theame) {				//light=Theme(true)#666666->white[light->dark]
+			Color c = Color.web("white");			
+			error_label.setStyle("-fx-border-color: white");
+			app_log.setStyle("-fx-border-color: white");
+			app_log.setTextFill(c);
+			anchor.setStyle("-fx-background-color:  #666666");			
+			lChart.setStyle("-fx-border-color: white");
+		    lChart.setStyle("-fx-text-fill: white");			
+			lineValue.setTextFill(c);
+			xxis.setTickLabelFill(c);
+			yxis.setTickLabelFill(c);			
+			xxis.setStyle("-fx-text-fill: black");
+			yxis.setStyle("-fx-text-fill: black");
+			theameCircle.setFill(Color.web("#d8d8d8"));
+			theame = false;
+		}
+		else {		//dark[if dark then set Light]
+			Color c = Color.web("black");			
+			error_label.setStyle("-fx-border-color: black");
+			app_log.setStyle("-fx-border-color: black");
+			app_log.setTextFill(c);
+			anchor.setStyle("-fx-background-color:  #d8d8d8");			
+			lChart.setStyle("-fx-border-color: black");
+			lChart.setStyle("-fx-text-fill: black");			
+			lineValue.setTextFill(c);
+			xxis.setTickLabelFill(c);
+			yxis.setTickLabelFill(c);
+			xxis.setStyle("-fx-text-fill: white");
+			yxis.setStyle("-fx-text-fill: white");					
+			theameCircle.setFill(c);
+			theame = true;
+		}
+	}
+	//Add Functions-----------------------------------------------------------
+	public void addData() {		
+		System.out.println("#AddData#");
+		String X = "{"+seriesLabel.getText()+"}"+xVal.getText();
+		if(xVal.getText().isEmpty())
+			error_label.setText("Enter Pattern before adding");
+		else if(seriesLabel == null) {
+			error_label.setText("Please enter the name of Line");
+		}
+		else if(!inputValidator(X)) {
+			error_label.setText("");
+			error_label.setText("Entered pattern is not valid\nPlease try again!");
+			System.out.println("Invalid Pattern");
+		} else {
+//			if(dbEnable.isSelected()) {
+//				try {if(!DbController.insertSeries(seriesLabel.getText(),1,X)) {error_label.setText("Error in Database");}} 
+//				catch (SQLException e) {e.printStackTrace();}
+//			}			
+			decodeAndDraw();			
+		}
+	}
+	public void addClickData() {
+		//decodeAndDraw(seriesLabel.getText(),clickDataStr,true);
+		clickDataStr="";
+	}
+	//Draw & decoding Validations Functions-----------------------------------------------------------
 	private boolean inputValidator(String X) {
 		System.out.println("#PatternValidator#");		
 		for(int i=0;i< X.length();i++) {
@@ -483,41 +445,56 @@ public class LineChartController {
 		}
 		return true;
 	}
-	private void decodeAndDraw(String line,String X,Boolean whoCalled) {
+	private void drawChart() {
+		System.out.println("#drawChart#");
+		lChart.getData().clear();
+		LineTableController row;
+		Series<Double, Double> series = new XYChart.Series<Double, Double>();
+		for(XYChart.Series<Double, Double> seriList : SeriList) {
+			series = new XYChart.Series<Double, Double>();
+			for(Data<Double, Double> seriData : seriList.getData()) {
+				series.getData().add(new Data<Double,Double>(seriData.getXValue(),seriData.getYValue()));
+				row = new LineTableController(seriList.getName(),seriData.getXValue(),seriData.getYValue());
+				table.getItems().add(row);
+			}
+			lChart.getData().add(series);
+		}
+	}
+	private void decodeAndDraw() {
 		error_label.setText("");
+		String X = xVal.getText();
 		xVal.setText("");
-		System.out.println("---------------\nxVal\tyVal\n---------------");
 		int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,xindexCounter=0,yindexCounter=0;
 		Double[] xValues = new Double[arraySize];
-		Double[] yValues = new Double[arraySize];									
+		Double[] yValues = new Double[arraySize];
+		String xCo = "",yCo="";
 		//Pattern reader
 		for(int i=0;i< X.length();i++) {						
 			if(X.charAt(i) == '[') {
 				int j=0;
-				String xCo = new String();
-				for(j=i;X.charAt(j+1)!=',';j++) {					
+				xCo = "";
+				for(j=i;X.charAt(j+1)!=',';j++)
 					xCo+=X.charAt(j+1);
-					System.out.print(X.charAt(j+1));
-				}
-				System.out.print("\t");
+
 				xValues[xindexCounter]=Double.parseDouble(xCo);
 				xindexCounter++;
 			} else if(X.charAt(i)==',') {
 				int j=0;
-				String yCo = new String();
-				for(j=i;X.charAt(j+1)!=']';j++) {					
+				yCo = "";
+				for(j=i;X.charAt(j+1)!=']';j++)					
 					yCo+=X.charAt(j+1);
-					System.out.print(X.charAt(j+1));
-				}
-				System.out.println();
+				
 				yValues[yindexCounter]=Double.parseDouble(yCo);
 				yindexCounter++;								
-			} else {}			
-		}		
-		System.out.println("---------------\nArraySize: "+arraySize+"\nStorage values :");		
-		System.out.println("\tX: "+Arrays.toString(xValues)+"\n\tY: "+Arrays.toString(yValues));
-		System.out.println("IndexCounters:\n\tX: "+xindexCounter+"\n\tY: "+yindexCounter);		
-		drawChart(line,xValues,yValues,xindexCounter,whoCalled);		
+			}
+		}
+		Series<Double, Double> series = new XYChart.Series<Double, Double>();
+		for(int i=0;i<xindexCounter;i++) {
+			series.getData().add(new Data<Double,Double>(xValues[i],yValues[i]));
+			series.setName(seriesLabel.getText());
+		}
+		SeriList.add(series);		
+		drawChart();		
 	}
 	private boolean dblChecker(String x) {
 		try {Double.parseDouble(x);}
@@ -527,10 +504,29 @@ public class LineChartController {
 	    }
 		return true;
 	}
-	//loading functions------------------------------------------------------
-	private void callWriter(String lineNames,Double[] xValues,Double[] yValues) {		
-		lineFileSysController.writeDataInFile(yValues,xValues, lineNames,0);
+	//open-save--------------------------------------
+	public void save() {
+		if(FILE_PATH == "") {
+			FileChooser fileChooser = new FileChooser();
+		    fileChooser.setTitle("Save");
+		    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Fx Line Chart", "*.fxlinechart"));
+		    File file = fileChooser.showSaveDialog(primaryStage);
+  
+	        if (file != null) {
+	        	FILE_PATH = file.getPath()+".fxlinechart";
+	        	callWriter();
+	        	error_label.setText("File Saved '"+FILE_PATH+"'");
+	        }
+		}else {
+			callWriter();
+			error_label.setText("Saved");
+		}
 	}
+	public void load() {
+		loadDataFromFileConfirmed();
+	}
+	//loading functions------------------------------------------------------
+	private void callWriter() {lineFileSysController.writeDataInFile(SeriList,FILE_PATH);}
 	public void loadDataFromFile() {
 		if(!lChart.getData().isEmpty()) {
 			Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -549,81 +545,22 @@ public class LineChartController {
 		}
 	}
 	public void loadDataFromFileConfirmed() {
-		clearChart();
-		ArrayList<String> seriesArr = lineFileSysController.readDataFromFile();						
-		if(!seriesArr.isEmpty()) {			
-			for(int seriIndex=0;seriIndex< seriesArr.size();seriIndex++) {
-				String X = seriesArr.get(seriIndex);
-				if(!inputValidator(X)) {
-					error_label.setText("");
-					error_label.setText("Entered pattern is not valid\nPlease try again!");
-					System.out.println("Invalid Pattern");
-				} else {
-					String line = "";
-					if(X.charAt(0) == '{') {						
-						for(int j=0; X.charAt(j+1) != '}'; j++) {
-							line += X.charAt(j+1);
-						}						
-					}
-					decodeAndDraw(line,X,false);
-				}
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open");
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Fx Line Chart", "*.fxlinechart"));
+		File file = fileChooser.showOpenDialog(anchor.getScene().getWindow());        
+		
+		if (file != null) {
+			clearChart();
+			ArrayList<XYChart.Series<Double, Double>> seriesArr = lineFileSysController.readDataFromFile(file.getAbsolutePath());						
+			if(!seriesArr.isEmpty()) {			
+				SeriList = new ArrayList<XYChart.Series<Double, Double>>(seriesArr);
+				drawChart();
+			}else {
+				error_label.setText("File is empty!\nPlease add data first");
 			}
-		}else {
-			error_label.setText("File is empty!\nPlease add data first");
 		}
-	}	
-	public void loadDataInTable() {					        
-		ArrayList<String> data = lineFileSysController.readDataFromFile();
-		table.setEditable(true);
-		c1.setCellValueFactory(new PropertyValueFactory<>("series"));		
-		c2.setCellValueFactory(new PropertyValueFactory<>("seriesX"));
-		c3.setCellValueFactory(new PropertyValueFactory<>("seriesY"));
-		c1.setSortable(false);
-		c2.setSortable(false);
-		c3.setSortable(false);
-				
-		for(int newSeri=0;newSeri<data.size();newSeri++) {
-			String X = data.get(newSeri);
-			int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,xindexCounter=0,yindexCounter=0;
-			Double[] xValues = new Double[arraySize];
-			Double[] yValues = new Double[arraySize];
-			
-			String[] lineNames =new String[arraySize];
-			//Pattern decoder
-			for(int i=0;i< X.length();i++) {
-				if(X.charAt(i) == '{') {
-					String line = "";
-					for(int j=0; X.charAt(j+1) != '}'; j++) {
-						line += X.charAt(j+1);
-					}
-					lineNames[i] = line;					
-				}			
-				if(X.charAt(i) == '[') {
-					int j=0;
-					String xCo = new String();
-					for(j=i;X.charAt(j+1)!=',';j++) {					
-						xCo+=X.charAt(j+1);					
-					}
-					xValues[xindexCounter]=Double.parseDouble(xCo);
-					xindexCounter++;
-				} else if(X.charAt(i)==',') {
-					int j=0;
-					String yCo = new String();
-					for(j=i;X.charAt(j+1)!=']';j++) {					
-						yCo+=X.charAt(j+1);					
-					}					
-					yValues[yindexCounter]=Double.parseDouble(yCo);
-					yindexCounter++;								
-				} else {}
-			}
-			for(int i=0;i<xindexCounter;i++) {
-				//String value1 = Double.parseDouble(xValues[i]);
-				//String value2 = Integer.toString(yValues[i]);				
-				LineTableController row = new LineTableController(lineNames[i],xValues[i],yValues[i]);
-				table.getItems().add(row);			
-			}
-		}			
-	}	
+	}
 	public void loadDataFromDb() {
 		clearChart();		
 		ArrayList<String> seriesArr = null;
@@ -642,7 +579,7 @@ public class LineChartController {
 						line += X.charAt(j+1);
 					}						
 				}
-				decodeAndDraw(line,X,false);
+				//decodeAndDraw(line,X,false);
 			}
 		}else {
 			error_label.setText("DB is empty!\nPlease add data first");
@@ -701,7 +638,7 @@ public class LineChartController {
 					System.out.println("\t<"+xArr[j]+"><"+yArr[j]+">");
 				}
 				selector+=bkCnt.get(i);				
-				drawChart(nmArr.get(i),xArr,yArr,bkCnt.get(i),false);
+				//drawChart(nmArr.get(i),xArr,yArr,bkCnt.get(i),false);
 			}
 		}else
 			error_label.setText("Value of "+table.getItems().get(i).getSeries()+" must be a number");
@@ -766,47 +703,12 @@ public class LineChartController {
         fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV", "*.csv"));
         File file = fileChooser.showSaveDialog(primaryStage);
         final ObservableList<LineTableController> obdata = FXCollections.observableArrayList();
-        ArrayList<String> data = lineFileSysController.readDataFromFile();						
-        for(int newSeri=0;newSeri<data.size();newSeri++) {
-			String X = data.get(newSeri);
-			int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,xindexCounter=0,yindexCounter=0;
-			Double[] xValues = new Double[arraySize];
-			Double[] yValues = new Double[arraySize];
-			
-			String[] lineNames =new String[arraySize];
-			//Pattern decoder
-			for(int i=0;i< X.length();i++) {
-				if(X.charAt(i) == '{') {
-					String line = "";
-					for(int j=0; X.charAt(j+1) != '}'; j++) {
-						line += X.charAt(j+1);
-					}
-					lineNames[i] = line;					
-				}			
-				if(X.charAt(i) == '[') {
-					int j=0;
-					String xCo = new String();
-					for(j=i;X.charAt(j+1)!=',';j++) {					
-						xCo+=X.charAt(j+1);					
-					}
-					xValues[xindexCounter]=Double.parseDouble(xCo);
-					xindexCounter++;
-				} else if(X.charAt(i)==',') {
-					int j=0;
-					String yCo = new String();
-					for(j=i;X.charAt(j+1)!=']';j++) {					
-						yCo+=X.charAt(j+1);					
-					}					
-					yValues[yindexCounter]=Double.parseDouble(yCo);
-					yindexCounter++;								
-				} else {}
-			}								
-			for(int i=0;i<xindexCounter;i++) {
-				Double locX = xValues[i];
-				Double locY = yValues[i];
-				obdata.add(new LineTableController(lineNames[i],locX,locY));							
-			}					
-		}        
+        ArrayList<XYChart.Series<Double, Double>> data = lineFileSysController.readDataFromFile(FILE_PATH);						
+        
+        for(XYChart.Series<Double,Double> seriList: data)
+        	for(XYChart.Data<Double, Double> seriData : seriList.getData())
+        		obdata.add(new LineTableController(seriList.getName(),seriData.getXValue(),seriData.getYValue()));
+        
         Writer writer = null;
         try {        	
         	file = new File(file.getAbsolutePath()+".csv");
@@ -826,7 +728,7 @@ public class LineChartController {
 		File file = fileChooser.showSaveDialog(primaryStage);
 	      
         if (file != null) {
-        	loadDataInTable();
+        	//loadDataInTable();
         	file = new File(file.getAbsolutePath()+".pdf");
         	Document report= new Document();
             PdfWriter.getInstance(report, new FileOutputStream(file));

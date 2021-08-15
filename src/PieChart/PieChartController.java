@@ -428,11 +428,11 @@ public class PieChartController {
 		if(FILE_PATH == "") {
 			FileChooser fileChooser = new FileChooser();
 		    fileChooser.setTitle("Save");
-		    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("FXCHART", "*.fxchart"));
+		    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("FXCHART", "*.fxpiechart"));
 		    File file = fileChooser.showSaveDialog(primaryStage);
   
 	        if (file != null) {
-	        	FILE_PATH = file.getPath()+".fxchart";
+	        	FILE_PATH = file.getPath()+".fxpiechart";
 	        	callWriter();
 	        	error_label.setText("File Saved '"+FILE_PATH+"'");
 	        }
