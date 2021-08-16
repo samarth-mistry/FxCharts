@@ -57,6 +57,8 @@ import javafx.scene.control.TableColumn.CellEditEvent;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -68,6 +70,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
+import javafx.stage.Popup;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Stage;
 import javafx.util.StringConverter;
@@ -101,8 +104,7 @@ public class PieChartController {
 	private Stack<ArrayList<PieChart.Data>> priList = new Stack<ArrayList<PieChart.Data>>(),secList = new Stack<ArrayList<PieChart.Data>>();
 	
 	final double SCALE_DELTA = 1.1;
-	final KeyCombination 
-	altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN),
+	final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN),
     altj= new KeyCodeCombination(KeyCode.J, KeyCombination.ALT_DOWN),
     altk= new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN),
     altl= new KeyCodeCombination(KeyCode.L, KeyCombination.ALT_DOWN),
@@ -111,6 +113,9 @@ public class PieChartController {
     ctrld= new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN),
     ctrls= new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN),
     ctrlo= new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN),
+    ctrlz= new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN),
+    ctrlshiftz= new KeyCodeCombination(KeyCode.Z, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN),
+    ctrlshiftc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN),
     ctrlPrintPDF = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN),
     ctrlPrintPNG = new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN),
     ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN),
@@ -194,6 +199,9 @@ public class PieChartController {
 		else if (altl.match(event)) {clearDb();event.consume();}
 		else if (ctrls.match(event)) {save();event.consume();}
 		else if (ctrlo.match(event)) {load();event.consume();}
+		else if (ctrlz.match(event)) {undo();event.consume();}
+		else if (ctrlshiftz.match(event)) {redo();event.consume();}
+		else if (ctrlshiftc.match(event)) {copyImgToClipBoard();event.consume();}
 		else if (ctrlb.match(event)) {
 			if(bulkEnable.isSelected()) {
 				bulkEnable.setSelected(false);
@@ -599,6 +607,22 @@ public class PieChartController {
 		} catch (IOException e) {e.printStackTrace();}
     }
 	//Export functions------------------------------
+	public void copyImgToClipBoard() {
+		WritableImage nodeshot = pChart.snapshot(new SnapshotParameters(), null);
+    	
+    	Clipboard clipboard = Clipboard.getSystemClipboard();	 
+		ClipboardContent content = new ClipboardContent();
+		content.putImage(nodeshot);
+		clipboard.setContent(content);
+    	
+    	final Popup popup = new Popup();
+        popup.setAutoFix(true);
+        popup.setAutoHide(true);
+        popup.setHideOnEscape(true);
+        Label mess = new Label("Image Copied to Clipboard!");
+        popup.getContent().add(mess);
+        popup.show(anchor.getScene().getWindow());
+    }
 	public void pdfExtract() {	
 		openPdfTextDialog();
 		FileChooser fileChooser = new FileChooser();

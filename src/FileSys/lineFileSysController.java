@@ -5,9 +5,6 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
-
-import LineChart.LineTableController;
-import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
@@ -50,6 +47,7 @@ public class lineFileSysController {
             Series<Double, Double> series = new XYChart.Series<Double, Double>();
             ArrayList<Double> xval = new ArrayList<Double>(),yval = new ArrayList<Double>();
             ArrayList<String> names = new ArrayList<String>();
+            int name_index = 0;
             while(scanner.hasNextLine()) {
                 String line = scanner.nextLine();
                 x="";y="";name="";sr_id="";
@@ -68,7 +66,8 @@ public class lineFileSysController {
                 	for(int i=0;i<xval.size();i++) {
                 		series.getData().add(new Data<Double,Double>(xval.get(i),yval.get(i)));
                 	}
-        			series.setName(name);
+        			series.setName(names.get(name_index));
+        			name_index++;
         			SeriList.add(series);
         			names.clear();
         			xval.clear();
@@ -97,7 +96,6 @@ public class lineFileSysController {
         			names.clear();
         			xval.clear();
         			yval.clear();
-        			//previous_sr_id = sr_id;
         		}
             }
     		System.out.println("\tFile Reading");

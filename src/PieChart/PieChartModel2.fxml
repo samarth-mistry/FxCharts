@@ -89,7 +89,7 @@
       <TextField fx:id="nm" layoutX="11.0" layoutY="107.0" onKeyReleased="#nmValEntriesPressed" prefHeight="24.0" prefWidth="199.0" promptText="Name" text="PieSlice" />      
       <TextField fx:id="val" layoutX="11.0" layoutY="140.0" onKeyReleased="#nmValEntriesPressed" prefHeight="24.0" prefWidth="199.0" promptText="Value" text="10.8" />
       <TextArea fx:id="bulk" disable="true" layoutX="10.0" layoutY="172.0" onKeyReleased="#bulkEntriesPressed" prefHeight="99.0" prefWidth="199.0" promptText="Bulk entry here eg. [abc,23.4][efg,34.2]........" />
-      <Button fx:id="add_data" layoutX="147.0" layoutY="277.0" mnemonicParsing="false" onAction="#addData" prefHeight="28.0" prefWidth="28.0" style="-fx-background-color: #60c0da;">
+      <Button fx:id="add_data" layoutX="138.0" layoutY="277.0" mnemonicParsing="false" onAction="#addData" prefHeight="28.0" prefWidth="28.0" style="-fx-background-color: #60c0da;">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -131,7 +131,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button layoutX="100.0" layoutY="277.0" mnemonicParsing="false" onAction="#refresh">
+      <Button layoutX="95.0" layoutY="277.0" mnemonicParsing="false" onAction="#refresh" prefHeight="28.0" prefWidth="28.0">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -155,7 +155,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Circle fx:id="theameCircle" fill="#666666" layoutX="196.0" layoutY="326.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
+      <Circle fx:id="theameCircle" fill="#666666" layoutX="195.0" layoutY="327.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
       <TableView fx:id="table" editable="true" layoutX="1081.0" layoutY="76.0" prefHeight="538.0" prefWidth="261.0">
          <columns>
             <TableColumn fx:id="c1" minWidth="5.0" prefWidth="160.0" text="Name" />
@@ -181,7 +181,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button layoutX="56.0" layoutY="278.0" mnemonicParsing="false" onAction="#redo" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #ffaa00;">
+      <Button layoutX="52.0" layoutY="278.0" mnemonicParsing="false" onAction="#redo" prefHeight="26.0" prefWidth="29.0" style="-fx-background-color: #ffaa00;">
          <tooltip>
             <Tooltip text="Redo" />
          </tooltip>
@@ -220,5 +220,17 @@
             <Font name="DejaVu Sans Bold" size="16.0" />
          </font>
       </Label>
+      <Button fx:id="cpClpBrdBtn" layoutX="181.0" layoutY="277.0" mnemonicParsing="false" onAction="#copyImgToClipBoard" onKeyReleased="#btnOnKeyPressed" prefHeight="28.0" prefWidth="28.0" style="-fx-background-color: #86b56e;">
+         <tooltip>
+            <Tooltip text="Copy image to ClipBoard" />
+         </tooltip>
+         <graphic>
+            <ImageView fitHeight="18.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../resources/imgs/copy-to-clipboard.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
    </children>
 </AnchorPane>

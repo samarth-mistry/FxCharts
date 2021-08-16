@@ -4,6 +4,7 @@ import FileSys.lineFileSysController;
 import Main.FxChartMainPage;
 import DbSys.DbController;
 
+import java.awt.Toolkit;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -13,11 +14,12 @@ import java.io.IOException;
 import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.Writer;
-import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Optional;
+import java.util.Stack;
+
 import javax.imageio.ImageIO;
 
 import com.itextpdf.text.Document;
@@ -62,6 +64,8 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -75,6 +79,7 @@ import javafx.stage.FileChooser;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.stage.Modality;
+import javafx.stage.Popup;
 import javafx.util.StringConverter;
 import javafx.util.converter.DoubleStringConverter;
 
@@ -90,23 +95,22 @@ public class LineChartController {
 	@FXML private TableColumn<LineTableController, String> c1;
 	@FXML private TableColumn<LineTableController, Double> c2,c3;
 	@FXML private CheckBox clickDraw;
-	@FXML private Button loadDataFromFile,add_data,add_click_data;	
+	@FXML private Button loadDataFromFile,add_data;	
 	@FXML private AnchorPane anchor;
 	@FXML private Circle theameCircle;
 	@FXML private DatePicker setDate;
 	@FXML private ToggleButton themeToggle;
 	final Stage primaryStage = null;
-	final double SCALE_DELTA = 1.1;
+	private final static double SCALE_DELTA = 1.1;
 	private DateTimeFormatter classic=DateTimeFormatter.ofPattern("dd/MM/yyyy");
-	private boolean theame=true,isFullScr=false;;
+	private boolean theame=true,isFullScr=false;
 	private String clickDataStr = null;
 	private static String FILE_PATH = "";
-	Stage stage = null;
-	static String pdfTextApp = null;
+	static String pdfTextApp = null;	
 	private ArrayList<XYChart.Series<Double, Double>> SeriList = new ArrayList<XYChart.Series<Double, Double>>();
+	private Stack<ArrayList<XYChart.Series<Double, Double>>> priList = new Stack<ArrayList<XYChart.Series<Double, Double>>>(), secList = new Stack<ArrayList<XYChart.Series<Double, Double>>>();
 	
-	final KeyCombination 
-	altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN),
+	final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN),
     altj= new KeyCodeCombination(KeyCode.J, KeyCombination.ALT_DOWN),
     altk= new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN),
     altl= new KeyCodeCombination(KeyCode.L, KeyCombination.ALT_DOWN),
@@ -115,6 +119,9 @@ public class LineChartController {
     ctrld= new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN),
     ctrls= new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN),
     ctrlo= new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN),
+    ctrlz= new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN),
+    ctrlshiftz= new KeyCodeCombination(KeyCode.Z, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN),
+    ctrlshiftc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN),
     ctrlPrintPDF = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN),
     ctrlPrintPNG = new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN),
     ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN),
@@ -173,34 +180,21 @@ public class LineChartController {
     }
     @FXML void bulkEntriesPressed(KeyEvent event) {
     	if (altEnter.match(event)) {addData();event.consume();}
-    	else {btnOnKeyPressed(event);event.consume();}
+    	else {btnOnKeyPressed(event);}
     }
 	@FXML void btnOnKeyPressed(KeyEvent event) {									
 		if (altT.match(event)) {changeTheme();event.consume();}		
 		else if (altj.match(event)) {clearChart();event.consume();}
 		else if (altk.match(event)) {clearFile();event.consume();}
-		else if (altl.match(event)) {clearDb();event.consume();}				
-		else if (ctrlf.match(event)) {
-//			if(fileEnable.isSelected())
-//				fileEnable.setSelected(false);
-//			else
-//				fileEnable.setSelected(true);
-			event.consume();
-			buttonEnabler();
-		}
-		else if (ctrld.match(event)) {
-//			if(dbEnable.isSelected())
-//				dbEnable.setSelected(false);
-//			else
-//				dbEnable.setSelected(true);
-			event.consume();
-			buttonEnabler();
-		}		
+		else if (altl.match(event)) {clearDb();event.consume();}
 		else if (ctrlPrintPDF.match(event)) {pdfExtract();}
 		else if (ctrlPrintPNG.match(event)) {pngExtract();}
 		else if (ctrlQ.match(event)) {exit();}
 		else if (ctrls.match(event)) {save();}
 		else if (ctrlo.match(event)) {load();}
+		else if (ctrlz.match(event)) {undo();event.consume();}
+		else if (ctrlshiftz.match(event)) {redo();event.consume();}
+		else if (ctrlshiftc.match(event)) {copyImgToClipBoard();event.consume();}
 		else if (ctrlPrintTPDF.match(event)) {        	
         	try {
 				pdfTableExtract();
@@ -212,10 +206,8 @@ public class LineChartController {
 				e.printStackTrace();
 			}
         }
-		else if(altF11.match(event))
-			setFullscrn();
-		else
-			event.consume();		
+		else if(altF11.match(event)){setFullscrn();event.consume();}
+		else {event.consume();}
 	}
 	//Zooming-------------------------------------------------
 	public void zoomLineChart(ScrollEvent event) {
@@ -282,6 +274,12 @@ public class LineChartController {
 		clearFile();
 	}
 	//Configuration functions Functions-----------------------------------------------------------
+	public void checkAnimated() {
+		if(lChart.getAnimated())
+			lChart.setAnimated(false);
+		else
+			lChart.setAnimated(true);
+	}
 	private void cursorMoni() {
 	    final Axis<Double> xAxis = lChart.getXAxis();
 	    final Axis<Double> yAxis = lChart.getYAxis();	    	    
@@ -317,7 +315,7 @@ public class LineChartController {
 	}
 	public void setFullscrn() {
 		System.out.println("#FullScreen");
-		stage = (Stage) anchor.getScene().getWindow();
+		Stage stage = (Stage) anchor.getScene().getWindow();
 		stage.setFullScreenExitHint("Press Alt + F11 to exit full-screen mode");
 		if(!isFullScr) {
 			stage.setFullScreen(true);
@@ -339,26 +337,6 @@ public class LineChartController {
 			xxis.setLabel("X->");
 		if(yxisLabel.getText() == "")
 			yxis.setLabel("X->");		
-	}
-	public void buttonEnabler() {
-//		if(fileEnable.isSelected()) {
-//			loadDataFromFile.setDisable(false);
-//			loadDataInTable.setDisable(false);
-//		}else {
-//			loadDataInTable.setDisable(true);
-//			loadDataFromFile.setDisable(true);
-//		}
-//		if(dbEnable.isSelected()) {
-//			loadDataFromDb.setDisable(false);
-//		}
-//		if(!dbEnable.isSelected()){
-//			loadDataFromDb.setDisable(true);
-//		}
-		if(clickDraw.isSelected()) {
-			add_click_data.setDisable(false);			
-		}else {			
-			add_click_data.setDisable(true);
-		}
 	}
 	public void changeTheme() {
 		if(theame) {				//light=Theme(true)#666666->white[light->dark]
@@ -397,21 +375,16 @@ public class LineChartController {
 	//Add Functions-----------------------------------------------------------
 	public void addData() {		
 		System.out.println("#AddData#");
-		String X = "{"+seriesLabel.getText()+"}"+xVal.getText();
 		if(xVal.getText().isEmpty())
 			error_label.setText("Enter Pattern before adding");
 		else if(seriesLabel == null) {
 			error_label.setText("Please enter the name of Line");
 		}
-		else if(!inputValidator(X)) {
+		else if(!inputValidator()) {
 			error_label.setText("");
 			error_label.setText("Entered pattern is not valid\nPlease try again!");
 			System.out.println("Invalid Pattern");
 		} else {
-//			if(dbEnable.isSelected()) {
-//				try {if(!DbController.insertSeries(seriesLabel.getText(),1,X)) {error_label.setText("Error in Database");}} 
-//				catch (SQLException e) {e.printStackTrace();}
-//			}			
 			decodeAndDraw();			
 		}
 	}
@@ -420,13 +393,10 @@ public class LineChartController {
 		clickDataStr="";
 	}
 	//Draw & decoding Validations Functions-----------------------------------------------------------
-	private boolean inputValidator(String X) {
+	private boolean inputValidator() {
 		System.out.println("#PatternValidator#");		
+		String X = xVal.getText();
 		for(int i=0;i< X.length();i++) {
-			if(X.charAt(0) != '{' || X.charAt(X.length()-1) != ']') {
-				System.out.println("valid 1");
-				return false;
-			}
 			if(X.charAt(i) == '[') {					
 				String xCo = new String();
 				for(int j=i;X.charAt(j+1)!=',' && X.charAt(j+1)!=']';j++) {					
@@ -448,13 +418,22 @@ public class LineChartController {
 	private void drawChart() {
 		System.out.println("#drawChart#");
 		lChart.getData().clear();
+		table.getItems().clear();
 		LineTableController row;
+		boolean is_first;
 		Series<Double, Double> series = new XYChart.Series<Double, Double>();
 		for(XYChart.Series<Double, Double> seriList : SeriList) {
 			series = new XYChart.Series<Double, Double>();
+			series.setName(seriList.getName());
+			is_first = true;
 			for(Data<Double, Double> seriData : seriList.getData()) {
 				series.getData().add(new Data<Double,Double>(seriData.getXValue(),seriData.getYValue()));
-				row = new LineTableController(seriList.getName(),seriData.getXValue(),seriData.getYValue());
+				if(is_first) {
+					row = new LineTableController(seriList.getName(),seriData.getXValue(),seriData.getYValue());
+					is_first = false;
+				}else {
+					row = new LineTableController("",seriData.getXValue(),seriData.getYValue());
+				}
 				table.getItems().add(row);
 			}
 			lChart.getData().add(series);
@@ -493,7 +472,8 @@ public class LineChartController {
 			series.getData().add(new Data<Double,Double>(xValues[i],yValues[i]));
 			series.setName(seriesLabel.getText());
 		}
-		SeriList.add(series);		
+		SeriList.add(series);
+		priList.push(new ArrayList<XYChart.Series<Double, Double>>(cloneList(SeriList)));
 		drawChart();		
 	}
 	private boolean dblChecker(String x) {
@@ -503,6 +483,33 @@ public class LineChartController {
 	    	return false;
 	    }
 		return true;
+	}
+	public void undo() {
+		System.out.print("#UNDO_PIE");
+		if(!priList.isEmpty()) {
+			if(secList.size() < 21) {
+				ArrayList<XYChart.Series<Double, Double>> temp = (ArrayList<XYChart.Series<Double, Double>>) priList.pop();
+		        secList.push(temp);
+		        
+		        if(priList.empty()){SeriList = new ArrayList<XYChart.Series<Double, Double>>();}
+		        else{temp = (ArrayList<XYChart.Series<Double, Double>>) priList.peek(); SeriList = temp;}
+		        
+		        drawChart();
+			}else
+				error_label.setText("Can't do more than 20 undo's");
+		}else
+			jbp();
+	}
+	public void redo() {
+		System.out.print("#REDO_PIE");
+		if(!secList.isEmpty()) {
+			ArrayList<XYChart.Series<Double, Double>> temp = (ArrayList<XYChart.Series<Double, Double>>) secList.pop();
+	        priList.push(temp);            
+	        temp = (ArrayList<XYChart.Series<Double, Double>>) priList.peek();
+	        SeriList = temp;
+	        drawChart();
+		}else
+			jbp();
 	}
 	//open-save--------------------------------------
 	public void save() {
@@ -522,8 +529,15 @@ public class LineChartController {
 			error_label.setText("Saved");
 		}
 	}
-	public void load() {
-		loadDataFromFileConfirmed();
+	public void load() {loadDataFromFileConfirmed();}
+	//utilities functions---------------------------------------------
+	private void jbp() {Toolkit.getDefaultToolkit().beep();}
+	private ArrayList<XYChart.Series<Double, Double>> cloneList(ArrayList<XYChart.Series<Double, Double>> l) {
+		ArrayList<XYChart.Series<Double, Double>> temp = new ArrayList<XYChart.Series<Double, Double>>();
+        for(int i=0;i<l.size();i++){
+            temp.add(l.get(i));
+        }
+        return temp;
 	}
 	//loading functions------------------------------------------------------
 	private void callWriter() {lineFileSysController.writeDataInFile(SeriList,FILE_PATH);}
@@ -552,7 +566,8 @@ public class LineChartController {
 		
 		if (file != null) {
 			clearChart();
-			ArrayList<XYChart.Series<Double, Double>> seriesArr = lineFileSysController.readDataFromFile(file.getAbsolutePath());						
+			ArrayList<XYChart.Series<Double, Double>> seriesArr = lineFileSysController.readDataFromFile(file.getAbsolutePath());
+			FILE_PATH = file.getAbsolutePath();
 			if(!seriesArr.isEmpty()) {			
 				SeriList = new ArrayList<XYChart.Series<Double, Double>>(seriesArr);
 				drawChart();
@@ -562,28 +577,28 @@ public class LineChartController {
 		}
 	}
 	public void loadDataFromDb() {
-		clearChart();		
-		ArrayList<String> seriesArr = null;
-		try {
-			seriesArr = DbController.getSeries();
-		} catch (SQLException e) {
-			error_label.setText("Error fetching data from DB");
-			e.printStackTrace();
-		}
-		if(!seriesArr.isEmpty()) {			
-			for(int seriIndex=0;seriIndex< seriesArr.size();seriIndex++) {
-				String X = seriesArr.get(seriIndex);
-				String line = "";
-				if(X.charAt(0) == '{') {						
-					for(int j=0; X.charAt(j+1) != '}'; j++) {
-						line += X.charAt(j+1);
-					}						
-				}
-				//decodeAndDraw(line,X,false);
-			}
-		}else {
-			error_label.setText("DB is empty!\nPlease add data first");
-		}
+//		clearChart();		
+//		ArrayList<String> seriesArr = null;
+//		try {
+//			seriesArr = DbController.getSeries();
+//		} catch (SQLException e) {
+//			error_label.setText("Error fetching data from DB");
+//			e.printStackTrace();
+//		}
+//		if(!seriesArr.isEmpty()) {			
+//			for(int seriIndex=0;seriIndex< seriesArr.size();seriIndex++) {
+//				String X = seriesArr.get(seriIndex);
+//				String line = "";
+//				if(X.charAt(0) == '{') {						
+//					for(int j=0; X.charAt(j+1) != '}'; j++) {
+//						line += X.charAt(j+1);
+//					}						
+//				}
+//				//decodeAndDraw(line,X,false);
+//			}
+//		}else {
+//			error_label.setText("DB is empty!\nPlease add data first");
+//		}
 	}
 	//Editing------------------------------------------------------------	
     private void openPdfTextDialog(){
@@ -622,28 +637,42 @@ public class LineChartController {
 				bkCnt.add(breakAfter);
 			}
 		}
-		System.out.println("\tnmArr"+nmArr+"\n\tBkCnt: "+bkCnt+"\n\txArr: "+bufx+"\n\tyArr: "+bufy);
-		
 		if(isDvalid) {
+			SeriList.clear();
 			int selector = 0;
 			clearChart();
 			clearTable();
+			Series<Double, Double> series;
 			for(i=0;i<nmArr.size();i++) {
-				System.out.println("\tisDvalid\n\t\tnmArr: "+nmArr.get(i)+"\n\t\tSeletr: "+selector);
-				Double[] xArr = new Double[bkCnt.get(i)];
-				Double[] yArr = new Double[bkCnt.get(i)];
+				series = new XYChart.Series<Double, Double>();
+				series.setName(nmArr.get(i));
 				for(int j=0;j<bkCnt.get(i);j++) {
-					xArr[j] = bufx.get(selector+j);
-					yArr[j] = bufy.get(selector+j);
-					System.out.println("\t<"+xArr[j]+"><"+yArr[j]+">");
+					series.getData().add(new Data<Double,Double>(bufx.get(selector+j),bufy.get(selector+j)));
 				}
-				selector+=bkCnt.get(i);				
-				//drawChart(nmArr.get(i),xArr,yArr,bkCnt.get(i),false);
+				selector+=bkCnt.get(i);
+				SeriList.add(series);
 			}
+			drawChart();
 		}else
 			error_label.setText("Value of "+table.getItems().get(i).getSeries()+" must be a number");
 	}
 	//Exports--------------------------------------------
+	public void copyImgToClipBoard() {
+		WritableImage nodeshot = lChart.snapshot(new SnapshotParameters(), null);
+    	
+    	Clipboard clipboard = Clipboard.getSystemClipboard();	 
+		ClipboardContent content = new ClipboardContent();
+		content.putImage(nodeshot);
+		clipboard.setContent(content);
+    	
+    	final Popup popup = new Popup();
+        popup.setAutoFix(true);
+        popup.setAutoHide(true);
+        popup.setHideOnEscape(true);
+        Label mess = new Label("Image Copied to Clipboard!");
+        popup.getContent().add(mess);
+        popup.show(anchor.getScene().getWindow());
+    }
 	public void pdfExtract() {
 		openPdfTextDialog();
 		FileChooser fileChooser = new FileChooser();
@@ -756,33 +785,36 @@ public class LineChartController {
 	public void openPieKit() {	
 		FxChartMainPage openNew = new FxChartMainPage();
 		try {
-			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			Stage thisstage = new Stage();
 			openNew.setStage(thisstage,"Pie chart");
-			System.out.println("Opening Pie Chart closed bar chart");
 		} catch (IOException e) {e.printStackTrace();}
 	}
 	public void openBarKit() {
 		FxChartMainPage openNew = new FxChartMainPage();
 		try {
-			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			Stage thisstage = new Stage();
 			openNew.setStage(thisstage,"Bar chart");
-			System.out.println("Opening Pie Chart closed bar chart");
 		} catch (IOException e) {e.printStackTrace();}
 	}
 	public void openLineKit() {
 		FxChartMainPage openNew = new FxChartMainPage();
 		try {
-			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			Stage thisstage = new Stage();
 			openNew.setStage(thisstage,"Line chart");
-			System.out.println("Opening Pie Chart closed bar chart");
 		} catch (IOException e) {e.printStackTrace();}
 	}
 	public void openStackKit() {
 		FxChartMainPage openNew = new FxChartMainPage();
 		try {
-			Stage thisstage = (Stage) anchor.getScene().getWindow();
+			Stage thisstage = new Stage();
 			openNew.setStage(thisstage,"Stacked chart");
-			System.out.println("Opening Pie Chart closed bar chart");
+		} catch (IOException e) {e.printStackTrace();}
+	}
+	public void openFxPaintKit() {
+		FxChartMainPage openNew = new FxChartMainPage();
+		try {
+			Stage thisstage = new Stage();
+			openNew.setStage(thisstage,"FxPaint");
 		} catch (IOException e) {e.printStackTrace();}
 	}
 }
