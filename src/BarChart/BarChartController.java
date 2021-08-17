@@ -1,6 +1,7 @@
 package BarChart;
 
 import FileSys.barFileSysController;
+import LineChart.LineTableController;
 import Main.FxChartMainPage;
 import DbSys.DbController;
 
@@ -15,9 +16,12 @@ import java.io.OutputStream;
 import java.io.StringReader;
 import java.io.Writer;
 import java.sql.SQLException;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Optional;
+import java.util.Stack;
+
 import javax.imageio.ImageIO;
 
 import com.itextpdf.text.Document;
@@ -41,7 +45,9 @@ import javafx.scene.SnapshotParameters;
 import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Data;
 import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Alert.AlertType;
@@ -59,6 +65,8 @@ import javafx.scene.control.ToggleButton;
 import javafx.scene.control.cell.PropertyValueFactory;
 import javafx.scene.control.cell.TextFieldTableCell;
 import javafx.scene.image.WritableImage;
+import javafx.scene.input.Clipboard;
+import javafx.scene.input.ClipboardContent;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyCodeCombination;
 import javafx.scene.input.KeyCombination;
@@ -70,6 +78,7 @@ import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.FileChooser;
 import javafx.stage.Modality;
+import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.stage.FileChooser.ExtensionFilter;
 import javafx.util.converter.DoubleStringConverter;
@@ -81,51 +90,46 @@ public class BarChartController {
 	@FXML private Label error_label;
 	@FXML private Label app_log;
 	@FXML private Label barValue;
-	@FXML private Label l6;
-	@FXML private Label l5;
-	@FXML private Label l4;
-	@FXML private Label l3;
-	@FXML private Label l2;
-	@FXML private Label l1;
-	@FXML private TextArea bulkNms;
-	@FXML private TextArea bulk;
-	@FXML private TextField nm;
-	@FXML private TextField val;
-	@FXML private TextField barChartTitle;
-	@FXML private TextField seriesLabel;
-	@FXML private TextField xxisLabel;
-	@FXML private TextField yxisLabel;
+	@FXML private TextArea bulkNms,bulk;
+	@FXML private TextField nm,val,barChartTitle,seriesLabel,xxisLabel,yxisLabel;
 	@FXML private CategoryAxis xxis;
 	@FXML private NumberAxis yxis;
 	@FXML private TableView<BarTableController> table;
-	@FXML private TableColumn<BarTableController, String> c1;
-	@FXML private TableColumn<BarTableController, String> c2;
+	@FXML private TableColumn<BarTableController, String> c1,c2;
 	@FXML private TableColumn<BarTableController, Double> c3;
-	@FXML private CheckBox dbEnable;
-	@FXML private CheckBox fileEnable;
 	@FXML private CheckBox bulkEnable;
-	@FXML private Button loadDataFromFile;
-	@FXML private Button loadDataFromDb;
-	@FXML private Button loadDataInTable;
-	@FXML private Button add_data;
-	@FXML private Button add_b_data;
-	@FXML private Button add_b_nms;
+	@FXML private Button add_b_data,add_b_nms,add_data;
 	@FXML private AnchorPane anchor;	
-	@FXML private Circle theameCircle;	
+	@FXML private Circle theameCircle;
 	@FXML private ToggleButton themeToggle;
 	static String pdfTextApp = null;
-    final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN);
-    final KeyCombination altj= new KeyCodeCombination(KeyCode.J, KeyCombination.ALT_DOWN);
-    final KeyCombination altk= new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN);
-    final KeyCombination altl= new KeyCodeCombination(KeyCode.L, KeyCombination.ALT_DOWN);
-    final KeyCombination ctrlb= new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrld= new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlPrintPDF = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlPrintPNG = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN);
-    final KeyCombination ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN);
-    final KeyCombination altT= new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
+	private DateTimeFormatter classic=DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	private boolean theame=true,isFullScr=false;
+	final Stage primaryStage = null;
+	final double SCALE_DELTA = 1.1;
+	private static String FILE_PATH = "";
+	private ArrayList<String> bulkNames = new ArrayList<String>();
+	private ArrayList<XYChart.Series<String, Number>> SeriList = new ArrayList<XYChart.Series<String, Number>>();
+	private Stack<ArrayList<XYChart.Series<String, Number>>> priList = new Stack<ArrayList<XYChart.Series<String, Number>>>(), secList = new Stack<ArrayList<XYChart.Series<String, Number>>>();
+	
+    final KeyCombination altEnter = new KeyCodeCombination(KeyCode.ENTER, KeyCombination.ALT_DOWN),
+    altj= new KeyCodeCombination(KeyCode.J, KeyCombination.ALT_DOWN),
+    altk= new KeyCodeCombination(KeyCode.K, KeyCombination.ALT_DOWN),
+    altl= new KeyCodeCombination(KeyCode.L, KeyCombination.ALT_DOWN),
+    ctrlb= new KeyCodeCombination(KeyCode.B, KeyCombination.CONTROL_DOWN),
+    ctrlf= new KeyCodeCombination(KeyCode.F, KeyCombination.CONTROL_DOWN),
+    ctrld= new KeyCodeCombination(KeyCode.D, KeyCombination.CONTROL_DOWN),
+	ctrls= new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN),
+    ctrlo= new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN),
+    ctrlz= new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN),
+    ctrlshiftz= new KeyCodeCombination(KeyCode.Z, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN),
+    ctrlshiftc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN),
+    ctrlPrintPDF = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN),
+    ctrlPrintPNG = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN),
+    ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN),
+    ctrlQ = new KeyCodeCombination(KeyCode.Q, KeyCombination.CONTROL_DOWN),
+    altT= new KeyCodeCombination(KeyCode.T, KeyCombination.ALT_DOWN);
+    
     @FXML void bulkNamesPressed(KeyEvent event) {
     	if (altEnter.match(event)){setBulkNames();event.consume();}
     	else {btnOnKeyPressed(event);event.consume();}
@@ -142,7 +146,12 @@ public class BarChartController {
 		if (altT.match(event)) {changeTheme();event.consume();}		
 		else if (altj.match(event)) {clearChart();event.consume();}
 		else if (altk.match(event)) {clearFile();event.consume();}
-		else if (altl.match(event)) {clearDb();event.consume();}		
+		else if (altl.match(event)) {clearDb();event.consume();}
+		else if (ctrls.match(event)) {save();}
+		else if (ctrlo.match(event)) {load();}
+		else if (ctrlz.match(event)) {undo();event.consume();}
+		else if (ctrlshiftz.match(event)) {redo();event.consume();}
+		else if (ctrlshiftc.match(event)) {copyImgToClipBoard();event.consume();}
 		else if (ctrlb.match(event)) {
 			if(bulkEnable.isSelected()) {
 				bulkEnable.setSelected(false);
@@ -153,22 +162,6 @@ public class BarChartController {
 			event.consume();
 			buttonEnabler();
 		}
-		else if (ctrlf.match(event)) {
-			if(fileEnable.isSelected())
-				fileEnable.setSelected(false);
-			else
-				fileEnable.setSelected(true);
-			event.consume();
-			buttonEnabler();
-		}
-		else if (ctrld.match(event)) {
-			if(dbEnable.isSelected())
-				dbEnable.setSelected(false);
-			else
-				dbEnable.setSelected(true);
-			event.consume();
-			buttonEnabler();
-		}		
 		else if (ctrlPrintPDF.match(event)) {pdfExtract();}
 		else if (ctrlPrintPNG.match(event)) {pngExtract();}
 		else if (ctrlQ.match(event)) {exit();}
@@ -186,12 +179,9 @@ public class BarChartController {
 		else
 			event.consume();
 	}
-	private boolean theame=true;
-	final Stage primaryStage = null;
-	final double SCALE_DELTA = 1.1;
-	private ArrayList<String> bulkNames = new ArrayList<String>();
 	@FXML public void initialize() {
 		//AudioPlayer.ALERT_AUDIOCLIP.play();
+		bChart.setAnimated(false);
 		Toolkit.getDefaultToolkit().beep();		
 		table.setEditable(true);		
 		c1.setCellValueFactory(new PropertyValueFactory<>("series"));			
@@ -301,6 +291,24 @@ public class BarChartController {
 		}		
 	}
 	//Config functions Functions-----------------------------------------------------------
+	public void setFullscrn() {
+		System.out.println("#FullScreen");
+		Stage stage = (Stage) anchor.getScene().getWindow();
+		stage.setFullScreenExitHint("Press Alt + F11 to exit full-screen mode");
+		if(!isFullScr) {
+			stage.setFullScreen(true);
+			isFullScr=true;
+		}else {
+			stage.setFullScreen(false);
+			isFullScr=false;
+		}		
+	}
+	public void checkAnimated() {
+		if(bChart.getAnimated())
+			bChart.setAnimated(false);
+		else
+			bChart.setAnimated(true);
+	}
 	public void axisRenamed() {
 		bChart.setTitle(barChartTitle.getText());				
 		xxis.setLabel(xxisLabel.getText());
@@ -315,19 +323,6 @@ public class BarChartController {
 			yxis.setLabel("Y->");		
 	}
 	public void buttonEnabler() {
-		if(fileEnable.isSelected()) {
-			loadDataFromFile.setDisable(false);
-			loadDataInTable.setDisable(false);
-		}else {
-			loadDataInTable.setDisable(true);
-			loadDataFromFile.setDisable(true);
-		}
-		if(dbEnable.isSelected()) {
-			loadDataFromDb.setDisable(false);
-		}
-		if(!dbEnable.isSelected()){
-			loadDataFromDb.setDisable(true);
-		}
 		if(bulkEnable.isSelected()){
 			nm.setDisable(true);
 			val.setDisable(true);
@@ -349,7 +344,6 @@ public class BarChartController {
 			Color c = Color.web("#d8d8d8");			//white color	
 			error_label.setStyle("-fx-border-color: white");
 			anchor.setStyle("-fx-background-color:  #666666");
-			//anchor2.setStyle("-fx-background-color:  #666666");
 			bChart.setStyle("-fx-border-color: #d8d8d8");
 		    bChart.setStyle("-fx-text-fill: black");
 			barValue.setStyle("-fx-border-color: #d8d8d8");
@@ -357,15 +351,7 @@ public class BarChartController {
 			xxis.setTickLabelFill(c);yxis.setTickLabelFill(c);			
 			xxis.setStyle("-fx-text-fill: black");
 			yxis.setStyle("-fx-text-fill: black");			
-			l1.setTextFill(c);
-			l2.setTextFill(c);
-			l3.setTextFill(c);
-			l4.setTextFill(c);
-			l5.setTextFill(c);
-			l6.setTextFill(c);
 			bulkEnable.setTextFill(c);
-			fileEnable.setTextFill(c);
-			dbEnable.setTextFill(c);					
 			theameCircle.setFill(c);
 			theame = false;
 		}
@@ -373,7 +359,6 @@ public class BarChartController {
 			Color c = Color.web("#666666");			
 			error_label.setStyle("-fx-border-color: black");
 			anchor.setStyle("-fx-background-color:  #d8d8d8");
-			//anchor2.setStyle("-fx-background-color:  #d8d8d8");
 			bChart.setStyle("-fx-border-color: #666666");
 			bChart.setStyle("-fx-text-fill: white");
 			barValue.setStyle("-fx-border-color: #666666");
@@ -382,15 +367,7 @@ public class BarChartController {
 			yxis.setTickLabelFill(c);
 			xxis.setStyle("-fx-text-fill: white");
 			yxis.setStyle("-fx-text-fill: white");
-			l1.setTextFill(c);
-			l2.setTextFill(c);
-			l3.setTextFill(c);
-			l4.setTextFill(c);
-			l5.setTextFill(c);
-			l6.setTextFill(c);
 			bulkEnable.setTextFill(c);
-			fileEnable.setTextFill(c);
-			dbEnable.setTextFill(c);					
 			theameCircle.setFill(c);
 			theame = true;
 		}
@@ -405,32 +382,21 @@ public class BarChartController {
 			error_label.setText("Please enter the name of Bar");
 		else {
 			if(dblChecker(X)) {
-				if(dbEnable.isSelected()) {
-					try {if(!DbController.insertSeries(seriesLabel.getText(),1,X)) {error_label.setText("Error in Database");}} 
-					catch (SQLException e) {e.printStackTrace();}
-				}
 				drawSinChart(true);				
 			}else
 				error_label.setText("Value of val must be number");
 		}
 	}
 	public void addBulkData() {
-		String X = "{"+seriesLabel.getText()+"}"+bulk.getText();
 		if(bulkNms.getText().isEmpty())
 			error_label.setText("Enter Pattern before adding");
 		else if(seriesLabel == null) {
 			error_label.setText("Please enter the name of Bar");
 		}
-		else if(!inputValidator(X)) {
-			error_label.setText("");
+		else if(!inputValidator("{"+seriesLabel.getText()+"}"+bulk.getText())) {
 			error_label.setText("Entered pattern is not valid. Please try again!");
-			System.out.println("Invalid Pattern");
 		} else {
-			if(dbEnable.isSelected()) {
-				try {if(!DbController.insertSeries(seriesLabel.getText(),1,X)) {error_label.setText("Error in Database");}} 
-				catch (SQLException e) {e.printStackTrace();}
-			}
-			decodeAndDraw(seriesLabel.getText(),X,true);			
+			decodeAndDraw();			
 		}
 	}	
 	//Draw & decoding Validations Functions-----------------------------------------------------------
@@ -445,37 +411,31 @@ public class BarChartController {
 			}
 		}catch(Exception e) {e.printStackTrace();}
 	}
-	private void drawBulkChart(String barName,Number yValues[],int filled,Boolean whoCalled) {
+	private void drawBulkChart() {
 		System.out.println("#drawBulkChart");
 		if(!bulkNames.isEmpty()) {
-			try {								
-				XYChart.Series<String, Number> series = new XYChart.Series<String, Number>();			
-				int i=0;
-				for(i=0;i<filled;i++) {
-					if(!whoCalled) {
-						series.setName(barName);
-					}					
-					series.getData().add(new XYChart.Data<String, Number>(bulkNames.get(i),yValues[i]));
-					BarTableController row;
-					if(i==0)
-						row = new BarTableController(barName,bulkNames.get(i),yValues[i]);
-					else
-						row = new BarTableController("",bulkNames.get(i),yValues[i]);
-					table.getItems().add(row);										
-				}			
-				Number[] yFin= new Number[i];
-				for(i=0;i<filled;i++) {				
-					yFin[i] = yValues[i];
-				}							
-				if(whoCalled) {				//add function is calling them 	
-					series.setName(seriesLabel.getText());
-					if(fileEnable.isSelected()) {
-						callWriter(barName,bulkNames, yFin);
+			bChart.getData().clear();
+			table.getItems().clear();
+			BarTableController row;
+			boolean is_first;
+			Series<String, Number> series = new XYChart.Series<String, Number>();
+			for(XYChart.Series<String, Number> seriList : SeriList) {
+				series = new XYChart.Series<String, Number>();
+				series.setName(seriList.getName());
+				is_first = true;
+				for(XYChart.Data<String, Number> seriData : seriList.getData()) {
+					series.getData().add(new XYChart.Data<String,Number>(seriData.getXValue(),seriData.getYValue()));
+					System.out.println("serInDraw: "+series.getData());
+					if(is_first) {
+						row = new BarTableController(seriList.getName(),seriData.getXValue(),seriData.getYValue());
+						is_first = false;
+					}else {
+						row = new BarTableController("",seriData.getXValue(),seriData.getYValue());
 					}
+					table.getItems().add(row);
 				}
 				bChart.getData().add(series);
-				barValuePlotter();
-			}catch(Exception e) {e.printStackTrace();}
+			}
 		}		
 	}
 	public void setBulkNames() {
@@ -531,12 +491,13 @@ public class BarChartController {
 		}
 		return true;
 	}
-	private void decodeAndDraw(String bar,String X,Boolean whoCalled) {
+	private void decodeAndDraw() {
 		System.out.println("#decodeAndDraw");
+		String X = bulk.getText();
 		if(bulkNames.isEmpty()) {
-			System.out.println("decode setting again");
+			System.out.println("\tdecode setting again");
 			setBulkNames();
-		}		
+		}
 		error_label.setText("");
 		bulk.setText("");
 		System.out.println("---------------\nxVal\tyVal\n---------------");
@@ -563,12 +524,16 @@ public class BarChartController {
 				yValues[yindexCounter]=Double.parseDouble(xCo);
 				yindexCounter++;
 				bulkCounter++;								
-			} else {}					
+			}
 		}
-		System.out.println("---------------\nStorage values :");		
-		System.out.println("\tX: "+bulkNames+"\n\tY: "+Arrays.toString(yValues));
-		System.out.println("IndexCounters:\n\tY: "+yindexCounter);		
-		drawBulkChart(bar,yValues,yindexCounter,whoCalled);		
+		Series<String, Number> series = new XYChart.Series<String, Number>();
+		for(int i=0;i<yindexCounter;i++) {
+			series.getData().add(new XYChart.Data<String,Number>(bulkNames.get(i),yValues[i]));
+		}
+		series.setName(seriesLabel.getText());
+		SeriList.add(series);
+		priList.push(new ArrayList<XYChart.Series<String, Number>>(cloneList(SeriList)));
+		drawBulkChart();
 	}
 	private boolean dblChecker(String x) {
 		try {Double.parseDouble(x);}
@@ -636,7 +601,7 @@ public class BarChartController {
 						yindexCounter++;					
 					}				
 				}
-				drawBulkChart(line,yValues,yindexCounter,false);
+				//drawBulkChart(line,yValues,yindexCounter,false);
 			}
 		}else {
 			error_label.setText("File is empty!\nPlease add data first");
@@ -697,29 +662,83 @@ public class BarChartController {
 		}			
 	}	
 	public void loadDataFromDb() {
-		clearChart();		
-		ArrayList<String> seriesArr = null;
-		try {
-			seriesArr = DbController.getSeries();
-		} catch (SQLException e) {
-			error_label.setText("Error fetching data from DB");
-			e.printStackTrace();
-		}
-		if(!seriesArr.isEmpty()) {			
-			for(int seriIndex=0;seriIndex< seriesArr.size();seriIndex++) {
-				String X = seriesArr.get(seriIndex);
-				String line = "";
-				if(X.charAt(0) == '{') {						
-					for(int j=0; X.charAt(j+1) != '}'; j++) {
-						line += X.charAt(j+1);
-					}						
-				}
-				decodeAndDraw(line,X,false);
-			}
-		}else {
-			error_label.setText("DB is empty!\nPlease add data first");
-		}
+//		clearChart();		
+//		ArrayList<String> seriesArr = null;
+//		try {
+//			seriesArr = DbController.getSeries();
+//		} catch (SQLException e) {
+//			error_label.setText("Error fetching data from DB");
+//			e.printStackTrace();
+//		}
+//		if(!seriesArr.isEmpty()) {			
+//			for(int seriIndex=0;seriIndex< seriesArr.size();seriIndex++) {
+//				String X = seriesArr.get(seriIndex);
+//				String line = "";
+//				if(X.charAt(0) == '{') {						
+//					for(int j=0; X.charAt(j+1) != '}'; j++) {
+//						line += X.charAt(j+1);
+//					}						
+//				}
+//				//decodeAndDraw(line,X,false);
+//			}
+//		}else {
+//			error_label.setText("DB is empty!\nPlease add data first");
+//		}
 	}
+	//utilities functions--------------------------------------
+	private ArrayList<XYChart.Series<String, Number>> cloneList(ArrayList<XYChart.Series<String, Number>> l) {
+		ArrayList<XYChart.Series<String, Number>> temp = new ArrayList<XYChart.Series<String, Number>>();
+        for(int i=0;i<l.size();i++){
+            temp.add(l.get(i));
+        }
+        return temp;
+	}
+	public void undo() {
+		System.out.print("#UNDO_PIE");
+		if(!priList.isEmpty()) {
+			if(secList.size() < 21) {
+				ArrayList<XYChart.Series<String, Number>> temp = (ArrayList<XYChart.Series<String, Number>>) priList.pop();
+		        secList.push(temp);
+		        
+		        if(priList.empty()){SeriList = new ArrayList<XYChart.Series<String, Number>>();}
+		        else{temp = (ArrayList<XYChart.Series<String, Number>>) priList.peek(); SeriList = temp;}
+		        
+		        drawBulkChart();
+			}else
+				error_label.setText("Can't do more than 20 undo's");
+		}else
+			jbp();
+	}
+	public void redo() {
+		System.out.print("#REDO_Bar");
+		if(!secList.isEmpty()) {
+			ArrayList<XYChart.Series<String, Number>> temp = (ArrayList<XYChart.Series<String, Number>>) secList.pop();
+	        priList.push(temp);            
+	        temp = (ArrayList<XYChart.Series<String, Number>>) priList.peek();
+	        SeriList = temp;
+	        drawBulkChart();
+		}else
+			jbp();
+	}
+	private void jbp() {Toolkit.getDefaultToolkit().beep();}
+	public void save() {
+//		if(FILE_PATH == "") {
+//			FileChooser fileChooser = new FileChooser();
+//		    fileChooser.setTitle("Save");
+//		    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("FXCHART", "*.fxpiechart"));
+//		    File file = fileChooser.showSaveDialog(primaryStage);
+//  
+//	        if (file != null) {
+//	        	FILE_PATH = file.getPath()+".fxpiechart";
+//	        	callWriter();
+//	        	error_label.setText("File Saved '"+FILE_PATH+"'");
+//	        }
+//		}else {
+//			callWriter();
+//			error_label.setText("Saved");
+//		}
+	}
+	public void load() {loadDataFromFileConfirmed();}
 	//Previewing-------------------------------------------
 	public void previewPDF() {}
 	//Editing-----------------------------------------------
@@ -764,7 +783,7 @@ public class BarChartController {
 					System.out.println("\t<"+xArr[j]+"><"+yArr[j]+">");
 				}
 				selector+=bkCnt.get(i);				
-				drawBulkChart(nmArr.get(i),yArr,bkCnt.get(i),false);
+				//drawBulkChart(nmArr.get(i),yArr,bkCnt.get(i),false);
 			}
 		}else
 			error_label.setText("Value of "+table.getItems().get(i).getSeries()+" must be a number");
@@ -783,6 +802,22 @@ public class BarChartController {
 		} catch (IOException e) {e.printStackTrace();}
     }
 	//Exports-------------------------------------------
+	public void copyImgToClipBoard() {
+		WritableImage nodeshot = bChart.snapshot(new SnapshotParameters(), null);
+    	
+    	Clipboard clipboard = Clipboard.getSystemClipboard();	 
+		ClipboardContent content = new ClipboardContent();
+		content.putImage(nodeshot);
+		clipboard.setContent(content);
+    	
+    	final Popup popup = new Popup();
+        popup.setAutoFix(true);
+        popup.setAutoHide(true);
+        popup.setHideOnEscape(true);
+        Label mess = new Label("Image Copied to Clipboard!");
+        popup.getContent().add(mess);
+        popup.show(anchor.getScene().getWindow());
+    }
 	public void pdfExtract() {
 		openPdfTextDialog();
 		FileChooser fileChooser = new FileChooser();

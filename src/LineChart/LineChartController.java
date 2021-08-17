@@ -106,7 +106,7 @@ public class LineChartController {
 	private boolean theame=true,isFullScr=false;
 	private String clickDataStr = null;
 	private static String FILE_PATH = "";
-	static String pdfTextApp = null;	
+	static String pdfTextApp = null;
 	private ArrayList<XYChart.Series<Double, Double>> SeriList = new ArrayList<XYChart.Series<Double, Double>>();
 	private Stack<ArrayList<XYChart.Series<Double, Double>>> priList = new Stack<ArrayList<XYChart.Series<Double, Double>>>(), secList = new Stack<ArrayList<XYChart.Series<Double, Double>>>();
 	

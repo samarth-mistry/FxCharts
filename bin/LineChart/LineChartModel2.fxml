@@ -187,7 +187,7 @@
             <Tooltip text="Redo" />
          </tooltip>
          <graphic>
-            <ImageView fitHeight="18.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../../resources/imgs/redo.png" />
                </image>
@@ -199,7 +199,7 @@
             <Tooltip text="Undo" />
          </tooltip>
          <graphic>
-            <ImageView fitHeight="18.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true">
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../../resources/imgs/undo.png" />
                </image>
@@ -214,5 +214,17 @@
             <NumberAxis fx:id="yxis" side="LEFT" />
          </yAxis>
       </LineChart>
+      <Button fx:id="cpClpBrdBtn" layoutX="131.0" layoutY="300.0" mnemonicParsing="false" onAction="#copyImgToClipBoard" onKeyReleased="#btnOnKeyPressed" prefHeight="26.0" prefWidth="38.0" style="-fx-background-color: #86b56e;">
+         <tooltip>
+            <Tooltip text="Copy image to ClipBoard" />
+         </tooltip>
+         <graphic>
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../resources/imgs/copy-to-clipboard.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
    </children>
 </AnchorPane>
