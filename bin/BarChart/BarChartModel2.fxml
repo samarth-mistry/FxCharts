@@ -109,7 +109,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button fx:id="load" disable="true" layoutX="9.0" layoutY="305.0" mnemonicParsing="false" onAction="#loadDataFromFile" prefHeight="28.0" prefWidth="78.0" style="-fx-background-color: #60c0da;" text="Open">
+      <Button disable="true" layoutX="9.0" layoutY="305.0" mnemonicParsing="false" onAction="#load" prefHeight="28.0" prefWidth="78.0" style="-fx-background-color: #60c0da;" text="Open">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>

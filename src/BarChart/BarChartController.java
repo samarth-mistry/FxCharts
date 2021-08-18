@@ -1,6 +1,7 @@
 package BarChart;
 
 import FileSys.barFileSysController;
+import FileSys.lineFileSysController;
 import LineChart.LineTableController;
 import Main.FxChartMainPage;
 import DbSys.DbController;
@@ -103,7 +104,7 @@ public class BarChartController {
 	@FXML private Circle theameCircle;
 	@FXML private ToggleButton themeToggle;
 	static String pdfTextApp = null;
-	private DateTimeFormatter classic=DateTimeFormatter.ofPattern("dd/MM/yyyy");
+	//private DateTimeFormatter classic=DateTimeFormatter.ofPattern("dd/MM/yyyy");
 	private boolean theame=true,isFullScr=false;
 	final Stage primaryStage = null;
 	final double SCALE_DELTA = 1.1;
@@ -244,7 +245,7 @@ public class BarChartController {
 	//Clear Functions-----------------------------------------------------------
 	public void clearChart() {
 		bChart.getData().clear();		
-		error_label.setText("Chart Data Cleared! Click load data to reload");				
+		//error_label.setText("Chart Data Cleared! Click load data to reload");				
 	}
 	public void clearFile() {		
 		Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -259,7 +260,7 @@ public class BarChartController {
 		}		
 	}
 	public void clearTable() {
-		error_label.setText("Table it cleared! To reload click on load button");
+		//error_label.setText("Table it cleared! To reload click on load button");
 		table.getItems().clear();
 	}
 	public void clearDb() {
@@ -271,7 +272,7 @@ public class BarChartController {
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
 			DbController.clearSeries();
-			error_label.setText("DB is Cleared. Data is permanently lost");
+			//error_label.setText("DB is Cleared. Data is permanently lost");
 		}		
 	}
 	public void clearAll() {
@@ -413,7 +414,6 @@ public class BarChartController {
 	}
 	private void drawBulkChart() {
 		System.out.println("#drawBulkChart");
-		if(!bulkNames.isEmpty()) {
 			bChart.getData().clear();
 			table.getItems().clear();
 			BarTableController row;
@@ -425,7 +425,6 @@ public class BarChartController {
 				is_first = true;
 				for(XYChart.Data<String, Number> seriData : seriList.getData()) {
 					series.getData().add(new XYChart.Data<String,Number>(seriData.getXValue(),seriData.getYValue()));
-					System.out.println("serInDraw: "+series.getData());
 					if(is_first) {
 						row = new BarTableController(seriList.getName(),seriData.getXValue(),seriData.getYValue());
 						is_first = false;
@@ -436,7 +435,6 @@ public class BarChartController {
 				}
 				bChart.getData().add(series);
 			}
-		}		
 	}
 	public void setBulkNames() {
 		System.out.println("#setBulkNames");
@@ -497,43 +495,44 @@ public class BarChartController {
 		if(bulkNames.isEmpty()) {
 			System.out.println("\tdecode setting again");
 			setBulkNames();
-		}
-		error_label.setText("");
-		bulk.setText("");
-		System.out.println("---------------\nxVal\tyVal\n---------------");
-		int arraySize = (X.length()-((X.length())/5)*3)/2 + 2,yindexCounter=0;
-		Number[] yValues = new Number[arraySize];									
-		//Pattern reader
-		int bulkCounter = 0;						
-		for(int i=0;i< X.length();i++) {
-			if(X.charAt(i) == '[') {					
-				String xCo = new String();
-				for(int j=i;X.charAt(j+1)!=',' && X.charAt(j+1) != ']';j++) {
-					xCo+=X.charAt(j+1);					
+		}else {
+			error_label.setText("");
+			bulk.setText("");
+			System.out.println("---------------\nxVal\tyVal\n---------------");
+			int arraySize = (X.length()-((X.length())/5)*3)/2 + 2,yindexCounter=0;
+			Number[] yValues = new Number[arraySize];									
+			//Pattern reader
+			int bulkCounter = 0;						
+			for(int i=0;i< X.length();i++) {
+				if(X.charAt(i) == '[') {					
+					String xCo = new String();
+					for(int j=i;X.charAt(j+1)!=',' && X.charAt(j+1) != ']';j++) {
+						xCo+=X.charAt(j+1);					
+					}
+					System.out.println(bulkNames.get(bulkCounter)+"\t"+xCo);
+					yValues[yindexCounter]=Double.parseDouble(xCo);
+					yindexCounter++;
+					bulkCounter++;					
+				} else if(X.charAt(i)==',') {					
+					String xCo = new String();
+					for(int j=i;X.charAt(j+1)!=',' && X.charAt(j+1) != ']' ;j++) {					
+						xCo+=X.charAt(j+1);					
+					}
+					System.out.println(bulkNames.get(bulkCounter)+"\t"+xCo);
+					yValues[yindexCounter]=Double.parseDouble(xCo);
+					yindexCounter++;
+					bulkCounter++;								
 				}
-				System.out.println(bulkNames.get(bulkCounter)+"\t"+xCo);
-				yValues[yindexCounter]=Double.parseDouble(xCo);
-				yindexCounter++;
-				bulkCounter++;					
-			} else if(X.charAt(i)==',') {					
-				String xCo = new String();
-				for(int j=i;X.charAt(j+1)!=',' && X.charAt(j+1) != ']' ;j++) {					
-					xCo+=X.charAt(j+1);					
-				}
-				System.out.println(bulkNames.get(bulkCounter)+"\t"+xCo);
-				yValues[yindexCounter]=Double.parseDouble(xCo);
-				yindexCounter++;
-				bulkCounter++;								
 			}
+			Series<String, Number> series = new XYChart.Series<String, Number>();
+			for(int i=0;i<yindexCounter;i++) {
+				series.getData().add(new XYChart.Data<String,Number>(bulkNames.get(i),yValues[i]));
+			}
+			series.setName(seriesLabel.getText());
+			SeriList.add(series);
+			priList.push(new ArrayList<XYChart.Series<String, Number>>(cloneList(SeriList)));
+			drawBulkChart();
 		}
-		Series<String, Number> series = new XYChart.Series<String, Number>();
-		for(int i=0;i<yindexCounter;i++) {
-			series.getData().add(new XYChart.Data<String,Number>(bulkNames.get(i),yValues[i]));
-		}
-		series.setName(seriesLabel.getText());
-		SeriList.add(series);
-		priList.push(new ArrayList<XYChart.Series<String, Number>>(cloneList(SeriList)));
-		drawBulkChart();
 	}
 	private boolean dblChecker(String x) {
 		try {Double.parseDouble(x);}
@@ -544,9 +543,7 @@ public class BarChartController {
 		return true;
 	}
 	//loading functions------------------------------------------------------
-	private void callWriter(String barNames,ArrayList<String> xValues,Number[] yFin) {		
-		barFileSysController.writeDataInFile(xValues,yFin, barNames,0);
-	}
+	private void callWriter() {barFileSysController.writeDataInFile(SeriList, FILE_PATH);}
 	public void loadDataFromFile() {
 		if(!bChart.getData().isEmpty()) {
 			Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -565,101 +562,22 @@ public class BarChartController {
 		}
 	}
 	public void loadDataFromFileConfirmed() {
-		clearChart();
-		bulkNames.clear();
-		ArrayList<String> seriesArr = barFileSysController.readDataFromFile();		
-		if(!seriesArr.isEmpty()) {			
-			for(int seriIndex=0;seriIndex< seriesArr.size();seriIndex++) {																				
-				String X = seriesArr.get(seriIndex);	
-				int arraySize = (X.length()-((X.length())/5)*3)/2 + 2,yindexCounter=0;
-				Number[] yValues = new Number[arraySize];
-				String line = "";
-				if(X.charAt(0) == '{') {						
-					for(int j=0; X.charAt(j+1) != '}'; j++) {
-						line += X.charAt(j+1);
-					}						
-				}
-				if(seriIndex == 0) {
-					for(int k=0;k<X.length();k++) {
-						if(X.charAt(k)=='[') {
-							String str4blk = "";
-							for(int j=k;X.charAt(j+1) != ',';j++) {
-								str4blk+=X.charAt(j+1);
-							}
-							bulkNames.add(str4blk);
-						}
-					}
-					System.out.println("\tBulkNames: "+bulkNames);
-				}
-				for(int k=0;k<X.length();k++) {
-					if(X.charAt(k)==',') {					
-						String xCo = new String();
-						for(int j=k;X.charAt(j+1) != ']';j++) {					
-							xCo+=X.charAt(j+1);					
-						}					
-						yValues[yindexCounter]=Double.parseDouble(xCo);
-						yindexCounter++;					
-					}				
-				}
-				//drawBulkChart(line,yValues,yindexCounter,false);
-			}
-		}else {
-			error_label.setText("File is empty!\nPlease add data first");
-		}
-	}	
-	public void loadDataInTable() {					        
-		ArrayList<String> data = barFileSysController.readDataFromFile();
-		table.setEditable(true);
-		c1.setCellValueFactory(new PropertyValueFactory<>("series"));		
-		c2.setCellValueFactory(new PropertyValueFactory<>("seriesX"));
-		c3.setCellValueFactory(new PropertyValueFactory<>("seriesY"));
-		c1.setSortable(false);	
-		c2.setSortable(false);
-		c3.setSortable(false);
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open");
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Fx Bar Chart", "*.fxbarchart"));
+		File file = fileChooser.showOpenDialog(anchor.getScene().getWindow());        
 		
-		if(!data.isEmpty()) {			
-			for(int seriIndex=0;seriIndex< data.size();seriIndex++) {																				
-				String X = data.get(seriIndex);	
-				int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,yindexCounter=0;
-				String[] lineNames =new String[arraySize];
-				Number[] yValues = new Number[arraySize];				
-				String line = "";
-								
-				for(int k=0;k<X.length();k++) {
-					if(X.charAt(k) == '{') {						
-						for(int j=0; X.charAt(j+1) != '}'; j++) {
-							line += X.charAt(j+1);
-						}
-						lineNames[k] = line;
-					}
-					if(X.charAt(k)=='[') {
-						String str4blk = "";
-						for(int j=k;X.charAt(j+1) != ',';j++) {
-							str4blk+=X.charAt(j+1);
-						}
-						bulkNames.add(str4blk);
-					}
-				}
-				//System.out.println("\tBulkNames: "+bulkNames);			
-				for(int k=0;k<X.length();k++) {
-					if(X.charAt(k)==',') {					
-						String xCo = new String();
-						for(int j=k;X.charAt(j+1) != ']';j++) {					
-							xCo+=X.charAt(j+1);					
-						}					
-						yValues[yindexCounter]=Double.parseDouble(xCo);
-						yindexCounter++;					
-					}				
-				}
-				for(int i=0;i<yindexCounter;i++) {
-					String value1 = bulkNames.get(i);
-					Number value2 = yValues[i];
-										    	
-					BarTableController row = new BarTableController(lineNames[i],value1,value2);
-					table.getItems().add(row);										
-				}
+		if (file != null) {
+			clearChart();
+			FILE_PATH = file.getAbsolutePath();
+			ArrayList<XYChart.Series<String, Number>> seriesArr = barFileSysController.readDataFromFile(FILE_PATH);
+			if(!seriesArr.isEmpty()) {			
+				SeriList = new ArrayList<XYChart.Series<String, Number>>(seriesArr);
+				drawBulkChart();
+			}else {
+				error_label.setText("File is empty!");
 			}
-		}			
+		}
 	}	
 	public void loadDataFromDb() {
 //		clearChart();		
@@ -722,21 +640,21 @@ public class BarChartController {
 	}
 	private void jbp() {Toolkit.getDefaultToolkit().beep();}
 	public void save() {
-//		if(FILE_PATH == "") {
-//			FileChooser fileChooser = new FileChooser();
-//		    fileChooser.setTitle("Save");
-//		    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("FXCHART", "*.fxpiechart"));
-//		    File file = fileChooser.showSaveDialog(primaryStage);
-//  
-//	        if (file != null) {
-//	        	FILE_PATH = file.getPath()+".fxpiechart";
-//	        	callWriter();
-//	        	error_label.setText("File Saved '"+FILE_PATH+"'");
-//	        }
-//		}else {
-//			callWriter();
-//			error_label.setText("Saved");
-//		}
+		if(FILE_PATH == "") {
+			FileChooser fileChooser = new FileChooser();
+		    fileChooser.setTitle("Save");
+		    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Fx Bar Chart", "*.fxbarchart"));
+		    File file = fileChooser.showSaveDialog(primaryStage);
+  
+	        if (file != null) {
+	        	FILE_PATH = file.getPath()+".fxbarchart";
+	        	callWriter();
+	        	error_label.setText("File Saved '"+FILE_PATH+"'");
+	        }
+		}else {
+			callWriter();
+			error_label.setText("Saved");
+		}
 	}
 	public void load() {loadDataFromFileConfirmed();}
 	//Previewing-------------------------------------------
@@ -873,67 +791,28 @@ public class BarChartController {
 		}
 	}
 	public void csvExtract() throws IOException {
-	    FileChooser fileChooser = new FileChooser();
+		FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Save");
         fileChooser.getExtensionFilters().addAll(new ExtensionFilter("CSV", "*.csv"));
         File file = fileChooser.showSaveDialog(primaryStage);
         final ObservableList<BarTableController> obdata = FXCollections.observableArrayList();
-        ArrayList<String> data = barFileSysController.readDataFromFile();              
-        if(!data.isEmpty()) {			
-			for(int seriIndex=0;seriIndex< data.size();seriIndex++) {																				
-				String X = data.get(seriIndex);	
-				int arraySize = (X.length()-((X.length())/5)*3)/2 + 5,yindexCounter=0;
-				String[] lineNames =new String[arraySize];
-				Number[] yValues = new Number[arraySize];				
-				String line = "";
-								
-				for(int k=0;k<X.length();k++) {
-					if(X.charAt(k) == '{') {						
-						for(int j=0; X.charAt(j+1) != '}'; j++) {
-							line += X.charAt(j+1);
-						}
-						lineNames[k] = line;
-					}
-					if(X.charAt(k)=='[') {
-						String str4blk = "";
-						for(int j=k;X.charAt(j+1) != ',';j++) {
-							str4blk+=X.charAt(j+1);
-						}
-						bulkNames.add(str4blk);
-					}
-				}
-				//System.out.println("\tBulkNames: "+bulkNames);			
-				for(int k=0;k<X.length();k++) {
-					if(X.charAt(k)==',') {					
-						String xCo = new String();
-						for(int j=k;X.charAt(j+1) != ']';j++) {					
-							xCo+=X.charAt(j+1);					
-						}					
-						yValues[yindexCounter]=Double.parseDouble(xCo);
-						yindexCounter++;					
-					}				
-				}
-				for(int i=0;i<yindexCounter;i++) {
-					String value1 = bulkNames.get(i);
-					Number value2 = yValues[i];
-										    	
-	    			obdata.add(new BarTableController(lineNames[i],value1,value2));							
-				}				
-			}
-			Writer writer = null;
-	        try {        	
-	        	file = new File(file.getAbsolutePath()+".csv");
-	            writer = new BufferedWriter(new FileWriter(file));
-	            for (BarTableController person : obdata) {
-	                String text = person.getSeries() + "," + person.getSeriesX() +","+ person.getSeriesY()+"\n";
-	                writer.write(text);                
-	            }
-	            System.out.println("Export CSV\n\t CSV exported");
-	        } catch (Exception ex) {ex.printStackTrace();System.out.println("Export CSV\n\t CSV exported error");}
-	        finally {writer.flush();writer.close();}
-		}else {
-			error_label.setText("File is empty!\nPlease add data first for exporting");
-		}																		                       
+        ArrayList<XYChart.Series<String, Number>> data = barFileSysController.readDataFromFile(FILE_PATH);						
+        
+        for(XYChart.Series<String, Number> seriList: data)
+        	for(XYChart.Data<String, Number> seriData : seriList.getData())
+        		obdata.add(new BarTableController(seriList.getName(),seriData.getXValue(),seriData.getYValue()));
+        
+        Writer writer = null;
+        try {        	
+        	file = new File(file.getAbsolutePath()+".csv");
+            writer = new BufferedWriter(new FileWriter(file));
+            for (BarTableController person : obdata) {
+                String text = person.getSeries() + "," + person.getSeriesX() +","+ person.getSeriesY()+"\n";
+                writer.write(text);                
+            }
+            System.out.println("Export CSV\n\t CSV exported");
+        } catch (Exception ex) {ex.printStackTrace();System.out.println("Export CSV\n\t CSV exported error");}
+        finally {writer.flush();writer.close();}
     }
 	public void pdfTableExtract() throws DocumentException, FileNotFoundException {
 		FileChooser fileChooser = new FileChooser();
@@ -942,17 +821,15 @@ public class BarChartController {
 		File file = fileChooser.showSaveDialog(primaryStage);
 	      
         if (file != null) {
-        	loadDataInTable();
         	file = new File(file.getAbsolutePath()+".pdf");
         	Document report= new Document();
             PdfWriter.getInstance(report, new FileOutputStream(file));
-            report.open();            
-            //we have four columns in our table
+            report.open();
             PdfPTable report_table = new PdfPTable(3);
 
             for(int i=0;i<table.getItems().size();i++) {
             	report_table.addCell(getCell(((BarTableController) table.getItems().get(i)).getSeries(),PdfPCell.ALIGN_CENTER ));
-            	report_table.addCell(getCell(((BarTableController) table.getItems().get(i)).getSeriesX(),PdfPCell.ALIGN_CENTER ));
+            	report_table.addCell(getCell(((BarTableController) table.getItems().get(i)).getSeriesX().toString(),PdfPCell.ALIGN_CENTER ));            	
             	report_table.addCell(getCell(((BarTableController) table.getItems().get(i)).getSeriesY().toString(),PdfPCell.ALIGN_CENTER ));
             }
             report.add(report_table);

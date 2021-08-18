@@ -767,8 +767,8 @@ public class LineChartController {
 
             for(int i=0;i<table.getItems().size();i++) {
             	report_table.addCell(getCell(((LineTableController) table.getItems().get(i)).getSeries(),PdfPCell.ALIGN_CENTER ));
-            	report_table.addCell(getCell(((LineTableController) table.getItems().get(i)).getSeriesY().toString(),PdfPCell.ALIGN_CENTER ));            	
-            	report_table.addCell(getCell(((LineTableController) table.getItems().get(i)).getSeriesX().toString(),PdfPCell.ALIGN_CENTER ));
+            	report_table.addCell(getCell(((LineTableController) table.getItems().get(i)).getSeriesX().toString(),PdfPCell.ALIGN_CENTER ));            	
+            	report_table.addCell(getCell(((LineTableController) table.getItems().get(i)).getSeriesY().toString(),PdfPCell.ALIGN_CENTER ));
             }
             report.add(report_table);
             report.close();
