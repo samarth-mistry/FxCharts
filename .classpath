@@ -14,5 +14,6 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/JavaFX GL"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/XAMPP conn"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/ITextPdf"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.USER_LIBRARY/Xstream java-xml"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

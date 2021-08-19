@@ -70,19 +70,4 @@ public class pieFileSysController {
 			System.out.println("\tFile clearing error");
 		}
 	}
-	
-//	  public static void main(String[] args) { 		  
-//		  String fileName = "pieFileData.txt";
-//		  //clearFile(fileName);
-//		  ArrayList<String> name = new ArrayList<>();
-//		  ArrayList<Double> value = new ArrayList<>();
-//		  name.add("str1");
-//		  name.add("str2");
-//		  value.add(80.0);
-//		  value.add(80.1);		  
-//		  //writeDataInFile(name,value);
-//	  
-//		  readDataFromFile(); 
-//	  }
-
 }

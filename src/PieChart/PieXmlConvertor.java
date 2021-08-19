@@ -1,31 +1,23 @@
 package PieChart;
-
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-
-@XmlRootElement
 public class PieXmlConvertor {
-	private int id;
-	private String s;
-    private Double d;
+	private String pieName;
+    private Double pieData;
 
+    public PieXmlConvertor() {}
     public PieXmlConvertor(String s, Double d) {
-        this.s = s;
-        this.d = d;        
+        this.pieName = s;
+        this.pieData = d;        
     }
-    @XmlAttribute
-    public String getS() {
-        return s;
+    public String getPieName() {
+        return pieName;
     }
-    @XmlElement
-    public Double getD() {
-        return d;
+    public Double getPieValue() {
+        return pieData;
     }
-    public void setS(String s) {
-    	this.s = s;
+    public void setPieName(String s) {
+    	this.pieName = s;
     }
-    public void setD(String d) {
-    	this.d = Double.parseDouble(d);
+    public void setPieValue(Double d) {
+    	this.pieData = d;
     }
 }
