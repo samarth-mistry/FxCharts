@@ -1,5 +1,20 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<PieChart.PieXmlConvertor>
-  <pieName>Pie4</pieName>
-  <pieData>40.0</pieData>
-</PieChart.PieXmlConvertor>
+<PieChartData>
+  <PieNodes>
+    <PieNode>
+      <Name>Pie1</Name>
+      <Data>10.0</Data>
+    </PieNode>
+    <PieNode>
+      <Name>Pie2</Name>
+      <Data>20.0</Data>
+    </PieNode>
+    <PieNode>
+      <Name>Pie3</Name>
+      <Data>30.0</Data>
+    </PieNode>
+    <PieNode>
+      <Name>Pie4</Name>
+      <Data>40.0</Data>
+    </PieNode>
+  </PieNodes>
+</PieChartData>
