@@ -27,8 +27,9 @@ import com.itextpdf.text.pdf.PdfPCell;
 import com.itextpdf.text.pdf.PdfPTable;
 import com.itextpdf.text.pdf.PdfWriter;
 
-import FileSys.pieFileSysController;
+import FileSys.PTFileManager;
 import Main.FxChartMainPage;
+import XMLController.PXFileManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;
@@ -83,9 +84,9 @@ public class PieChartController {
 	@FXML private Label error_label,pieValue;
 	@FXML private TextField pieChartTitle,nm,val;	
 	@FXML private TextArea bulk;
-	@FXML private TableView<PieTableController> table;
-	@FXML private TableColumn<PieTableController, String> c1;
-	@FXML private TableColumn<PieTableController, Double> c2;
+	@FXML private TableView<PieTableModal> table;
+	@FXML private TableColumn<PieTableModal, String> c1;
+	@FXML private TableColumn<PieTableModal, Double> c2;
 	@FXML private CheckBox bulkEnable;
 	@FXML private Button load,add_data,add_b_data;
 	@FXML private AnchorPane anchor;
@@ -151,16 +152,16 @@ public class PieChartController {
 		table.getSelectionModel().cellSelectionEnabledProperty().set(true);
 		c1.setCellFactory(TextFieldTableCell.forTableColumn());
 		c2.setCellFactory(TextFieldTableCell.forTableColumn(new DoubleStringConverter()));
-	    c1.setOnEditCommit(new EventHandler<CellEditEvent<PieTableController, String>>() {
-	         public void handle(CellEditEvent<PieTableController, String> t) {
-	               ((PieTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setS(t.getNewValue().toString());
+	    c1.setOnEditCommit(new EventHandler<CellEditEvent<PieTableModal, String>>() {
+	         public void handle(CellEditEvent<PieTableModal, String> t) {
+	               ((PieTableModal)t.getTableView().getItems().get(t.getTablePosition().getRow())).setS(t.getNewValue().toString());
 	               editFromTable();
 	         }
 	    });
-	    c2.setOnEditCommit(new EventHandler<CellEditEvent<PieTableController, Double>>() {
-	         public void handle(CellEditEvent<PieTableController, Double> t) {
+	    c2.setOnEditCommit(new EventHandler<CellEditEvent<PieTableModal, Double>>() {
+	         public void handle(CellEditEvent<PieTableModal, Double> t) {
 	        	 if(dblChecker(t.getNewValue().toString())) {
-	        		 ((PieTableController)t.getTableView().getItems().get(t.getTablePosition().getRow())).setD(t.getNewValue().toString());
+	        		 ((PieTableModal)t.getTableView().getItems().get(t.getTablePosition().getRow())).setD(t.getNewValue().toString());
 	        	 	editFromTable();
 	         	 }
 	        	 else
@@ -255,8 +256,10 @@ public class PieChartController {
 	}
 	//Clearing functions----------------------------------------------
 	public void clearChart() {
+		error_label.setText("");
 		pChart.getData().clear();
 		pieList.clear();
+		table.getItems().clear();
 		//error_label.setText("Chart Data Cleared! Click load data to reload");				
 	}
 	public void clearFile() {
@@ -267,7 +270,7 @@ public class PieChartController {
 
 		Optional<ButtonType> result = alert.showAndWait();
 		if (result.get() == ButtonType.OK){
-			pieFileSysController.clearFile(FILE_PATH);	
+			PTFileManager.clearFile(FILE_PATH);	
 			error_label.setText("File is Cleared");
 		}		
 	}
@@ -311,6 +314,12 @@ public class PieChartController {
 		drawChart(true);
 	}
 	//Configuration functions Functions-----------------------------------------------------------
+	public void checkAnimated() {
+		if(pChart.getAnimated())
+			pChart.setAnimated(false);
+		else
+			pChart.setAnimated(true);
+	}
 	public void setFullscrn() {
 		System.out.println("#FullScreen");
 		stage = (Stage) anchor.getScene().getWindow();
@@ -436,7 +445,7 @@ public class PieChartController {
 		if(FILE_PATH == "") {
 			FileChooser fileChooser = new FileChooser();
 		    fileChooser.setTitle("Save");
-		    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("FXCHART", "*.fxpiechart"));
+		    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Fx Pie Chart", "*.fxpiechart"));
 		    File file = fileChooser.showSaveDialog(primaryStage);
   
 	        if (file != null) {
@@ -449,7 +458,77 @@ public class PieChartController {
 			error_label.setText("Saved");
 		}
 	}
-	public void load() {loadDataFromFileConfirmed();}
+	public void saveas() {
+		FileChooser fileChooser = new FileChooser();
+	    fileChooser.setTitle("Save");
+	    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Fx Pie Chart", "*.fxpiechart"));
+	    File file = fileChooser.showSaveDialog(primaryStage);
+
+        if (file != null) {
+        	FILE_PATH = file.getPath()+".fxpiechart";
+        	callWriter();
+        	error_label.setText("File Saved '"+FILE_PATH+"'");
+        }
+	}
+	public void load() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open");
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Fx Pie Chart", "*.fxpiechart"));
+		File file = fileChooser.showOpenDialog(anchor.getScene().getWindow());        
+		
+		if (file != null) {
+			clearChart();
+			ArrayList<PieChart.Data> read = PTFileManager.readDataFromFile(file.getAbsolutePath());
+			FILE_PATH = file.getAbsolutePath();
+			pieList = new ArrayList<PieChart.Data>(read);
+			drawChart(false);
+		}
+	}
+	public void saveXml() {
+		if(FILE_PATH == "") {
+			FileChooser fileChooser = new FileChooser();
+		    fileChooser.setTitle("Save");
+		    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PieChart XML", "*.piexml"));
+		    File file = fileChooser.showSaveDialog(primaryStage);
+  
+	        if (file != null) {
+	        	FILE_PATH = file.getPath()+".piexml";
+	        	callWriterXml();
+	        	error_label.setText("Xml Saved '"+FILE_PATH+"'");
+	        }
+		}else {
+			callWriterXml();
+			error_label.setText("Saved");
+		}
+	}
+	public void saveasXml() {
+		FileChooser fileChooser = new FileChooser();
+	    fileChooser.setTitle("Save");
+	    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PieChart XML", "*.piexml"));
+	    File file = fileChooser.showSaveDialog(primaryStage);
+
+        if (file != null) {
+        	FILE_PATH = file.getPath()+".piexml";
+        	callWriterXml();
+        	error_label.setText("Xml Saved '"+FILE_PATH+"'");
+        }
+	}
+	public void loadXml() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open");
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PieXml", "*.piexml"));
+		File file = fileChooser.showOpenDialog(anchor.getScene().getWindow());        
+		
+		if (file != null) {
+			clearChart();
+			ArrayList<PieChart.Data> read = PXFileManager.readDataFromFile(file.getAbsolutePath());
+			FILE_PATH = file.getAbsolutePath();
+			pieList = new ArrayList<PieChart.Data>(read);
+			drawChart(false);
+		}
+	}
+	private void callWriter() {PTFileManager.writeDataInFile(pieList,FILE_PATH);}
+	private void callWriterXml() {PXFileManager.writeDataInFile(pieList,FILE_PATH);}
 	//utilities Core functions---------------------------------------------
 	private ArrayList<PieChart.Data> cloneList(ArrayList<PieChart.Data> l) {
 		ArrayList<PieChart.Data> temp = new ArrayList<PieChart.Data>();
@@ -464,7 +543,7 @@ public class PieChartController {
 		pie_data = FXCollections.observableArrayList();
 		for(PieChart.Data ent_no : pieList){
 			pie_data.add(new PieChart.Data(ent_no.getName(),ent_no.getPieValue()));
-			PieTableController row = new PieTableController(ent_no.getName(),ent_no.getPieValue());
+			PieTableModal row = new PieTableModal(ent_no.getName(),ent_no.getPieValue());
 			table.getItems().add(row);
 		}
 		pChart.setData(pie_data);
@@ -545,29 +624,6 @@ public class PieChartController {
 	    }
 		return true;
 	}
-	//loading functions------------------------------------------------------
-	private void callWriter() {pieFileSysController.writeDataInFile(pieList,FILE_PATH);}
-	private void loadDataFromFileConfirmed() {
-		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open");
-		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("FXCHART", "*.fxchart"));
-		File file = fileChooser.showOpenDialog(anchor.getScene().getWindow());        
-		
-		if (file != null) {
-			clearChart();
-			ArrayList<PieChart.Data> read = pieFileSysController.readDataFromFile(file.getAbsolutePath());
-			FILE_PATH = file.getAbsolutePath();
-			pieList = new ArrayList<PieChart.Data>(read);
-			drawChart(false);
-		}	
-	}	
-	public void loadDataInTable() {
-		for(int i=0;i<pieList.size();i++) {
-			PieTableController row = new PieTableController(pieList.get(i).getName(),pieList.get(i).getPieValue());
-			table.getItems().add(row);			
-		}
-	}	
-	public void loadDataFromDb() {}
 	//Editing--------------------------------------
 	public void editFromTable() {
 		System.out.println("#editDataFromTable");
@@ -686,14 +742,14 @@ public class PieChartController {
         File file = fileChooser.showSaveDialog(primaryStage);
       
         if(file != null) {        	
-        	final ObservableList<PieTableController> data = FXCollections.observableArrayList();
+        	final ObservableList<PieTableModal> data = FXCollections.observableArrayList();
     		for(int i=0;i<pieList.size();i++)
-    			data.add(new PieTableController(pieList.get(i).getName(),pieList.get(i).getPieValue()));
+    			data.add(new PieTableModal(pieList.get(i).getName(),pieList.get(i).getPieValue()));
     		Writer writer = null;
             try {        	
             	file = new File(file.getAbsolutePath()+".csv");
                 writer = new BufferedWriter(new FileWriter(file));
-                for (PieTableController person : data) {
+                for (PieTableModal person : data) {
                     String text = person.getS() + "," + person.getD() +"\n";
                     writer.write(text);
                     System.out.println("Export CSV\n\t CSV exported");
@@ -709,7 +765,6 @@ public class PieChartController {
 		File file = fileChooser.showSaveDialog(primaryStage);
 	      
         if (file != null) {
-        	loadDataInTable();
         	file = new File(file.getAbsolutePath()+".pdf");
         	Document report= new Document();
             PdfWriter.getInstance(report, new FileOutputStream(file));
@@ -717,8 +772,8 @@ public class PieChartController {
             PdfPTable report_table = new PdfPTable(2);
 
             for(int i=0;i<table.getItems().size();i++) {
-            	report_table.addCell(getCell(((PieTableController) table.getItems().get(i)).getS(),PdfPCell.ALIGN_CENTER ));
-            	report_table.addCell(getCell(((PieTableController) table.getItems().get(i)).getD().toString(),PdfPCell.ALIGN_CENTER ));            	
+            	report_table.addCell(getCell(((PieTableModal) table.getItems().get(i)).getS(),PdfPCell.ALIGN_CENTER ));
+            	report_table.addCell(getCell(((PieTableModal) table.getItems().get(i)).getD().toString(),PdfPCell.ALIGN_CENTER ));            	
             }
             report.add(report_table);
             report.close();

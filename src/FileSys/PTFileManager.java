@@ -8,7 +8,7 @@ import java.util.Scanner;
 
 import javafx.scene.chart.PieChart;
 
-public class pieFileSysController {
+public class PTFileManager {
 	static FileWriter locFile = null; 
 	@SuppressWarnings("null")
 	public static void writeDataInFile(ArrayList<PieChart.Data> pieList, String FilePath) {

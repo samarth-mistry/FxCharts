@@ -1,10 +1,10 @@
 package PieChart;
 
-public class PieTableController {
+public class PieTableModal {
 	private String s;
     private Double d;
 
-    public PieTableController(String s, Double d) {
+    public PieTableModal(String s, Double d) {
         this.s = s;
         this.d = d;        
     }

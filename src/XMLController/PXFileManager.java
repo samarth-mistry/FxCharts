@@ -11,12 +11,10 @@ import com.thoughtworks.xstream.io.xml.DomDriver;
 
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.PieChart.Data;
-import PieChart.PXNodeModal;
-import PieChart.PXRootModal;
 
 public class PXFileManager {
 	private static FileWriter locFile = null;
-	private static void writeDataInFile(ArrayList<PieChart.Data> pieList, String FilePath) {
+	public static void writeDataInFile(ArrayList<PieChart.Data> pieList, String FilePath) {
 		XStream xs = new XStream(new DomDriver());
 		xs.alias("PieChartData", PXRootModal.class);
 		xs.alias("PieNode", PXNodeModal.class);

@@ -1,0 +1,20 @@
+<PieChartData>
+  <PieNodes>
+    <PieNode>
+      <Name>PieSlice</Name>
+      <Data>10.8</Data>
+    </PieNode>
+    <PieNode>
+      <Name>PieSlice</Name>
+      <Data>10.8</Data>
+    </PieNode>
+    <PieNode>
+      <Name>PieSlice</Name>
+      <Data>10.8</Data>
+    </PieNode>
+    <PieNode>
+      <Name>PieSlice</Name>
+      <Data>10.8</Data>
+    </PieNode>
+  </PieNodes>
+</PieChartData>

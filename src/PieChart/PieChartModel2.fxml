@@ -4,6 +4,7 @@
 <?import javafx.scene.chart.PieChart?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.CheckBox?>
+<?import javafx.scene.control.CheckMenuItem?>
 <?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
 <?import javafx.scene.control.Menu?>
@@ -29,8 +30,9 @@
         <menus>
           <Menu mnemonicParsing="false" text="File">
             <items>
-                  <MenuItem mnemonicParsing="false" text="Open       [ctrl+o]" />
-                  <MenuItem mnemonicParsing="false" text="New File [ctrl+o]" />
+                  <MenuItem mnemonicParsing="false" onAction="#load" text="Open       [ctrl+o]" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" onAction="#openPieKit" text="New File [ctrl+o]" />
                   <MenuItem mnemonicParsing="false" onAction="#openBarKit" text="New BarChart" />
                   <MenuItem mnemonicParsing="false" onAction="#openPieKit" text="New PieChart" />
                   <MenuItem mnemonicParsing="false" onAction="#openLineKit" text="New LineChart" />
@@ -38,11 +40,15 @@
                   <MenuItem mnemonicParsing="false" onAction="#openFxPaintKit" text="New FxPaint" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" text="Save       [ctrl+s]" />
+                  <MenuItem mnemonicParsing="false" text="Save  As  [ctrl+shift+s]" />
+                  <MenuItem mnemonicParsing="false" text="Save XML" />
+                  <MenuItem mnemonicParsing="false" text="Save as XML" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" onAction="#pdfExtract" text="Export chart to PDF  [ctrl+p]" />
                   <MenuItem mnemonicParsing="false" onAction="#pngExtract" text="Export chart to PNG [ctrl+i]" />
                   <MenuItem mnemonicParsing="false" onAction="#pdfTableExtract" text="Export table to PDF  [ctrl+t]" />
                   <MenuItem mnemonicParsing="false" onAction="#csvExtract" text="Export table to CSV [ctrl+r]" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
               <MenuItem mnemonicParsing="false" onAction="#exit" text="Exit         [ctrl+q]" />
             </items>
           </Menu>
@@ -69,6 +75,7 @@
                   <MenuItem mnemonicParsing="false" onAction="#zoomNormal" text="Full Screen [alt+F11]" />
                   <MenuItem mnemonicParsing="false" text="Zoom chart  [ctrl++]" />
                   <MenuItem mnemonicParsing="false" onAction="#zoomNormal" text="Zoom to normal" />
+                  <CheckMenuItem mnemonicParsing="false" onAction="#checkAnimated" text="Animation" />
               </items>
             </Menu>
           <Menu mnemonicParsing="false" text="Help">
@@ -83,7 +90,7 @@
          <font>
             <Font name="System Bold Italic" size="14.0" />
          </font></Label>
-      <Line endX="-140.0" endY="-138.0" layoutX="344.0" layoutY="592.0" startX="-336.0" startY="-138.0" />
+      <Line endX="-140.0" endY="-138.0" layoutX="344.0" layoutY="552.0" startX="-336.0" startY="-138.0" />
       <DatePicker fx:id="setDate" layoutX="10.0" layoutY="41.0" onKeyReleased="#btnOnKeyPressed" prefHeight="24.0" prefWidth="199.0" promptText="Set date [DD/MM/YYYY]" />      
       <TextField fx:id="pieChartTitle" layoutX="11.0" layoutY="75.0" onKeyReleased="#nmValEntriesPressed" onKeyTyped="#axisRenamed" prefHeight="24.0" prefWidth="199.0" promptText="Change chart's title" />
       <TextField fx:id="nm" layoutX="11.0" layoutY="107.0" onKeyReleased="#nmValEntriesPressed" prefHeight="24.0" prefWidth="199.0" promptText="Name" text="PieSlice" />      
@@ -105,7 +112,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <CheckBox fx:id="bulkEnable" layoutX="101.0" layoutY="418.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable Bulk" />                       
+      <CheckBox fx:id="bulkEnable" layoutX="101.0" layoutY="351.0" mnemonicParsing="false" onAction="#buttonEnabler" text="Enable Bulk" />                       
       <Button layoutX="10.0" layoutY="531.0" mnemonicParsing="false" onAction="#exit" prefHeight="24.0" prefWidth="84.0" style="-fx-background-color: #ff2225;" text="Exit" textFill="WHITE" />
       <Button fx:id="load" layoutX="10.0" layoutY="379.0" mnemonicParsing="false" onAction="#load" prefHeight="28.0" prefWidth="84.0" style="-fx-background-color: #60c0da;" text="Open">
          <graphic>
@@ -156,7 +163,7 @@
             </ImageView>
          </graphic></Button>
       <Circle fx:id="theameCircle" fill="#666666" layoutX="195.0" layoutY="327.0" onMouseClicked="#changeTheme" radius="11.0" stroke="BLACK" strokeType="INSIDE" />
-      <TableView fx:id="table" editable="true" layoutX="1081.0" layoutY="76.0" prefHeight="538.0" prefWidth="261.0">
+      <TableView fx:id="table" editable="true" layoutX="1081.0" layoutY="76.0" prefHeight="538.0" prefWidth="261.0" style="-fx-border-color: black;">
          <columns>
             <TableColumn fx:id="c1" minWidth="5.0" prefWidth="160.0" text="Name" />
             <TableColumn fx:id="c2" prefWidth="100.0" text="Value" />
@@ -205,8 +212,8 @@
             </ImageView>
          </graphic>
       </Button>      
-      <PieChart fx:id="pChart" layoutX="222.0" layoutY="75.0" onMouseClicked="#zoomNormal" onScroll="#zoomPieChart" prefHeight="538.0" prefWidth="849.0" style="-fx-border-color: #666666;" title="PieChart title" />
-      <Button layoutX="10.0" layoutY="413.0" mnemonicParsing="false" onAction="#pdfExtract" prefHeight="28.0" prefWidth="84.0" style="-fx-background-color: #81af6a;" text="Save" textFill="WHITE">
+      <PieChart fx:id="pChart" animated="false" layoutX="222.0" layoutY="75.0" onMouseClicked="#zoomNormal" onScroll="#zoomPieChart" prefHeight="538.0" prefWidth="849.0" style="-fx-border-color: #666666;" title="PieChart title" />
+      <Button layoutX="10.0" layoutY="426.0" mnemonicParsing="false" onAction="#save" prefHeight="28.0" prefWidth="84.0" style="-fx-background-color: #81af6a;" text="Save" textFill="WHITE">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -228,6 +235,24 @@
             <ImageView fitHeight="18.0" fitWidth="21.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../../resources/imgs/copy-to-clipboard.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
+      <Button layoutX="101.0" layoutY="426.0" mnemonicParsing="false" onAction="#saveXml" prefHeight="28.0" prefWidth="114.0" style="-fx-background-color: #81af6a;" text="Save XML" textFill="WHITE">
+         <graphic>
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../resources/imgs/save.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
+      <Button layoutX="100.0" layoutY="379.0" mnemonicParsing="false" onAction="#loadXml" prefHeight="28.0" prefWidth="114.0" style="-fx-background-color: #60c0da;" text="Open XML">
+         <graphic>
+            <ImageView fitHeight="20.0" fitWidth="32.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../resources/imgs/add.png" />
                </image>
             </ImageView>
          </graphic>
