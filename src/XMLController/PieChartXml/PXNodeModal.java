@@ -1,4 +1,4 @@
-package XMLController;
+package XMLController.PieChartXml;
 
 import com.thoughtworks.xstream.annotations.XStreamAlias;
 

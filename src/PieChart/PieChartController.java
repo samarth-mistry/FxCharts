@@ -29,7 +29,7 @@ import com.itextpdf.text.pdf.PdfWriter;
 
 import FileSys.PTFileManager;
 import Main.FxChartMainPage;
-import XMLController.PXFileManager;
+import XMLController.PieChartXml.PXFileManager;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.embed.swing.SwingFXUtils;

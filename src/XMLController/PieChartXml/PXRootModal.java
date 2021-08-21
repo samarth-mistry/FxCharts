@@ -1,4 +1,4 @@
-package XMLController;
+package XMLController.PieChartXml;
 
 import java.util.List;
 

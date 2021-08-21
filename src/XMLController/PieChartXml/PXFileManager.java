@@ -1,4 +1,4 @@
-package XMLController;
+package XMLController.PieChartXml;
 
 import java.io.FileInputStream;
 import java.io.FileWriter;
