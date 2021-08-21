@@ -32,17 +32,25 @@
           <Menu mnemonicParsing="false" text="File">
             <items>
                   <MenuItem mnemonicParsing="false" text="New File [ctrl+o]" />
+                  <MenuItem mnemonicParsing="false" onAction="#loadXml" text="Open XML" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
+                  <MenuItem mnemonicParsing="false" onAction="#openLineKit" text="New File [ctrl+o]" />
                   <MenuItem mnemonicParsing="false" onAction="#openBarKit" text="New BarChart" />
                   <MenuItem mnemonicParsing="false" onAction="#openPieKit" text="New PieChart" />
                   <MenuItem mnemonicParsing="false" onAction="#openLineKit" text="New LineChart" />
                   <MenuItem mnemonicParsing="false" onAction="#openStackKit" text="New StackedAreaChart" />
+                  <MenuItem mnemonicParsing="false" onAction="#openFxPaintKit" text="New FxPaint" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Save       [ctrl+s]" />
+                  <MenuItem mnemonicParsing="false" onAction="#save" text="Save       [ctrl+s]" />
+                  <MenuItem mnemonicParsing="false" onAction="#saveasXml" text="Save  As  [ctrl+shift+s]" />
+                  <MenuItem mnemonicParsing="false" onAction="#saveXml" text="Save XML" />
+                  <MenuItem mnemonicParsing="false" onAction="#saveasXml" text="Save as XML" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" onAction="#pdfExtract" text="Export chart to PDF  [ctrl+p]" />
                   <MenuItem mnemonicParsing="false" onAction="#pngExtract" text="Export chart to PNG [ctrl+i]" />
                   <MenuItem mnemonicParsing="false" onAction="#pdfTableExtract" text="Export table to PDF  [ctrl+t]" />
                   <MenuItem mnemonicParsing="false" onAction="#csvExtract" text="Export table to CSV [ctrl+r]" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
               <MenuItem mnemonicParsing="false" onAction="#exit" text="Exit         [ctrl+q]" />
             </items>
           </Menu>
@@ -53,6 +61,7 @@
               <MenuItem mnemonicParsing="false" onAction="#clearDb" text="Clear Database" />
               <MenuItem mnemonicParsing="false" onAction="#clearTable" text="Clear table" />
               <MenuItem mnemonicParsing="false" onAction="#clearAll" text="Clear chart, table and file [ctrl+c]" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
               <MenuItem mnemonicParsing="false" text="Enable bulk entries" />
               <MenuItem mnemonicParsing="false" text="Enable file" />
               <MenuItem mnemonicParsing="false" text="Enable database recording" />
@@ -85,7 +94,7 @@
       <TextField fx:id="yxisLabel" layoutX="8.0" layoutY="120.0" onKeyReleased="#bulkEntriesPressed" onKeyTyped="#axisRenamed" prefHeight="24.0" prefWidth="198.0" promptText="Label of Y-axis" text="Y" />
       <TextField fx:id="seriesLabel" layoutX="9.0" layoutY="150.0" onKeyReleased="#bulkEntriesPressed" prefHeight="24.0" prefWidth="198.0" promptText="Label for line" text="Line" />
       <TextArea layoutX="9.0" layoutY="180.0" onKeyReleased="#bulkEntriesPressed" prefHeight="106.0" prefWidth="198.0" promptText="Enter Bulkkk data here...." text="[9,10][10,9][14,13][4,4]" fx:id="xVal" />
-      <Button layoutX="8.0" layoutY="366.0" mnemonicParsing="false" onAction="#pngExtract" prefHeight="28.0" prefWidth="78.0" style="-fx-background-color: #81af6a;" text="PNG" textFill="WHITE">
+      <Button layoutX="8.0" layoutY="478.0" mnemonicParsing="false" onAction="#pngExtract" prefHeight="28.0" prefWidth="78.0" style="-fx-background-color: #81af6a;" text="PNG" textFill="WHITE">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -93,7 +102,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button layoutX="8.0" layoutY="400.0" mnemonicParsing="false" onAction="#pdfExtract" prefHeight="28.0" prefWidth="78.0" style="-fx-background-color: #81af6a;" text="PDF" textFill="WHITE">
+      <Button layoutX="8.0" layoutY="512.0" mnemonicParsing="false" onAction="#pdfExtract" prefHeight="28.0" prefWidth="78.0" style="-fx-background-color: #81af6a;" text="PDF" textFill="WHITE">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -109,7 +118,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button layoutX="174.0" layoutY="333.0" mnemonicParsing="false" onAction="#clearChart" prefHeight="28.0" prefWidth="36.0" style="-fx-background-color: #ffaa00;">
+      <Button layoutX="57.0" layoutY="335.0" mnemonicParsing="false" onAction="#clearChart" prefHeight="28.0" prefWidth="36.0" style="-fx-background-color: #ffaa00;">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -117,7 +126,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button fx:id="loadDataFromFile" disable="true" layoutX="8.0" layoutY="299.0" mnemonicParsing="false" onAction="#loadDataFromFile" style="-fx-background-color: #60c0da;" text="Open">
+      <Button fx:id="loadDataFromFile" layoutX="8.0" layoutY="411.0" mnemonicParsing="false" onAction="#load" style="-fx-background-color: #60c0da;" text="Open">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -125,9 +134,9 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <CheckBox fx:id="clickDraw" layoutX="8.0" layoutY="471.0" mnemonicParsing="false" onKeyReleased="#bulkEntriesPressed" text="Click Draw" />                       
+      <CheckBox fx:id="clickDraw" layoutX="114.0" layoutY="341.0" mnemonicParsing="false" onKeyReleased="#bulkEntriesPressed" text="Click Draw" />                       
       <Button layoutX="8.0" layoutY="582.0" mnemonicParsing="false" onAction="#exit" prefHeight="24.0" prefWidth="77.0" style="-fx-background-color: #ff2225;" text="Exit" textFill="WHITE" />
-      <Button layoutX="132.0" layoutY="334.0" mnemonicParsing="false" onAction="#refresh">
+      <Button layoutX="14.0" layoutY="334.0" mnemonicParsing="false" onAction="#refresh">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -135,7 +144,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button layoutX="8.0" layoutY="435.0" mnemonicParsing="false" onAction="#csvExtract" prefHeight="28.0" prefWidth="77.0" style="-fx-background-color: #81af6a;" text="CSV" textFill="WHITE">
+      <Button layoutX="8.0" layoutY="547.0" mnemonicParsing="false" onAction="#csvExtract" prefHeight="28.0" prefWidth="77.0" style="-fx-background-color: #81af6a;" text="CSV" textFill="WHITE">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -143,7 +152,7 @@
                </image>
             </ImageView>
          </graphic></Button>
-      <Button layoutX="105.0" layoutY="434.0" mnemonicParsing="false" onAction="#pdfTableExtract" prefHeight="28.0" prefWidth="111.0" style="-fx-background-color: #81af6a;" text="Table PDF" textFill="WHITE">
+      <Button layoutX="95.0" layoutY="547.0" mnemonicParsing="false" onAction="#pdfTableExtract" prefHeight="28.0" prefWidth="111.0" style="-fx-background-color: #81af6a;" text="Table PDF" textFill="WHITE">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -173,7 +182,7 @@
          </opaqueInsets>
       </TableView>
       <Label fx:id="app_log" layoutX="7.0" layoutY="620.0" prefHeight="61.0" prefWidth="1026.0" style="-fx-border-color: black;" text="Application Log" />
-      <Button layoutX="8.0" layoutY="332.0" mnemonicParsing="false" onAction="#pngExtract" prefHeight="28.0" prefWidth="78.0" style="-fx-background-color: #81af6a;" text="Save" textFill="WHITE">
+      <Button layoutX="8.0" layoutY="444.0" mnemonicParsing="false" onAction="#save" prefHeight="28.0" prefWidth="78.0" style="-fx-background-color: #81af6a;" text="Save" textFill="WHITE">
          <graphic>
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
@@ -182,7 +191,7 @@
             </ImageView>
          </graphic>
       </Button>
-      <Button layoutX="175.0" layoutY="367.0" mnemonicParsing="false" onAction="#redo" prefHeight="26.0" prefWidth="38.0" style="-fx-background-color: #ffaa00;">
+      <Button layoutX="57.0" layoutY="301.0" mnemonicParsing="false" onAction="#redo" prefHeight="26.0" prefWidth="38.0" style="-fx-background-color: #ffaa00;">
          <tooltip>
             <Tooltip text="Redo" />
          </tooltip>
@@ -194,7 +203,7 @@
             </ImageView>
          </graphic>
       </Button>
-      <Button layoutX="132.0" layoutY="367.0" mnemonicParsing="false" onAction="#undo" prefHeight="26.0" prefWidth="38.0" style="-fx-background-color: #ffaa00;">
+      <Button layoutX="14.0" layoutY="301.0" mnemonicParsing="false" onAction="#undo" prefHeight="26.0" prefWidth="38.0" style="-fx-background-color: #ffaa00;">
          <tooltip>
             <Tooltip text="Undo" />
          </tooltip>
@@ -222,6 +231,24 @@
             <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
                <image>
                   <Image url="@../../resources/imgs/copy-to-clipboard.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
+      <Button fx:id="loadDataFromFile1" layoutX="96.0" layoutY="411.0" mnemonicParsing="false" onAction="#loadXml" style="-fx-background-color: #60c0da;" text="Open XML">
+         <graphic>
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../resources/imgs/add.png" />
+               </image>
+            </ImageView>
+         </graphic>
+      </Button>
+      <Button layoutX="96.0" layoutY="444.0" mnemonicParsing="false" onAction="#saveXml" prefHeight="28.0" prefWidth="109.0" style="-fx-background-color: #81af6a;" text="Save XML" textFill="WHITE">
+         <graphic>
+            <ImageView fitHeight="20.0" fitWidth="20.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@../../resources/imgs/save.png" />
                </image>
             </ImageView>
          </graphic>

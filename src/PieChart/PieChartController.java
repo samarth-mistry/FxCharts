@@ -117,6 +117,7 @@ public class PieChartController {
     ctrlz= new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN),
     ctrlshiftz= new KeyCodeCombination(KeyCode.Z, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN),
     ctrlshiftc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN),
+	ctrlshifts= new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN),
     ctrlPrintPDF = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN),
     ctrlPrintPNG = new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN),
     ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN),
@@ -202,6 +203,7 @@ public class PieChartController {
 		else if (ctrlo.match(event)) {load();event.consume();}
 		else if (ctrlz.match(event)) {undo();event.consume();}
 		else if (ctrlshiftz.match(event)) {redo();event.consume();}
+		else if (ctrlshifts.match(event)) {saveas();event.consume();}
 		else if (ctrlshiftc.match(event)) {copyImgToClipBoard();event.consume();}
 		else if (ctrlb.match(event)) {
 			if(bulkEnable.isSelected()) {

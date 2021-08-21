@@ -1,0 +1,59 @@
+<LineChartData>
+  <SeriesModal>
+    <Series>
+      <SeriesName>Line</SeriesName>
+      <SeriPoints/>
+    </Series>
+    <Series>
+      <SeriesName>Line</SeriesName>
+      <SeriPoints>
+        <BarNode>
+          <Name>Sher</Name>
+          <Value class="double">1.0</Value>
+        </BarNode>
+        <BarNode>
+          <Name>Abbas Clocker</Name>
+          <Value class="double">2.0</Value>
+        </BarNode>
+        <BarNode>
+          <Name>OBL</Name>
+          <Value class="double">3.0</Value>
+        </BarNode>
+      </SeriPoints>
+    </Series>
+    <Series>
+      <SeriesName>Line</SeriesName>
+      <SeriPoints>
+        <BarNode>
+          <Name>Sher</Name>
+          <Value class="double">4.0</Value>
+        </BarNode>
+        <BarNode>
+          <Name>Abbas Clocker</Name>
+          <Value class="double">3.0</Value>
+        </BarNode>
+        <BarNode>
+          <Name>OBL</Name>
+          <Value class="double">1.0</Value>
+        </BarNode>
+      </SeriPoints>
+    </Series>
+    <Series>
+      <SeriesName>Line</SeriesName>
+      <SeriPoints>
+        <BarNode>
+          <Name>Sher</Name>
+          <Value class="double">5.0</Value>
+        </BarNode>
+        <BarNode>
+          <Name>Abbas Clocker</Name>
+          <Value class="double">6.0</Value>
+        </BarNode>
+        <BarNode>
+          <Name>OBL</Name>
+          <Value class="double">7.0</Value>
+        </BarNode>
+      </SeriPoints>
+    </Series>
+  </SeriesModal>
+</LineChartData>

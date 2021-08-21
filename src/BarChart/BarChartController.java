@@ -4,6 +4,8 @@ import FileSys.barFileSysController;
 import FileSys.lineFileSysController;
 import LineChart.LineTableController;
 import Main.FxChartMainPage;
+import XMLController.BarChartXml.BXFileManager;
+import XMLController.LineChartXml.LXFileManager;
 import DbSys.DbController;
 
 import java.awt.Toolkit;
@@ -125,6 +127,7 @@ public class BarChartController {
     ctrlz= new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN),
     ctrlshiftz= new KeyCodeCombination(KeyCode.Z, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN),
     ctrlshiftc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN),
+    ctrlshifts= new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN),
     ctrlPrintPDF = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN),
     ctrlPrintPNG = new KeyCodeCombination(KeyCode.O, KeyCombination.CONTROL_DOWN),
     ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN),
@@ -153,6 +156,7 @@ public class BarChartController {
 		else if (ctrlz.match(event)) {undo();event.consume();}
 		else if (ctrlshiftz.match(event)) {redo();event.consume();}
 		else if (ctrlshiftc.match(event)) {copyImgToClipBoard();event.consume();}
+		else if (ctrlshifts.match(event)) {saveas();event.consume();}
 		else if (ctrlb.match(event)) {
 			if(bulkEnable.isSelected()) {
 				bulkEnable.setSelected(false);
@@ -542,68 +546,8 @@ public class BarChartController {
 	    }
 		return true;
 	}
-	//loading functions------------------------------------------------------
-	private void callWriter() {barFileSysController.writeDataInFile(SeriList, FILE_PATH);}
-	public void loadDataFromFile() {
-		if(!bChart.getData().isEmpty()) {
-			Alert alert = new Alert(AlertType.CONFIRMATION);
-			alert.setTitle("ALERT");
-			alert.setHeaderText("Your Chart currently having data.\nBy loading it from file it will clear it");
-			alert.setContentText("Are you sure to overload?");
-
-			Optional<ButtonType> result = alert.showAndWait();
-			if (result.get() == ButtonType.OK){
-				loadDataFromFileConfirmed();
-			} else {
-			    // ... user chose CANCEL or closed the dialog
-			}
-		} else {
-			loadDataFromFileConfirmed();
-		}
-	}
-	public void loadDataFromFileConfirmed() {
-		FileChooser fileChooser = new FileChooser();
-		fileChooser.setTitle("Open");
-		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Fx Bar Chart", "*.fxbarchart"));
-		File file = fileChooser.showOpenDialog(anchor.getScene().getWindow());        
-		
-		if (file != null) {
-			clearChart();
-			FILE_PATH = file.getAbsolutePath();
-			ArrayList<XYChart.Series<String, Number>> seriesArr = barFileSysController.readDataFromFile(FILE_PATH);
-			if(!seriesArr.isEmpty()) {			
-				SeriList = new ArrayList<XYChart.Series<String, Number>>(seriesArr);
-				drawBulkChart();
-			}else {
-				error_label.setText("File is empty!");
-			}
-		}
-	}	
-	public void loadDataFromDb() {
-//		clearChart();		
-//		ArrayList<String> seriesArr = null;
-//		try {
-//			seriesArr = DbController.getSeries();
-//		} catch (SQLException e) {
-//			error_label.setText("Error fetching data from DB");
-//			e.printStackTrace();
-//		}
-//		if(!seriesArr.isEmpty()) {			
-//			for(int seriIndex=0;seriIndex< seriesArr.size();seriIndex++) {
-//				String X = seriesArr.get(seriIndex);
-//				String line = "";
-//				if(X.charAt(0) == '{') {						
-//					for(int j=0; X.charAt(j+1) != '}'; j++) {
-//						line += X.charAt(j+1);
-//					}						
-//				}
-//				//decodeAndDraw(line,X,false);
-//			}
-//		}else {
-//			error_label.setText("DB is empty!\nPlease add data first");
-//		}
-	}
 	//utilities functions--------------------------------------
+	public void refresh() {}
 	private ArrayList<XYChart.Series<String, Number>> cloneList(ArrayList<XYChart.Series<String, Number>> l) {
 		ArrayList<XYChart.Series<String, Number>> temp = new ArrayList<XYChart.Series<String, Number>>();
         for(int i=0;i<l.size();i++){
@@ -639,6 +583,7 @@ public class BarChartController {
 			jbp();
 	}
 	private void jbp() {Toolkit.getDefaultToolkit().beep();}
+	//Save - OPen----------------------------------------------
 	public void save() {
 		if(FILE_PATH == "") {
 			FileChooser fileChooser = new FileChooser();
@@ -656,7 +601,81 @@ public class BarChartController {
 			error_label.setText("Saved");
 		}
 	}
-	public void load() {loadDataFromFileConfirmed();}
+	public void saveas() {
+		FileChooser fileChooser = new FileChooser();
+	    fileChooser.setTitle("Save");
+	    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Fx Bar Chart", "*.fxbarchart"));
+	    File file = fileChooser.showSaveDialog(primaryStage);
+
+        if (file != null) {
+        	FILE_PATH = file.getPath()+".fxbarchart";
+        	callWriter();
+        	error_label.setText("File Saved '"+FILE_PATH+"'");
+        }
+	}
+	public void load() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open");
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Fx Bar Chart", "*.fxbarchart"));
+		File file = fileChooser.showOpenDialog(anchor.getScene().getWindow());        
+		
+		if (file != null) {
+			clearChart();
+			FILE_PATH = file.getAbsolutePath();
+			ArrayList<XYChart.Series<String, Number>> seriesArr = barFileSysController.readDataFromFile(FILE_PATH);
+			if(!seriesArr.isEmpty()) {			
+				SeriList = new ArrayList<XYChart.Series<String, Number>>(seriesArr);
+				drawBulkChart();
+			}else {
+				error_label.setText("File is empty!");
+			}
+		}
+	}
+	public void saveXml() {
+		if(FILE_PATH == "") {
+			FileChooser fileChooser = new FileChooser();
+		    fileChooser.setTitle("Save");
+		    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("BarChart XML", "*.barxml"));
+		    File file = fileChooser.showSaveDialog(primaryStage);
+  
+	        if (file != null) {
+	        	FILE_PATH = file.getPath()+".barxml";
+	        	callWriterXml();
+	        	error_label.setText("Xml Saved '"+FILE_PATH+"'");
+	        }
+		}else {
+			callWriterXml();
+			error_label.setText("Saved");
+		}
+	}
+	public void saveasXml() {
+		FileChooser fileChooser = new FileChooser();
+	    fileChooser.setTitle("Save");
+	    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("BarChart XML", "*.barxml"));
+	    File file = fileChooser.showSaveDialog(primaryStage);
+
+        if (file != null) {
+        	FILE_PATH = file.getPath()+".barxml";
+        	callWriterXml();
+        	error_label.setText("Xml Saved '"+FILE_PATH+"'");
+        }
+	}
+	public void loadXml() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open");
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("BarChart XML", "*.barxml"));
+		File file = fileChooser.showOpenDialog(anchor.getScene().getWindow());        
+		
+		if (file != null) {
+			clearChart();
+			ArrayList<XYChart.Series<String, Number>> read = BXFileManager.readDataFromFile(file.getAbsolutePath());
+			FILE_PATH = file.getAbsolutePath();
+			SeriList = new ArrayList<XYChart.Series<String,	Number>>(read);
+			drawBulkChart();
+		}
+	}
+	private void callWriterXml() {BXFileManager.writeDataInFile(SeriList,FILE_PATH);}
+	private void callWriter() {barFileSysController.writeDataInFile(SeriList, FILE_PATH);}
 	//Previewing-------------------------------------------
 	public void previewPDF() {}
 	//Editing-----------------------------------------------
@@ -701,8 +720,8 @@ public class BarChartController {
 					System.out.println("\t<"+xArr[j]+"><"+yArr[j]+">");
 				}
 				selector+=bkCnt.get(i);				
-				//drawBulkChart(nmArr.get(i),yArr,bkCnt.get(i),false);
 			}
+			drawBulkChart();
 		}else
 			error_label.setText("Value of "+table.getItems().get(i).getSeries()+" must be a number");
 	}
@@ -837,7 +856,6 @@ public class BarChartController {
             System.out.println("Export\n\tLine Table exported!");
 		}
     }
-	public void refresh() {}
 	private PdfPCell getCell(String text, int alignment) {
         PdfPCell cell = new PdfPCell(new Phrase(text));
         cell.setPadding(0);

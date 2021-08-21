@@ -31,6 +31,7 @@
           <Menu mnemonicParsing="false" text="File">
             <items>
                   <MenuItem mnemonicParsing="false" onAction="#load" text="Open       [ctrl+o]" />
+                  <MenuItem mnemonicParsing="false" onAction="#loadXml" text="Open XML" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" onAction="#openPieKit" text="New File [ctrl+o]" />
                   <MenuItem mnemonicParsing="false" onAction="#openBarKit" text="New BarChart" />
@@ -39,10 +40,10 @@
                   <MenuItem mnemonicParsing="false" onAction="#openStackKit" text="New StackedAreaChart" />
                   <MenuItem mnemonicParsing="false" onAction="#openFxPaintKit" text="New FxPaint" />
                   <SeparatorMenuItem mnemonicParsing="false" />
-                  <MenuItem mnemonicParsing="false" text="Save       [ctrl+s]" />
-                  <MenuItem mnemonicParsing="false" text="Save  As  [ctrl+shift+s]" />
-                  <MenuItem mnemonicParsing="false" text="Save XML" />
-                  <MenuItem mnemonicParsing="false" text="Save as XML" />
+                  <MenuItem mnemonicParsing="false" onAction="#save" text="Save       [ctrl+s]" />
+                  <MenuItem mnemonicParsing="false" onAction="#saveas" text="Save  As  [ctrl+shift+s]" />
+                  <MenuItem mnemonicParsing="false" onAction="#saveXml" text="Save XML" />
+                  <MenuItem mnemonicParsing="false" onAction="#saveasXml" text="Save as XML" />
                   <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" onAction="#pdfExtract" text="Export chart to PDF  [ctrl+p]" />
                   <MenuItem mnemonicParsing="false" onAction="#pngExtract" text="Export chart to PNG [ctrl+i]" />
@@ -54,15 +55,12 @@
           </Menu>
           <Menu mnemonicParsing="false" text="Edit">
             <items>
-              <MenuItem mnemonicParsing="false" onAction="#removeLast" text="Remove Last  [ctrl+z]" />
                   <MenuItem mnemonicParsing="false" onAction="#clearChart" text="Clear Chart" />
                   <MenuItem mnemonicParsing="false" onAction="#clearFile" text="Clear File" />
-                  <MenuItem mnemonicParsing="false" onAction="#clearDb" text="Clear Database" />
                   <MenuItem mnemonicParsing="false" onAction="#clearTable" text="Clear table" />
                   <MenuItem mnemonicParsing="false" onAction="#clearAll" text="Clear chart, table and file [ctrl+c]" />
+                  <SeparatorMenuItem mnemonicParsing="false" />
                   <MenuItem mnemonicParsing="false" text="Enable bulk entries" />
-                  <MenuItem mnemonicParsing="false" text="Enable file" />
-                  <MenuItem mnemonicParsing="false" text="Enable database recording" />
             </items>
           </Menu>
             <Menu mnemonicParsing="false" text="View">

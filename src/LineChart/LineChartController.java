@@ -2,6 +2,7 @@ package LineChart;
 
 import FileSys.lineFileSysController;
 import Main.FxChartMainPage;
+import XMLController.LineChartXml.LXFileManager;
 import DbSys.DbController;
 
 import java.awt.Toolkit;
@@ -122,6 +123,7 @@ public class LineChartController {
     ctrlz= new KeyCodeCombination(KeyCode.Z, KeyCombination.CONTROL_DOWN),
     ctrlshiftz= new KeyCodeCombination(KeyCode.Z, KeyCombination.SHIFT_DOWN, KeyCombination.CONTROL_DOWN),
     ctrlshiftc= new KeyCodeCombination(KeyCode.C, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN),
+    ctrlshifts= new KeyCodeCombination(KeyCode.S, KeyCombination.CONTROL_DOWN, KeyCombination.SHIFT_DOWN),
     ctrlPrintPDF = new KeyCodeCombination(KeyCode.P, KeyCombination.CONTROL_DOWN),
     ctrlPrintPNG = new KeyCodeCombination(KeyCode.I, KeyCombination.CONTROL_DOWN),
     ctrlPrintTPDF = new KeyCodeCombination(KeyCode.T, KeyCombination.CONTROL_DOWN),
@@ -195,6 +197,7 @@ public class LineChartController {
 		else if (ctrlz.match(event)) {undo();event.consume();}
 		else if (ctrlshiftz.match(event)) {redo();event.consume();}
 		else if (ctrlshiftc.match(event)) {copyImgToClipBoard();event.consume();}
+		else if (ctrlshifts.match(event)) {saveas();event.consume();}
 		else if (ctrlPrintTPDF.match(event)) {        	
         	try {
 				pdfTableExtract();
@@ -224,7 +227,8 @@ public class LineChartController {
 	//Clear Functions-----------------------------------------------------------
 	public void clearChart() {
 		lChart.getData().clear();
-		//error_label.setText("Chart Data Cleared!\nClick load data to reload");				
+		table.getItems().clear();
+		error_label.setText("");				
 	}
 	public void clearFile() {		
 		Alert alert = new Alert(AlertType.CONFIRMATION);
@@ -529,36 +533,19 @@ public class LineChartController {
 			error_label.setText("Saved");
 		}
 	}
-	public void load() {loadDataFromFileConfirmed();}
-	//utilities functions---------------------------------------------
-	private void jbp() {Toolkit.getDefaultToolkit().beep();}
-	private ArrayList<XYChart.Series<Double, Double>> cloneList(ArrayList<XYChart.Series<Double, Double>> l) {
-		ArrayList<XYChart.Series<Double, Double>> temp = new ArrayList<XYChart.Series<Double, Double>>();
-        for(int i=0;i<l.size();i++){
-            temp.add(l.get(i));
-        }
-        return temp;
-	}
-	//loading functions------------------------------------------------------
-	private void callWriter() {lineFileSysController.writeDataInFile(SeriList,FILE_PATH);}
-	public void loadDataFromFile() {
-		if(!lChart.getData().isEmpty()) {
-			Alert alert = new Alert(AlertType.CONFIRMATION);
-			alert.setTitle("ALERT");
-			alert.setHeaderText("Your Chart currently having data.\nBy loading it from file it will clear it");
-			alert.setContentText("Are you sure to overload?");
+	public void saveas() {
+		FileChooser fileChooser = new FileChooser();
+	    fileChooser.setTitle("Save");
+	    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Fx Line Chart", "*.fxlinechart"));
+	    File file = fileChooser.showSaveDialog(primaryStage);
 
-			Optional<ButtonType> result = alert.showAndWait();
-			if (result.get() == ButtonType.OK){
-				loadDataFromFileConfirmed();
-			} else {
-			    // ... user chose CANCEL or closed the dialog
-			}
-		} else {
-			loadDataFromFileConfirmed();
-		}
+        if (file != null) {
+        	FILE_PATH = file.getPath()+".fxlinechart";
+        	callWriter();
+        	error_label.setText("File Saved '"+FILE_PATH+"'");
+        }
 	}
-	public void loadDataFromFileConfirmed() {
+	public void load() {
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Open");
 		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("Fx Line Chart", "*.fxlinechart"));
@@ -576,29 +563,59 @@ public class LineChartController {
 			}
 		}
 	}
-	public void loadDataFromDb() {
-//		clearChart();		
-//		ArrayList<String> seriesArr = null;
-//		try {
-//			seriesArr = DbController.getSeries();
-//		} catch (SQLException e) {
-//			error_label.setText("Error fetching data from DB");
-//			e.printStackTrace();
-//		}
-//		if(!seriesArr.isEmpty()) {			
-//			for(int seriIndex=0;seriIndex< seriesArr.size();seriIndex++) {
-//				String X = seriesArr.get(seriIndex);
-//				String line = "";
-//				if(X.charAt(0) == '{') {						
-//					for(int j=0; X.charAt(j+1) != '}'; j++) {
-//						line += X.charAt(j+1);
-//					}						
-//				}
-//				//decodeAndDraw(line,X,false);
-//			}
-//		}else {
-//			error_label.setText("DB is empty!\nPlease add data first");
-//		}
+	public void saveXml() {
+		if(FILE_PATH == "") {
+			FileChooser fileChooser = new FileChooser();
+		    fileChooser.setTitle("Save");
+		    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("LineChart XML", "*.linexml"));
+		    File file = fileChooser.showSaveDialog(primaryStage);
+  
+	        if (file != null) {
+	        	FILE_PATH = file.getPath()+".linexml";
+	        	callWriterXml();
+	        	error_label.setText("Xml Saved '"+FILE_PATH+"'");
+	        }
+		}else {
+			callWriterXml();
+			error_label.setText("Saved");
+		}
+	}
+	public void saveasXml() {
+		FileChooser fileChooser = new FileChooser();
+	    fileChooser.setTitle("Save");
+	    fileChooser.getExtensionFilters().addAll(new ExtensionFilter("LineChart XML", "*.linexml"));
+	    File file = fileChooser.showSaveDialog(primaryStage);
+
+        if (file != null) {
+        	FILE_PATH = file.getPath()+".linexml";
+        	callWriterXml();
+        	error_label.setText("Xml Saved '"+FILE_PATH+"'");
+        }
+	}
+	public void loadXml() {
+		FileChooser fileChooser = new FileChooser();
+		fileChooser.setTitle("Open");
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("LineXml", "*.linexml"));
+		File file = fileChooser.showOpenDialog(anchor.getScene().getWindow());        
+		
+		if (file != null) {
+			clearChart();
+			ArrayList<XYChart.Series<Double, Double>> read = LXFileManager.readDataFromFile(file.getAbsolutePath());
+			FILE_PATH = file.getAbsolutePath();
+			SeriList = new ArrayList<XYChart.Series<Double,	Double>>(read);
+			drawChart();
+		}
+	}
+	private void callWriterXml() {LXFileManager.writeDataInFile(SeriList,FILE_PATH);}
+	private void callWriter() {lineFileSysController.writeDataInFile(SeriList,FILE_PATH);}
+	//utilities functions---------------------------------------------
+	private void jbp() {Toolkit.getDefaultToolkit().beep();}
+	private ArrayList<XYChart.Series<Double, Double>> cloneList(ArrayList<XYChart.Series<Double, Double>> l) {
+		ArrayList<XYChart.Series<Double, Double>> temp = new ArrayList<XYChart.Series<Double, Double>>();
+        for(int i=0;i<l.size();i++){
+            temp.add(l.get(i));
+        }
+        return temp;
 	}
 	//Editing------------------------------------------------------------	
     private void openPdfTextDialog(){

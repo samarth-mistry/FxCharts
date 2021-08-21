@@ -79,25 +79,4 @@ public class LXFileManager {
 	    	locFile.close();
 		}catch(IOException e) {}
 	}
-	public static void main(String[] args) {
-		ArrayList<XYChart.Series<Double, Double>> lineList = new ArrayList<XYChart.Series<Double, Double>>();
-		Series<Double, Double> series = new XYChart.Series<Double, Double>();
-		Double d =0.0;
-		series.setName("Sert-Slut");
-		for(int i=0;i<3;i++) {
-			series.getData().add(new XYChart.Data<Double, Double>(d,d+1.0));
-			d += 1.0;
-		}
-		lineList.add(series);
-		d=3.1;
-		series = new XYChart.Series<Double, Double>();
-		series.setName("Slut");
-		for(int i=0;i<3;i++) {
-			series.getData().add(new XYChart.Data<Double, Double>(d,d+1.0));
-			d += 1.0;
-		}
-		lineList.add(series);
-		writeDataInFile(lineList, "testLineXml.xml");
-		System.out.println(readDataFromFile("testLineXml.xml"));
-	}
 }
