@@ -685,7 +685,7 @@ public class PieChartController {
 		openPdfTextDialog();
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save");
-		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PDF", "*.pdf"));
 		File file = fileChooser.showSaveDialog(primaryStage);
       
 	     if (file != null) {
@@ -704,7 +704,7 @@ public class PieChartController {
 			    PdfWriter.getInstance(document, popfile);
 			    document.open();
 			    Image img = Image.getInstance("dat/imgs/chart.png");			    
-			    img.scaleAbsolute(560, 300);
+			    img.scaleAbsolute(520, 320);
 		        document.add(img);			   
 				HTMLWorker htmlWorker = new HTMLWorker(document);
 			    htmlWorker.parse(new StringReader(k));

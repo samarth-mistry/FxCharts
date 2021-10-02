@@ -759,7 +759,7 @@ public class BarChartController {
 		openPdfTextDialog();
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save");
-		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PDF", "*.pdf"));
 		File file = fileChooser.showSaveDialog(primaryStage);
 	      
         if (file != null) {
@@ -769,7 +769,8 @@ public class BarChartController {
 				ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", imgfile);
 			} catch (IOException e) {
 				System.out.println("Error in making image!");
-			}			
+			}
+			System.out.println("intermediate");
 			try {
 			    String k = pdfTextApp;				    
 			    OutputStream popfile = new FileOutputStream(new File(file.getAbsolutePath()+".pdf"));
@@ -777,7 +778,7 @@ public class BarChartController {
 			    PdfWriter.getInstance(document, popfile);
 			    document.open();
 			    Image img = Image.getInstance("dat/imgs/bchart.png");			    
-			    img.scaleAbsolute(560, 300);
+			    img.scaleAbsolute(520, 320);
 		        document.add(img);
 				HTMLWorker htmlWorker = new HTMLWorker(document);				
 			    htmlWorker.parse(new StringReader(k));

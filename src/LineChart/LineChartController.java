@@ -694,12 +694,12 @@ public class LineChartController {
 		openPdfTextDialog();
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save");
-		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PDF", "*.pdf"));
 		File file = fileChooser.showSaveDialog(primaryStage);
 	      
         if (file != null) {
 			WritableImage nodeshot = lChart.snapshot(new SnapshotParameters(), null);
-	        File imgfile = new File("dat/imgs/chart.png");
+	        File imgfile = new File("dat/imgs/lchart.png");
 	
 			try {
 			ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", imgfile);
@@ -712,8 +712,8 @@ public class LineChartController {
 			    Document document = new Document();
 			    PdfWriter.getInstance(document, popfile);
 			    document.open();
-			    Image img = Image.getInstance("dat/imgs/chart.png");			    
-			    img.scaleAbsolute(560, 300);
+			    Image img = Image.getInstance("dat/imgs/lchart.png");			    
+			    img.scaleAbsolute(520, 320);
 		        document.add(img);			   
 				HTMLWorker htmlWorker = new HTMLWorker(document);
 			    htmlWorker.parse(new StringReader(k));

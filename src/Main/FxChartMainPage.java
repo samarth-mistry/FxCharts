@@ -26,7 +26,7 @@ public class FxChartMainPage extends Application{
 		//chartSelector(primaryStage);
 		//URL url = new File("resources/views/LineChart.fxml").toURI().toURL();
 		//Parent root =FXMLLoader.load(url);
-		setStage(primaryStage,"Bar chart");
+		setStage(primaryStage,"FxPaint");
 	}
 	private void chartSelector(Stage primaryStage) throws IOException {
 		String chrt[] = {"Pie chart", "Line chart", "Bar chart", "FxPaint"};
@@ -35,7 +35,7 @@ public class FxChartMainPage extends Application{
         d.showAndWait();
         String sel = d.getSelectedItem();
         setStage(primaryStage, sel);        
-	}	
+	}
 	public void setStage(Stage primaryStage, String sel) throws IOException {
 		Parent root = null;
 		if(sel.equals("Pie chart")) {

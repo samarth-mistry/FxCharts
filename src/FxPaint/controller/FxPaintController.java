@@ -124,7 +124,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     private Stack<ArrayList<Boolean>> priList = new Stack<ArrayList<Boolean>>(),secList = new Stack<ArrayList<Boolean>>();
     //initialize---------------------------------------------------------
     public void initialize(URL url, ResourceBundle rb) {
-    	cursorMoni(); 
+    	cursorMoni();
     	objSize.valueProperty().addListener((obs, oldval, newVal) ->objSize.setValue(newVal.intValue()));
     	System.out.println("#initialize");
     	
@@ -166,14 +166,14 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	textStyle.getSelectionModel().select("Arial");
     }
     //Experiments-----------------
-    public void experimentHandler() {    	
+    public void experimentHandler() {
     	System.out.println("#experimentHandler");
     	//System.out.println("SHAPEList : "+shapeList);
     	System.out.println("ShapeTypeList : "+shapeTypeList);
     	//System.out.println("FreeHandList : "freeHandList);
     	//printFromFreeHand();
     }
-    public void drawOnDrag(MouseEvent dod) {    	
+    public void drawOnDrag(MouseEvent dod) {
     	String type = "";//1-cir//2-tri//3-lin//4-rec//5-ell//6-sq//7-txt
     	if(selectedShape == 1) {type = "Circle";}
     	else if(selectedShape == 2){type = "Triangle";}
@@ -195,7 +195,7 @@ public class FxPaintController implements Initializable, DrawingEngine {
     	}
     }
     public void printFromFreeHand() {
-    	System.out.println("#printFromFreehand");
+    	//System.out.println("#printFromFreehand");
     	String xval = "",yval = "";
     	for(int i=0;i<freeHandList.size();i++) {
     		String X = freeHandList.get(i);
@@ -967,12 +967,12 @@ public class FxPaintController implements Initializable, DrawingEngine {
 		//openPdfTextDialog();
 		FileChooser fileChooser = new FileChooser();
 		fileChooser.setTitle("Save");
-		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PNG", "*.png"));
+		fileChooser.getExtensionFilters().addAll(new ExtensionFilter("PDF", "*.pdf"));
 		File file = fileChooser.showSaveDialog(CanvasBox.getScene().getWindow());
 	      
         if (file != null) {
 			WritableImage nodeshot = CanvasBox.snapshot(new SnapshotParameters(), null);
-	        File imgfile = new File("dat/imgs/bchart.png");		        
+	        File imgfile = new File("dat/imgs/fxpaint.png");		        
 			try {
 				ImageIO.write(SwingFXUtils.fromFXImage(nodeshot, null), "png", imgfile);
 			} catch (IOException e) {
@@ -984,8 +984,10 @@ public class FxPaintController implements Initializable, DrawingEngine {
 			    Document document = new Document();
 			    PdfWriter.getInstance(document, popfile);
 			    document.open();
-			    Image img = Image.getInstance("dat/imgs/bchart.png");			    
-			    img.scaleAbsolute(560, 300);
+			    Image img = Image.getInstance("dat/imgs/fxpaint.png");
+			    img.setBorder(Image.BOX);
+			    img.setBorderWidth(1f);
+			    img.scaleAbsolute(520, 320);
 		        document.add(img);
 				HTMLWorker htmlWorker = new HTMLWorker(document);				
 			    htmlWorker.parse(new StringReader(k));
